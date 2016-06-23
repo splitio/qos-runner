@@ -1,0 +1,7 @@
+serverName: qos-server
+
+config: conf/qos.test.properties
+
+server:
+  type: simple
+  applicationContextPath: /api
