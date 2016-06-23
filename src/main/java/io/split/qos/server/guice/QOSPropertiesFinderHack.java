@@ -24,7 +24,7 @@ import com.google.common.base.Strings;
 public class QOSPropertiesFinderHack {
     private static String propertiesPath = "";
 
-    public synchronized static void setPath(String path) {
+    public static void setPath(String path) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(path));
         propertiesPath = path;
     }
