@@ -13,6 +13,9 @@ import io.split.qos.server.util.Util;
 import java.lang.reflect.Method;
 import java.util.List;
 
+/**
+ * Runs all the tests of the QOS.
+ */
 public class SlackRunAllCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerBehaviour behaviour;

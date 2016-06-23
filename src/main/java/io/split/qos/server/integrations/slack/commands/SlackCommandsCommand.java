@@ -9,6 +9,9 @@ import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
 import io.split.qos.server.modules.QOSServerModule;
 
+/**
+ * Lists all the available commands that the bot can process.
+ */
 public class SlackCommandsCommand implements SlackCommandExecutor {
 
     private final String serverName;

@@ -15,6 +15,9 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
+/**
+ * Simply encapsulates JUniteCore.run
+ */
 public class QOSTestRunner implements Callable<QOSTestResult> {
     private static final Log LOG = LogFactory.getLog(QOSTestRunner.class);
 

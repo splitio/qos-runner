@@ -11,6 +11,9 @@ import io.split.qos.server.modules.QOSServerModule;
 
 import java.util.Properties;
 
+/**
+ * Lists the configuration of the server (basically listing the properties file).
+ */
 public class SlackConfigCommand implements SlackCommandExecutor {
 
     private final Properties configuration;

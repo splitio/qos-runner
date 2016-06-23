@@ -20,7 +20,6 @@ import java.util.Optional;
 @Singleton
 public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration implements SlackBroadcaster {
 
-
     private final boolean enabled;
     private final boolean broadcastSuccess;
     private final DateFormatter dateFormatter;
@@ -43,14 +42,6 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
     }
 
-    /**
-     * Logic is something like:
-     * <ul>
-     *     <li> If it reached the number of consecutive FAILURES -> Broadcast</li>
-     *     <li> If it has been failing for more than reBroadcastFailureMinutes -> Broadcast</li>
-     *     <li> If it failed and was not triggered by the QOS Server, meaning it was run as an individual test -> Broadcast</li>
-     * </ul>
-     */
     @Override
     public void failure(Description description, Throwable error, String serverName, Long duration) {
         Broadcast broadcast = failCondition.failed(description);
@@ -65,9 +56,6 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         }
     }
 
-    /**
-     * Simple when it recovers -> Broadcast.
-     */
     @Override
     public void recovery(Description description, String serverName, Long duration) {
         if (digestEnabled()) {
@@ -75,13 +63,6 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         }
     }
 
-    /**
-     * Logic is something like:
-     * <ul>
-     *     <li> If it was failing before -> Broadcast Recovery</li>
-     *     <li> If broadcastSuccess is enabled -> Broadcast Success</li>
-     * </ul>
-     */
     @Override
     public void success(Description description, String serverName, Long duration) {
         Broadcast success = failCondition.success(description);

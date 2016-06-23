@@ -14,7 +14,7 @@ import io.split.qos.server.util.DateFormatter;
 import java.util.Map;
 
 /**
- * Lists all the tests that are running in the server, plus some info of each test.
+ * Runs one test of the server
  */
 @Singleton
 public class SlackTestsCommand implements SlackCommandExecutor {

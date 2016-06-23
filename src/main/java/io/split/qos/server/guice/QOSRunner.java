@@ -8,6 +8,7 @@ import com.google.inject.Injector;
 import io.split.qos.server.QOSServerApplication;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.FailWith;
+import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.util.QOSConfig;
@@ -104,8 +105,7 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
     private AbstractModule getFailCondition(Class<?> clazz) throws InitializationError {
         FailWith failWith = clazz.getAnnotation(FailWith.class);
         if (failWith == null) {
-            final String message = String.format("Missing @FailWith annotation for unit test '%s'", clazz.getName());
-            throw new InitializationError(message);
+            return new FailWithModule(SimpleFailCondition.class);
         }
 
         return new FailWithModule(failWith.value());

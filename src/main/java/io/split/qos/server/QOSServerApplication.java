@@ -40,8 +40,6 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         LOG.info("Setting Conf variable to: " + configuration.getConfig());
         System.setProperty(QOSPropertiesModule.CONF, configuration.getConfig());
 
-        //Not IDEAL but have to keep compatibility with DropWizard 0.9.2, so cannot use
-        //GuiceWizard.
         List<Module> modules = Lists.newArrayList(
                 new QOSPropertiesModule(),
                 new QOSServerModule(configuration.getServerName())
