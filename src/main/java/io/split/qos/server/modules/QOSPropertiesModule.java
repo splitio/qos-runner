@@ -1,9 +1,9 @@
 package io.split.qos.server.modules;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import io.split.qos.server.guice.QOSPropertiesFinderHack;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,7 +19,6 @@ import java.util.Properties;
 public class QOSPropertiesModule extends AbstractModule {
     // Where the qos.properties file reside.
     public static final String DEFAULT_CONFIG = "conf/qos.properties";
-    public static final String CONF = "conf";
 
     // ------------------
     // COMMON PROPERTIES
@@ -119,8 +118,7 @@ public class QOSPropertiesModule extends AbstractModule {
                 .stream()
                 .forEach(entry -> theProperties.setProperty(entry.getKey(), entry.getValue()));
 
-        String conf = System.getProperty(CONF);
-        Path propertiesPath = Paths.get(Strings.isNullOrEmpty(conf) ? DEFAULT_CONFIG : conf);
+        Path propertiesPath = Paths.get(QOSPropertiesFinderHack.getPath());
         // Loads the properties set in the properties file.
         if (Files.exists(propertiesPath)) {
             try {

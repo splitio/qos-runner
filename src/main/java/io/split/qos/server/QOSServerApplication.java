@@ -6,6 +6,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
+import io.split.qos.server.guice.QOSPropertiesFinderHack;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.resources.HealthResource;
@@ -38,7 +39,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
 
         // HACK so it can be loaded by the tests, since they use another guice injector.
         LOG.info("Setting Conf variable to: " + configuration.getConfig());
-        System.setProperty(QOSPropertiesModule.CONF, configuration.getConfig());
+        QOSPropertiesFinderHack.setPath(configuration.getConfig());
 
         List<Module> modules = Lists.newArrayList(
                 new QOSPropertiesModule(),
