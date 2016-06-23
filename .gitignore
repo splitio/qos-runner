@@ -19,6 +19,7 @@ meetup/allure-report
 meetup/target
 .sonar/
 sonar-scanner/
+sonar-project.properties
 // IDEA
 .idea/
 .project
