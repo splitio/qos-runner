@@ -13,7 +13,6 @@ import io.split.qos.server.util.Util;
 import org.junit.runner.Description;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -63,22 +62,19 @@ public class SimpleFailCondition implements FailCondition {
 
     @Override
     public Broadcast success(Description description) {
-        if (FAILURES.count(Util.id(description)) >= consecutiveFailures) {
-            return Broadcast.RECOVERY;
-        }
+        int count = FAILURES.count(Util.id(description));
         FIRST_FAILURE_TIME.remove(Util.id(description));
         FAILURE_MULTIPLIER.put(Util.id(description), 1);
         FAILURES.removeAll(Lists.newArrayList(Util.id(description)));
-        return Broadcast.NO;
+        if (count >= consecutiveFailures) {
+            return Broadcast.RECOVERY;
+        } else {
+            return Broadcast.NO;
+        }
     }
 
     @Override
-    public Optional<Long> firstFailure(Description description) {
-        Long first = FIRST_FAILURE_TIME.get(Util.id(description));
-        if (first == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(first);
-        }
+    public Long firstFailure(Description description) {
+        return FIRST_FAILURE_TIME.get(Util.id(description));
     }
 }

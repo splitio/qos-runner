@@ -2,8 +2,6 @@ package io.split.qos.server.failcondition;
 
 import org.junit.runner.Description;
 
-import java.util.Optional;
-
 /**
  * Defines whether failures/successes should be broadcasted.
  *
@@ -34,5 +32,5 @@ public interface FailCondition {
      * @param description the junit description of the test.
      * @return when was the first failure found.
      */
-    Optional<Long> firstFailure(Description description);
+    Long firstFailure(Description description);
 }

@@ -8,7 +8,12 @@ import org.junit.runner.Description;
 @Singleton
 public class SlackBroadcastIntegrationForTest implements SlackBroadcaster {
     @Override
-    public void failure(Description description, Throwable error, String serverName, Long duration) {
+    public void firstFailure(Description description, Throwable error, String serverName, Long duration) {
+
+    }
+
+    @Override
+    public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure, Long duration) {
 
     }
 

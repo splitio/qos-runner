@@ -9,12 +9,20 @@ import org.junit.runner.Description;
  */
 public interface SlackBroadcaster extends AutoCloseable, Integration {
     /**
-     * Broadcasts a failure
+     * Broadcasts the first failure
      *
      * @param description the test description.
      * @param error the error that caused the failure.
      */
-    void failure(Description description, Throwable error, String serverName, Long duration);
+    void firstFailure(Description description, Throwable error, String serverName, Long duration);
+
+    /**
+     * Re broadcasts a failure
+     *
+     * @param description the test description.
+     * @param error the error that caused the failure.
+     */
+    void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure, Long duration);
 
     /**
      * Broadcasts that a test that was failing now succeeded.

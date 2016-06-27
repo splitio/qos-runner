@@ -58,10 +58,13 @@ public class BroadcasterTestWatcher extends TestWatcher {
             length = System.currentTimeMillis() - started.get(Util.id(description));
         }
         Broadcast broadcast = failCondition.failed(description);
-        if (Broadcast.FIRST.equals(broadcast)) {
-            state.testFailed(description);
-            if (slack.isEnabled()) {
-                slack.failure(description, e, serverName, length);
+        if (slack.isEnabled()) {
+            if (Broadcast.FIRST.equals(broadcast)) {
+                state.testFailed(description);
+                slack.firstFailure(description, e, serverName, length);
+            }
+            if (Broadcast.REBROADCAST.equals(broadcast)) {
+                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(description), length);
             }
         }
     }

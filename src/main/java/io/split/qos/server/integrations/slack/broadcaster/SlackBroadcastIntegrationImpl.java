@@ -6,8 +6,6 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
-import io.split.qos.server.failcondition.Broadcast;
-import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.integrations.slack.AbstractSlackIntegration;
 import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.qos.server.modules.QOSPropertiesModule;
@@ -15,7 +13,6 @@ import io.split.qos.server.util.DateFormatter;
 import org.junit.runner.Description;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 @Singleton
 public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration implements SlackBroadcaster {
@@ -23,7 +20,6 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
     private final boolean enabled;
     private final boolean broadcastSuccess;
     private final DateFormatter dateFormatter;
-    private final FailCondition failCondition;
 
     @Inject
     public SlackBroadcastIntegrationImpl(
@@ -32,27 +28,18 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
             @Named(QOSPropertiesModule.SLACK_DIGEST_CHANNEL) String slackDigestChannel,
             @Named(QOSPropertiesModule.SLACK_VERBOSE_CHANNEL) String slackVerboseChannel,
             @Named(QOSPropertiesModule.BROADCAST_SUCCESS) String broadcastSuccess,
-            FailCondition failCondition,
             DateFormatter dateFormatter,
             SlackCommon slackCommon) {
         super(slackBotToken, slackDigestChannel, slackVerboseChannel, slackCommon);
         this.enabled = Boolean.valueOf(Preconditions.checkNotNull(slackIntegration));
         this.broadcastSuccess = Boolean.valueOf(Preconditions.checkNotNull(broadcastSuccess));
-        this.failCondition = Preconditions.checkNotNull(failCondition);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
     }
 
     @Override
-    public void failure(Description description, Throwable error, String serverName, Long duration) {
-        Broadcast broadcast = failCondition.failed(description);
-        if (Broadcast.FIRST.equals(broadcast)) {
+    public void firstFailure(Description description, Throwable error, String serverName, Long duration) {
+        if (digestEnabled()) {
             broadcastFailure(description, error, digestChannel(), serverName, duration);
-        }
-        if (Broadcast.REBROADCAST.equals(broadcast)) {
-            reBroadcastFailure(description, error, digestChannel(), serverName, duration);
-        }
-        if (verboseEnabled()) {
-            broadcastFailure(description, error, verboseChannel(), serverName, duration);
         }
     }
 
@@ -65,11 +52,6 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
 
     @Override
     public void success(Description description, String serverName, Long duration) {
-        Broadcast success = failCondition.success(description);
-        //It was failing before so it needs to broadcast success
-        if (digestEnabled() && Broadcast.RECOVERY.equals(success)) {
-                recovery(description, serverName, duration);
-        }
         if (verboseEnabled()) {
             if (broadcastSuccess || !this.isInitializedByServer()) {
                 broadcastSuccess(description, serverName, duration);
@@ -114,19 +96,26 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         return enabled;
     }
 
+    @Override
+    public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure, Long duration) {
+        if (digestEnabled()) {
+            reBroadcastFailure(description, error, digestChannel(), serverName, whenFirstFailure, duration);
+        }
+    }
+
     private void reBroadcastFailure(Description description,
                                     Throwable error,
                                     SlackChannel channel,
                                     String serverName,
+                                    Long whenFirstFailure,
                                     Long duration) {
-        Optional<Long> when = failCondition.firstFailure(description);
         String text = String.format("%s#%s finished in %s",
                                         description.getClassName(),
                                         description.getMethodName(),
                                         dateFormatter.formatHour(duration));
         String title = String.format("[%s] KEEPS FAILING SINCE %s",
                                             serverName.toUpperCase(),
-                                            dateFormatter.formatDate(when.isPresent() ? when.get() : null));
+                                            dateFormatter.formatDate(whenFirstFailure));
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
