@@ -5,6 +5,10 @@ apply plugin: 'maven-publish'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+group = "io.split"
+archivesBaseName = "qosrunner"
+version = "0.2"
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
