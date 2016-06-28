@@ -40,7 +40,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         // HACK so it can be loaded by the tests, since they use another guice injector.
         LOG.info("Setting Conf variable to: " + configuration.getConfig());
         QOSPropertiesFinderHack.setPath(configuration.getConfig());
-
+        QOSPropertiesFinderHack.setQos(true);
         List<Module> modules = Lists.newArrayList(
                 new QOSPropertiesModule(),
                 new QOSServerModule(configuration.getServerName())

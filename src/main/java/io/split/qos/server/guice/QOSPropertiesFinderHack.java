@@ -23,6 +23,15 @@ import com.google.common.base.Strings;
  */
 public class QOSPropertiesFinderHack {
     private static String propertiesPath = "";
+    private static boolean qos = false;
+
+    public static boolean isQos() {
+        return qos;
+    }
+
+    public static void setQos(boolean running) {
+        qos = running;
+    }
 
     public static void setPath(String path) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(path));

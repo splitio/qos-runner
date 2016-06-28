@@ -39,6 +39,7 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
             QOSConfig annotation = clazz.getAnnotation(QOSConfig.class);
             String configPath = annotation.value();
             QOSPropertiesFinderHack.setPath(configPath);
+            QOSPropertiesFinderHack.setQos(true);
         }
 
         this.injector = this.createInjectorFor(clazz);
@@ -80,7 +81,9 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
                     QOSServerApplication.injector.getInstance(SlackCommon.class),
                     QOSServerApplication.injector.getInstance(QOSServerState.class)));
         }
-        modules.add(getFailCondition(theClass));
+        if (QOSPropertiesFinderHack.isQos()) {
+            modules.add(getFailCondition(theClass));
+        }
         return Guice.createInjector(modules);
     }
 
