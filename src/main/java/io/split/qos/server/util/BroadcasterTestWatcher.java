@@ -46,7 +46,11 @@ public class BroadcasterTestWatcher extends TestWatcher {
         if (started.get(Util.id(description)) != null) {
             length = System.currentTimeMillis() - started.get(Util.id(description));
         }
+        Broadcast broadcast = failCondition.success(description);
         if (slack.isEnabled()) {
+            if (Broadcast.REBROADCAST.equals(broadcast)) {
+                slack.recovery(description, serverName, length);
+            }
             slack.success(description, serverName, length);
         }
     }
