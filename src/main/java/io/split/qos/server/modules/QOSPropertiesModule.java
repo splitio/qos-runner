@@ -17,9 +17,6 @@ import java.util.Properties;
  * Module for loading properties from the properties file.
  */
 public class QOSPropertiesModule extends AbstractModule {
-    // Where the qos.properties file reside.
-    public static final String DEFAULT_CONFIG = "conf/qos.properties";
-
     // ------------------
     // COMMON PROPERTIES
     // ------------------

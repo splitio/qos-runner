@@ -48,7 +48,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
         }
         Broadcast broadcast = failCondition.success(description);
         if (slack.isEnabled()) {
-            if (Broadcast.REBROADCAST.equals(broadcast)) {
+            if (Broadcast.RECOVERY.equals(broadcast)) {
                 slack.recovery(description, serverName, length);
             }
             slack.success(description, serverName, length);
