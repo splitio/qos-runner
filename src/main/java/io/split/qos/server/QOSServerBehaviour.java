@@ -248,6 +248,9 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     public List<Method> runAllNow() {
         List<Method> rerunning = Lists.newArrayList();
         List<QOSTestsTracker.Tracked> notRunning = tracker.getNotRunning();
+        if (notRunning.isEmpty()) {
+            return rerunning;
+        }
         int step = (spreadTests) ? delayBetweenInSeconds / notRunning.size() : 1;
         int schedule = step;
         for(QOSTestsTracker.Tracked track : notRunning) {
