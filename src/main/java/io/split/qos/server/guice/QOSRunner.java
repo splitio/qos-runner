@@ -88,10 +88,10 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
     }
 
     private List<Class<? extends AbstractModule>> getGuiceModulesFor(final Class<?> clazz) throws InitializationError {
-        final GuiceModules annotation = clazz.getAnnotation(GuiceModules.class);
+        final QOSGuiceModules annotation = clazz.getAnnotation(QOSGuiceModules.class);
 
         if (annotation == null) {
-            final String message = String.format("Missing @GuiceModules annotation for unit test '%s'", clazz.getName());
+            final String message = String.format("Missing @QOSGuiceModules annotation for unit test '%s'", clazz.getName());
             throw new InitializationError(message);
         }
 
@@ -99,7 +99,7 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
     }
 
     private List<Class<? extends AbstractModule>> getExtraModulesFor(final Class<?> clazz) throws InitializationError {
-        ExtraModules annotation = clazz.getAnnotation(ExtraModules.class);
+        QOSExtraModules annotation = clazz.getAnnotation(QOSExtraModules.class);
         return annotation == null ? Lists.newArrayList() : Lists.newArrayList(annotation.value());
     }
 

@@ -3,7 +3,7 @@ package io.split.qos.server.testcase;
 import com.google.inject.Inject;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
-import io.split.qos.server.guice.GuiceModules;
+import io.split.qos.server.guice.QOSGuiceModules;
 import io.split.qos.server.guice.QOSRunner;
 import io.split.qos.server.modules.QOSClientsModule;
 import io.split.qos.server.modules.QOSPropertiesModule;
@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
  * </p>
  */
 @RunWith(QOSRunner.class)
-@GuiceModules({QOSPropertiesModule.class, QOSClientsModule.class})
+@QOSGuiceModules({QOSPropertiesModule.class, QOSClientsModule.class})
 @FailWith(SimpleFailCondition.class)
 public class QOSTestCase {
 

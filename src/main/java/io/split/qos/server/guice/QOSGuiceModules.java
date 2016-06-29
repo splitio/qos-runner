@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GuiceModules {
+public @interface QOSGuiceModules {
 
     /**
      * The Guice Modules classes needed by the class under test.
