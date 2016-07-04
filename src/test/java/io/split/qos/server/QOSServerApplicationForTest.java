@@ -6,7 +6,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
-import io.split.qos.server.guice.QOSPropertiesFinderHack;
+import io.split.testrunner.util.GuiceInitializator;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModuleForTest;
 import io.split.qos.server.resources.HealthResource;
@@ -32,7 +32,7 @@ public class QOSServerApplicationForTest extends Application<QOSServerConfigurat
 
         // HACK so it can be loaded by the tests, since they use another guice injector.
         LOG.info("Setting Conf variable to: " + configuration.getConfig());
-        QOSPropertiesFinderHack.setPath(configuration.getConfig());
+        GuiceInitializator.setPath(configuration.getConfig());
 
         //Not IDEAL but have to keep compatibility with DropWizard 0.9.2, so cannot use
         //GuiceWizard.

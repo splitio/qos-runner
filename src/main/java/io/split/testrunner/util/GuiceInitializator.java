@@ -1,4 +1,4 @@
-package io.split.qos.server.guice;
+package io.split.testrunner.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -21,16 +21,25 @@ import com.google.common.base.Strings;
  *     </ul>
  * </p>
  */
-public class QOSPropertiesFinderHack {
+public class GuiceInitializator {
     private static String propertiesPath = "";
     private static boolean qos = false;
+    private static boolean method = false;
 
     public static boolean isQos() {
         return qos;
     }
 
-    public static void setQos(boolean running) {
-        qos = running;
+    public static void setQos() {
+        qos = true;
+    }
+
+    public static boolean isMethod() {
+        return method;
+    }
+
+    public static void setMethod() {
+        method = true;
     }
 
     public static void setPath(String path) {

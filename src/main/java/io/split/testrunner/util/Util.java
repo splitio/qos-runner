@@ -5,12 +5,12 @@ import com.google.common.base.Preconditions;
 import org.junit.runner.Description;
 
 import java.lang.reflect.Method;
+import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created on 6/1/16.
- */
 public class Util {
+    private static final SecureRandom random = new SecureRandom();
+
     public static final Function<Long, String> TO_PRETTY_FORMAT = millis -> String.format("%02d:%02d:%02d",
             TimeUnit.MILLISECONDS.toHours(millis),
             TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
@@ -33,6 +33,17 @@ public class Util {
 
     public static String id(Method method) {
         return String.format("%s#%s", Util.shortenClass(method.getDeclaringClass()), method.getName());
+    }
+
+    /**
+     * Gets a random number between min and max.
+     *
+     * @param min the minimum number.
+     * @param max the maximum number
+     * @return the value between min and max.
+     */
+    public static long getRandom(int min, int max) {
+        return (long)(random.nextInt(max - min + 1) + min);
     }
 
     /**

@@ -10,7 +10,8 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.integrations.slack.SlackCommon;
-import io.split.qos.server.util.QOSConfig;
+import io.split.testrunner.util.GuiceInitializator;
+import io.split.testrunner.util.PropertiesConfig;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
@@ -35,11 +36,10 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
         // This is for running tests from the IDE.
         // Basically you can set the annotation @QOSConfig and that will be used as properties file.
         // If it is not already set, meaning the server didn't set it.
-        if (Strings.isNullOrEmpty(QOSPropertiesFinderHack.getPath()) && clazz.isAnnotationPresent(QOSConfig.class)) {
-            QOSConfig annotation = clazz.getAnnotation(QOSConfig.class);
+        if (Strings.isNullOrEmpty(GuiceInitializator.getPath()) && clazz.isAnnotationPresent(PropertiesConfig.class)) {
+            PropertiesConfig annotation = clazz.getAnnotation(PropertiesConfig.class);
             String configPath = annotation.value();
-            QOSPropertiesFinderHack.setPath(configPath);
-            QOSPropertiesFinderHack.setQos(true);
+            GuiceInitializator.setPath(configPath);
         }
 
         this.injector = this.createInjectorFor(clazz);
@@ -81,7 +81,7 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
                     QOSServerApplication.injector.getInstance(SlackCommon.class),
                     QOSServerApplication.injector.getInstance(QOSServerState.class)));
         }
-        if (QOSPropertiesFinderHack.isQos()) {
+        if (GuiceInitializator.isQos()) {
             modules.add(getFailCondition(theClass));
         }
         return Guice.createInjector(modules);

@@ -135,7 +135,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
 
         for (Method method : methodsToTest) {
             state.registerTest(method);
-            TestRunner testRunner = testRunnerFactory.create(method);
+            TestRunner testRunner = testRunnerFactory.create(method, Optional.empty());
             ListenableFuture<TestResult> future = executor.schedule(
                     testRunner,
                     schedule,
@@ -182,7 +182,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                 int triggerAgain = result.getResult().wasSuccessful()? when : ifFailed;
                 LOG.info(String.format("%s finished, rerunning in %s seconds",
                         method.getName(), triggerAgain));
-                TestRunner runner = testRunnerFactory.create(method);
+                TestRunner runner = testRunnerFactory.create(method, Optional.empty());
                 ListenableFuture<TestResult> future = executor.schedule(
                         runner,
                         triggerAgain,
@@ -258,7 +258,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             rerunning.add(track.method());
             LOG.info(String.format("%s canceled, rerunning now",
                     Util.id(track.method())));
-            TestRunner runner = testRunnerFactory.create(track.method());
+            TestRunner runner = testRunnerFactory.create(track.method(), Optional.empty());
             ListenableFuture<TestResult> future = executor.schedule(
                     runner,
                     0,
@@ -294,7 +294,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             }
             LOG.info(String.format("Running now %s",
                     Util.id(tracked.method())));
-            TestRunner runner = testRunnerFactory.create(tracked.method());
+            TestRunner runner = testRunnerFactory.create(tracked.method(), Optional.empty());
             ListenableFuture<TestResult> future = executor.schedule(
                     runner,
                     0,

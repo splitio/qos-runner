@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 public class QOSTestRunnerTests extends BaseCaseForTest {
 
@@ -16,7 +17,7 @@ public class QOSTestRunnerTests extends BaseCaseForTest {
         Method emptyMethod = SmokeExampleTest.class.getMethod("testOne");
 
         TestRunnerFactory runnerFactory = injector().getInstance(TestRunnerFactory.class);
-        TestRunner qosTestRunner = runnerFactory.create(emptyMethod);
+        TestRunner qosTestRunner = runnerFactory.create(emptyMethod, Optional.empty());
         TestResult result = qosTestRunner.call();
         Assert.assertNotNull(result);
         Assert.assertTrue(result.getResult().wasSuccessful());
