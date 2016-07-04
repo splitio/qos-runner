@@ -8,7 +8,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerBehaviour;
 import io.split.qos.server.modules.QOSServerModule;
-import io.split.qos.server.util.Util;
+import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
 import java.util.List;

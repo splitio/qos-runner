@@ -4,17 +4,17 @@ import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
+import io.split.qos.server.integrations.slack.commander.SlackCommandProvider;
+import io.split.qos.server.integrations.slack.commander.SlackCommanderProviderImpl;
+import io.split.qos.server.integrations.slack.commandintegration.SlackCommandIntegration;
+import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
 import io.split.qos.server.mocks.SlackBroadcastIntegrationForTest;
 import io.split.qos.server.mocks.SlackCommandIntegrationForTest;
 import io.split.qos.server.mocks.SlackCommandListenerForTest;
-import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
-import io.split.qos.server.integrations.slack.commandintegration.SlackCommandIntegration;
-import io.split.qos.server.integrations.slack.commander.SlackCommandProvider;
-import io.split.qos.server.integrations.slack.commander.SlackCommanderProviderImpl;
-import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
-import io.split.qos.server.testrunner.QOSTestRunner;
-import io.split.qos.server.testrunner.QOSTestRunnerFactory;
 import io.split.qos.server.util.BroadcasterTestWatcher;
+import io.split.testrunner.TestRunner;
+import io.split.testrunner.TestRunnerFactory;
 
 public class QOSServerModuleForTest extends AbstractModule {
     private final String serverName;
@@ -30,8 +30,8 @@ public class QOSServerModuleForTest extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-                .implement(QOSTestRunner.class, QOSTestRunner.class)
-                .build(QOSTestRunnerFactory.class));
+                .implement(TestRunner.class, TestRunner.class)
+                .build(TestRunnerFactory.class));
 
         bind(SlackCommandProvider.class).to(SlackCommanderProviderImpl.class);
         bind(SlackCommandIntegration.class).to(SlackCommandIntegrationForTest.class);

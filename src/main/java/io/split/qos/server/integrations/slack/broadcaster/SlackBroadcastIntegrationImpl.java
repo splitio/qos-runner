@@ -9,7 +9,7 @@ import com.ullink.slack.simpleslackapi.SlackChannel;
 import io.split.qos.server.integrations.slack.AbstractSlackIntegration;
 import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.qos.server.modules.QOSPropertiesModule;
-import io.split.qos.server.util.DateFormatter;
+import io.split.testrunner.util.DateFormatter;
 import org.junit.runner.Description;
 
 import java.util.Arrays;

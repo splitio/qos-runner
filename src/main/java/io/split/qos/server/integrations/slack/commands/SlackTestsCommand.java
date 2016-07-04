@@ -9,7 +9,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
-import io.split.qos.server.util.DateFormatter;
+import io.split.testrunner.util.DateFormatter;
 
 import java.util.Map;
 

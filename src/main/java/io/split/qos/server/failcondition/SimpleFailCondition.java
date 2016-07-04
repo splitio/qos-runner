@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.split.qos.server.modules.QOSPropertiesModule;
-import io.split.qos.server.util.Util;
+import io.split.testrunner.util.Util;
 import org.junit.runner.Description;
 
 import java.util.Map;

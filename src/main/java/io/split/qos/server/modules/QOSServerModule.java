@@ -15,8 +15,8 @@ import io.split.qos.server.integrations.slack.commander.SlackCommandProvider;
 import io.split.qos.server.integrations.slack.commander.SlackCommanderProviderImpl;
 import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
 import io.split.qos.server.integrations.slack.listener.SlackCommandListenerImpl;
-import io.split.qos.server.testrunner.QOSTestRunner;
-import io.split.qos.server.testrunner.QOSTestRunnerFactory;
+import io.split.testrunner.TestRunner;
+import io.split.testrunner.TestRunnerFactory;
 import io.split.qos.server.util.BroadcasterTestWatcher;
 
 /**
@@ -36,8 +36,8 @@ public class QOSServerModule extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-                .implement(QOSTestRunner.class, QOSTestRunner.class)
-                .build(QOSTestRunnerFactory.class));
+                .implement(TestRunner.class, TestRunner.class)
+                .build(TestRunnerFactory.class));
 
         bind(FailCondition.class).to(SimpleFailCondition.class).in(Singleton.class);
         bind(SlackCommandProvider.class).to(SlackCommanderProviderImpl.class);

@@ -6,9 +6,9 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.split.qos.server.testrunner.QOSTestResult;
-import io.split.qos.server.testrunner.QOSTestRunner;
-import io.split.qos.server.util.Util;
+import io.split.testrunner.TestResult;
+import io.split.testrunner.TestRunner;
+import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -28,7 +28,7 @@ public class QOSTestsTracker {
         tracked = Maps.newConcurrentMap();
     }
 
-    public synchronized void track(Method method, QOSTestRunner runner, ListenableFuture<QOSTestResult> future) {
+    public synchronized void track(Method method, TestRunner runner, ListenableFuture<TestResult> future) {
         this.tracked.put(Util.id(method), new Tracked(method, runner, future));
     }
 
@@ -47,10 +47,10 @@ public class QOSTestsTracker {
 
     public static class Tracked {
         private final Method method;
-        private final QOSTestRunner runner;
-        private final ListenableFuture<QOSTestResult> future;
+        private final TestRunner runner;
+        private final ListenableFuture<TestResult> future;
 
-        private Tracked(Method method, QOSTestRunner runner, ListenableFuture<QOSTestResult> future) {
+        private Tracked(Method method, TestRunner runner, ListenableFuture<TestResult> future) {
             this.method = Preconditions.checkNotNull(method);
             this.runner = Preconditions.checkNotNull(runner);
             this.future = Preconditions.checkNotNull(future);
@@ -60,11 +60,11 @@ public class QOSTestsTracker {
             return method;
         }
 
-        public QOSTestRunner runner() {
+        public TestRunner runner() {
             return runner;
         }
 
-        public ListenableFuture<QOSTestResult> future() {
+        public ListenableFuture<TestResult> future() {
             return future;
         }
 

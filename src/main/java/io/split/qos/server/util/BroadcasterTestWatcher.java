@@ -9,6 +9,7 @@ import io.split.qos.server.failcondition.Broadcast;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.integrations.IntegrationTestFactory;
 import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
+import io.split.testrunner.util.Util;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
