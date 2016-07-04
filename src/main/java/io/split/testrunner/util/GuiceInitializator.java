@@ -1,7 +1,8 @@
 package io.split.testrunner.util;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+
+import java.nio.file.Path;
 
 /**
  * We need to inject the properties file both from the server, and from each test (each one has its own injector).
@@ -22,7 +23,7 @@ import com.google.common.base.Strings;
  * </p>
  */
 public class GuiceInitializator {
-    private static String propertiesPath = "";
+    private static Path propertiesPath;
     private static boolean qos = false;
     private static boolean method = false;
 
@@ -42,12 +43,15 @@ public class GuiceInitializator {
         method = true;
     }
 
-    public static void setPath(String path) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(path));
+    public static void setPath(Path path) {
+        Preconditions.checkNotNull(path);
         propertiesPath = path;
     }
 
-    public static String getPath() {
+    public static Path getPath() {
+        Preconditions.checkNotNull(
+                propertiesPath,
+                "Properties Path not set");
         return propertiesPath;
     }
 }

@@ -23,7 +23,7 @@ public class MethodCommandLineArguments {
     @Parameter(names = "-parallel", description = "How many tests in parallel are going to run")
     private Integer parallel = 1;
 
-    @Parameter(names = "-conf", description = "Path to the properties file if exists")
+    @Parameter(names = "-conf", description = "Path to the properties file if exists", required = true)
     private String conf = "";
 
     /**

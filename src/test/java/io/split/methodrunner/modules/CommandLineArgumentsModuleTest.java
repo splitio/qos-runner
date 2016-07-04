@@ -1,5 +1,6 @@
 package io.split.methodrunner.modules;
 
+import com.beust.jcommander.ParameterException;
 import io.split.methodrunner.TestMethodRunnerTest;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -13,14 +14,15 @@ public class CommandLineArgumentsModuleTest {
 
     @Test
     public void createWithNoConf() {
+        expectedException.expect(ParameterException.class);
+        expectedException.expectMessage("-conf");
         String[] arguments = {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
                 "-test",
                 "initalizeWithValidClassAndTest"
         };
-        CommandLineArgumentsModule argumentsModule = new CommandLineArgumentsModule(arguments);
-        Assert.assertTrue(!argumentsModule.propertiesPath().isPresent());
+        new CommandLineArgumentsModule(arguments);
     }
 
     @Test
@@ -35,7 +37,8 @@ public class CommandLineArgumentsModuleTest {
                 "-conf",
                 "inexistent"
         };
-        new CommandLineArgumentsModule(arguments);
+        CommandLineArgumentsModule argumentsModule = new CommandLineArgumentsModule(arguments);
+        argumentsModule.propertiesPath();
     }
 
     @Test
@@ -49,8 +52,7 @@ public class CommandLineArgumentsModuleTest {
                 TestMethodRunnerTest.PROPERTIES
         };
         CommandLineArgumentsModule argumentsModule = new CommandLineArgumentsModule(arguments);
-        Assert.assertTrue(argumentsModule.propertiesPath().isPresent());
-        Assert.assertEquals("conf/qos.test.properties", argumentsModule.propertiesPath().get().toString());
+        Assert.assertEquals("conf/qos.test.properties", argumentsModule.propertiesPath().toString());
     }
 
 }

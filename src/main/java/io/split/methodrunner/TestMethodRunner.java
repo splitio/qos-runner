@@ -21,6 +21,7 @@ import io.split.methodrunner.modules.TestRunnerModule;
 import io.split.methodrunner.modules.TestRunnerPropertiesModule;
 import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.junit.JUnitRunnerFactory;
+import io.split.testrunner.util.GuiceInitializator;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -132,8 +133,9 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
     @VisibleForTesting
     public static Injector createInjector(String[] args) {
         CommandLineArgumentsModule commandLineArgumentsModule = new CommandLineArgumentsModule(args);
+        GuiceInitializator.setPath(commandLineArgumentsModule.propertiesPath());
         List<Module> modules = Lists.newArrayList(commandLineArgumentsModule,
-                new TestRunnerPropertiesModule(commandLineArgumentsModule.propertiesPath()),
+                new TestRunnerPropertiesModule(),
                 new TestRunnerModule());
 
         return Guice.createInjector(modules);

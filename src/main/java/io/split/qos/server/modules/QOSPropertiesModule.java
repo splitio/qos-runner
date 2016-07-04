@@ -115,7 +115,7 @@ public class QOSPropertiesModule extends AbstractModule {
                 .stream()
                 .forEach(entry -> theProperties.setProperty(entry.getKey(), entry.getValue()));
 
-        Path propertiesPath = Paths.get(GuiceInitializator.getPath());
+        Path propertiesPath = GuiceInitializator.getPath();
         // Loads the properties set in the properties file.
         if (Files.exists(propertiesPath)) {
             try {

@@ -13,6 +13,7 @@ import io.split.qos.server.resources.HealthResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
 
         // HACK so it can be loaded by the tests, since they use another guice injector.
         LOG.info("Setting Conf variable to: " + configuration.getConfig());
-        GuiceInitializator.setPath(configuration.getConfig());
+        GuiceInitializator.setPath(Paths.get(configuration.getConfig()));
         GuiceInitializator.setQos();
         List<Module> modules = Lists.newArrayList(
                 new QOSPropertiesModule(),

@@ -1,6 +1,5 @@
 package io.split.testrunner;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -9,9 +8,9 @@ import io.split.qos.server.QOSServerApplication;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
+import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.qos.server.modules.QOSCommonModule;
 import io.split.qos.server.modules.QOSFailWithModule;
-import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.testrunner.guice.ExtraModules;
 import io.split.testrunner.guice.GuiceModules;
 import io.split.testrunner.util.GuiceInitializator;
@@ -19,6 +18,7 @@ import io.split.testrunner.util.PropertiesConfig;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -40,10 +40,10 @@ public class TestRunner extends BlockJUnit4ClassRunner {
         // This is for running tests from the IDE.
         // Basically you can set the annotation @QOSConfig and that will be used as properties file.
         // If it is not already set, meaning the server didn't set it.
-        if (Strings.isNullOrEmpty(GuiceInitializator.getPath()) && clazz.isAnnotationPresent(PropertiesConfig.class)) {
+        if (GuiceInitializator.getPath() == null && clazz.isAnnotationPresent(PropertiesConfig.class)) {
             PropertiesConfig annotation = clazz.getAnnotation(PropertiesConfig.class);
             String configPath = annotation.value();
-            GuiceInitializator.setPath(configPath);
+            GuiceInitializator.setPath(Paths.get(configPath));
         }
 
         this.injector = this.createInjectorFor(clazz);

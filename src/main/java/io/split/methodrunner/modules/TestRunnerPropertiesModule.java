@@ -4,11 +4,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import io.split.testrunner.util.GuiceInitializator;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -23,11 +25,7 @@ public class TestRunnerPropertiesModule extends AbstractModule {
         defaultProperties.put(TIMEOUT_IN_MINUTES, "20");
     };
 
-    private final Optional<Path> path;
-
-    public TestRunnerPropertiesModule(Optional<Path> path) {
-        this.path = Preconditions.checkNotNull(path);
-    }
+    public TestRunnerPropertiesModule() {}
 
     @Override
     protected void configure() {
@@ -37,17 +35,18 @@ public class TestRunnerPropertiesModule extends AbstractModule {
                 .stream()
                 .forEach(entry -> theProperties.setProperty(entry.getKey(), entry.getValue()));
 
-        path.ifPresent(thePath -> {
-            if (Files.exists(thePath)) {
-                try {
-                    theProperties.load(new FileInputStream(thePath.toFile()));
-                } catch (IOException e) {
-                    throw new IllegalStateException("Failed to load properties file " + thePath, e);
-                }
-            } else {
-                throw new IllegalArgumentException("Properties file does not exist " + thePath);
+        Path propertiesPath = GuiceInitializator.getPath();
+        // Loads the properties set in the properties file.
+        if (Files.exists(propertiesPath)) {
+            try {
+                theProperties.load(new FileInputStream(propertiesPath.toFile()));
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to load properties file " + propertiesPath, e);
             }
-        });
+        } else {
+            throw new IllegalArgumentException("Properties file does not exist " + propertiesPath);
+        }
+
         Names.bindProperties(binder(), theProperties);
     }
 }

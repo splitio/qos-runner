@@ -1,5 +1,6 @@
 package io.split.methodrunner.commandline;
 
+import io.split.methodrunner.TestMethodRunnerTest;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,13 +43,15 @@ public class MethodCommandLineArgumentsTest {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
                 "-test",
-                "initalizeWithValidClassAndTest"
+                "initalizeWithValidClassAndTest",
+                "-conf",
+                TestMethodRunnerTest.PROPERTIES
         };
         MethodCommandLineArguments theArgs = MethodCommandLineArguments.initialize(arguments);
         Assert.assertEquals("initalizeWithValidClassAndTest", theArgs.test().getName());
         Assert.assertEquals(1, theArgs.quantity());
         Assert.assertEquals(1, theArgs.parallel());
-        Assert.assertEquals("", theArgs.conf());
+        Assert.assertEquals(TestMethodRunnerTest.PROPERTIES, theArgs.conf());
     }
 
     @Test
@@ -63,12 +66,12 @@ public class MethodCommandLineArgumentsTest {
                 "-quantity",
                 "5",
                 "-conf",
-                "conf/the.properties"
+                TestMethodRunnerTest.PROPERTIES
         };
         MethodCommandLineArguments theArgs = MethodCommandLineArguments.initialize(arguments);
         Assert.assertEquals("initalizeWithValidClassAndTest", theArgs.test().getName());
         Assert.assertEquals(5, theArgs.quantity());
         Assert.assertEquals(3, theArgs.parallel());
-        Assert.assertEquals("conf/the.properties", theArgs.conf());
+        Assert.assertEquals(TestMethodRunnerTest.PROPERTIES, theArgs.conf());
     }
 }
