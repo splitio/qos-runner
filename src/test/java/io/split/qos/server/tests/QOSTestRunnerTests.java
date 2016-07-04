@@ -1,9 +1,9 @@
 package io.split.qos.server.tests;
 
 import io.split.qos.server.BaseCaseForTest;
-import io.split.testrunner.TestResult;
-import io.split.testrunner.TestRunner;
-import io.split.testrunner.TestRunnerFactory;
+import io.split.testrunner.junit.TestResult;
+import io.split.testrunner.junit.JUnitRunner;
+import io.split.testrunner.junit.JUnitRunnerFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,8 +16,8 @@ public class QOSTestRunnerTests extends BaseCaseForTest {
     public void testSucceed() throws Exception {
         Method emptyMethod = SmokeExampleTest.class.getMethod("testOne");
 
-        TestRunnerFactory runnerFactory = injector().getInstance(TestRunnerFactory.class);
-        TestRunner qosTestRunner = runnerFactory.create(emptyMethod, Optional.empty());
+        JUnitRunnerFactory runnerFactory = injector().getInstance(JUnitRunnerFactory.class);
+        JUnitRunner qosTestRunner = runnerFactory.create(emptyMethod, Optional.empty());
         TestResult result = qosTestRunner.call();
         Assert.assertNotNull(result);
         Assert.assertTrue(result.getResult().wasSuccessful());

@@ -1,7 +1,7 @@
 package io.split.methodrunner;
 
 import com.google.inject.Injector;
-import io.split.testrunner.TestResult;
+import io.split.testrunner.junit.TestResult;
 import org.junit.Assert;
 import org.junit.Test;
 

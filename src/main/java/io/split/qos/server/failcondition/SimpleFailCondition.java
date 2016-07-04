@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class SimpleFailCondition implements FailCondition {
 
     //Each Tests starts its own injector, so each test brings up its own Broadcaster.
-    //Could inject this in CommonModule instead so there is only one Broadcaster, haven't tried
+    //Could inject this in QOSCommonModule instead so there is only one Broadcaster, haven't tried
     //For now these has to be static.
     private static final Multiset<String> FAILURES = ConcurrentHashMultiset.create();
     private static final Map<String, Long> FIRST_FAILURE_TIME = Maps.newConcurrentMap();

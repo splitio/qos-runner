@@ -18,9 +18,9 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommandInt
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.pausable.PausableScheduledThreadPoolExecutor;
-import io.split.testrunner.TestResult;
-import io.split.testrunner.TestRunner;
-import io.split.testrunner.TestRunnerFactory;
+import io.split.testrunner.junit.TestResult;
+import io.split.testrunner.junit.JUnitRunner;
+import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.util.TestsFinder;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -54,7 +54,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     private final boolean spreadTests;
     private final List<String> suites;
     private final String suitesPackage;
-    private final TestRunnerFactory testRunnerFactory;
+    private final JUnitRunnerFactory testRunnerFactory;
     private final SlackCommandIntegration commandIntegration;
     private final SlackBroadcaster broadcastIntegration;
     private final String serverName;
@@ -71,7 +71,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             @Named(QOSPropertiesModule.SUITES) String suites,
             @Named(QOSPropertiesModule.SUITES_PACKAGE) String suitesPackage,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
-            TestRunnerFactory testRunnerFactory,
+            JUnitRunnerFactory testRunnerFactory,
             IntegrationServerFactory integrationServerFactory,
             QOSServerState state,
             QOSTestsTracker tracker) {
@@ -135,7 +135,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
 
         for (Method method : methodsToTest) {
             state.registerTest(method);
-            TestRunner testRunner = testRunnerFactory.create(method, Optional.empty());
+            JUnitRunner testRunner = testRunnerFactory.create(method, Optional.empty());
             ListenableFuture<TestResult> future = executor.schedule(
                     testRunner,
                     schedule,
@@ -182,7 +182,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                 int triggerAgain = result.getResult().wasSuccessful()? when : ifFailed;
                 LOG.info(String.format("%s finished, rerunning in %s seconds",
                         method.getName(), triggerAgain));
-                TestRunner runner = testRunnerFactory.create(method, Optional.empty());
+                JUnitRunner runner = testRunnerFactory.create(method, Optional.empty());
                 ListenableFuture<TestResult> future = executor.schedule(
                         runner,
                         triggerAgain,
@@ -258,7 +258,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             rerunning.add(track.method());
             LOG.info(String.format("%s canceled, rerunning now",
                     Util.id(track.method())));
-            TestRunner runner = testRunnerFactory.create(track.method(), Optional.empty());
+            JUnitRunner runner = testRunnerFactory.create(track.method(), Optional.empty());
             ListenableFuture<TestResult> future = executor.schedule(
                     runner,
                     0,
@@ -294,7 +294,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             }
             LOG.info(String.format("Running now %s",
                     Util.id(tracked.method())));
-            TestRunner runner = testRunnerFactory.create(tracked.method(), Optional.empty());
+            JUnitRunner runner = testRunnerFactory.create(tracked.method(), Optional.empty());
             ListenableFuture<TestResult> future = executor.schedule(
                     runner,
                     0,

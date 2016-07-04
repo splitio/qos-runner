@@ -6,8 +6,8 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.split.testrunner.TestResult;
-import io.split.testrunner.TestRunner;
+import io.split.testrunner.junit.TestResult;
+import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
@@ -28,7 +28,7 @@ public class QOSTestsTracker {
         tracked = Maps.newConcurrentMap();
     }
 
-    public synchronized void track(Method method, TestRunner runner, ListenableFuture<TestResult> future) {
+    public synchronized void track(Method method, JUnitRunner runner, ListenableFuture<TestResult> future) {
         this.tracked.put(Util.id(method), new Tracked(method, runner, future));
     }
 
@@ -47,10 +47,10 @@ public class QOSTestsTracker {
 
     public static class Tracked {
         private final Method method;
-        private final TestRunner runner;
+        private final JUnitRunner runner;
         private final ListenableFuture<TestResult> future;
 
-        private Tracked(Method method, TestRunner runner, ListenableFuture<TestResult> future) {
+        private Tracked(Method method, JUnitRunner runner, ListenableFuture<TestResult> future) {
             this.method = Preconditions.checkNotNull(method);
             this.runner = Preconditions.checkNotNull(runner);
             this.future = Preconditions.checkNotNull(future);
@@ -60,7 +60,7 @@ public class QOSTestsTracker {
             return method;
         }
 
-        public TestRunner runner() {
+        public JUnitRunner runner() {
             return runner;
         }
 

@@ -3,7 +3,7 @@ package io.split.qos.server.tests;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.split.qos.server.BaseCaseForTest;
 import io.split.qos.server.QOSTestsTracker;
-import io.split.testrunner.TestRunner;
+import io.split.testrunner.junit.JUnitRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -17,10 +17,10 @@ public class QOSTestsTrackerTests extends BaseCaseForTest {
         Method emptyMethod = this.getClass().getMethod("methodForTesting");
         Method emptyMethod2 = this.getClass().getMethod("methodForTesting2");
 
-        TestRunner mockedRunner = Mockito.mock(TestRunner.class);
+        JUnitRunner mockedRunner = Mockito.mock(JUnitRunner.class);
         Mockito.when(mockedRunner.isRunning()).thenReturn(true);
 
-        TestRunner mockedRunner2 = Mockito.mock(TestRunner.class);
+        JUnitRunner mockedRunner2 = Mockito.mock(JUnitRunner.class);
         Mockito.when(mockedRunner2.isRunning()).thenReturn(true);
 
         ListenableFuture mockedListener = Mockito.mock(ListenableFuture.class);
@@ -47,10 +47,10 @@ public class QOSTestsTrackerTests extends BaseCaseForTest {
     public void addingOverTheSameMehtodKeepsTheCountToOne() throws NoSuchMethodException {
         Method emptyMethod = this.getClass().getMethod("methodForTesting");
 
-        TestRunner mockedRunner = Mockito.mock(TestRunner.class);
+        JUnitRunner mockedRunner = Mockito.mock(JUnitRunner.class);
         Mockito.when(mockedRunner.isRunning()).thenReturn(true);
 
-        TestRunner mockedRunner2 = Mockito.mock(TestRunner.class);
+        JUnitRunner mockedRunner2 = Mockito.mock(JUnitRunner.class);
         Mockito.when(mockedRunner2.isRunning()).thenReturn(true);
 
         ListenableFuture mockedListener = Mockito.mock(ListenableFuture.class);

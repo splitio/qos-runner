@@ -19,8 +19,8 @@ import io.split.methodrunner.commandline.MethodCommandLineArguments;
 import io.split.methodrunner.modules.CommandLineArgumentsModule;
 import io.split.methodrunner.modules.TestRunnerModule;
 import io.split.methodrunner.modules.TestRunnerPropertiesModule;
-import io.split.testrunner.TestResult;
-import io.split.testrunner.TestRunnerFactory;
+import io.split.testrunner.junit.TestResult;
+import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
     private static final Logger LOG = LoggerFactory.getLogger(TestMethodRunner.class);
 
     private final Method method;
-    private final TestRunnerFactory testRunnerFactory;
+    private final JUnitRunnerFactory testRunnerFactory;
     private final Integer quantity;
     private final List<TestResult> results;
     private final Integer parallel;
@@ -53,7 +53,7 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
     @Inject
     public TestMethodRunner(@Named(TestRunnerPropertiesModule.TIMEOUT_IN_MINUTES) String timeOutInMinutes,
                             MethodCommandLineArguments arguments,
-                            TestRunnerFactory testRunnerFactory) {
+                            JUnitRunnerFactory testRunnerFactory) {
         this.method = Preconditions.checkNotNull(arguments.test());
         this.testRunnerFactory = Preconditions.checkNotNull(testRunnerFactory);
         this.quantity = arguments.quantity();

@@ -1,4 +1,4 @@
-package io.split.testrunner;
+package io.split.testrunner.junit;
 
 import org.junit.runner.Result;
 

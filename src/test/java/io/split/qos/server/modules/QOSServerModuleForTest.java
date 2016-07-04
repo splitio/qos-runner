@@ -13,8 +13,8 @@ import io.split.qos.server.mocks.SlackBroadcastIntegrationForTest;
 import io.split.qos.server.mocks.SlackCommandIntegrationForTest;
 import io.split.qos.server.mocks.SlackCommandListenerForTest;
 import io.split.qos.server.util.BroadcasterTestWatcher;
-import io.split.testrunner.TestRunner;
-import io.split.testrunner.TestRunnerFactory;
+import io.split.testrunner.junit.JUnitRunner;
+import io.split.testrunner.junit.JUnitRunnerFactory;
 
 public class QOSServerModuleForTest extends AbstractModule {
     private final String serverName;
@@ -30,8 +30,8 @@ public class QOSServerModuleForTest extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-                .implement(TestRunner.class, TestRunner.class)
-                .build(TestRunnerFactory.class));
+                .implement(JUnitRunner.class, JUnitRunner.class)
+                .build(JUnitRunnerFactory.class));
 
         bind(SlackCommandProvider.class).to(SlackCommanderProviderImpl.class);
         bind(SlackCommandIntegration.class).to(SlackCommandIntegrationForTest.class);
