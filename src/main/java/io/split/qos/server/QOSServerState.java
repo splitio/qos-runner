@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.split.qos.server.util.Util;
+import io.split.testrunner.util.Util;
 import org.joda.time.DateTime;
 import org.junit.runner.Description;
 

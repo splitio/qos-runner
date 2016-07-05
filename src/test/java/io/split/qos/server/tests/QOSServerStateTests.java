@@ -2,7 +2,7 @@ package io.split.qos.server.tests;
 
 import io.split.qos.server.BaseCaseForTest;
 import io.split.qos.server.QOSServerState;
-import io.split.qos.server.util.Util;
+import io.split.testrunner.util.Util;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.Description;

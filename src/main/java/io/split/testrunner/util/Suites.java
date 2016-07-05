@@ -1,4 +1,4 @@
-package io.split.qos.server.util;
+package io.split.testrunner.util;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

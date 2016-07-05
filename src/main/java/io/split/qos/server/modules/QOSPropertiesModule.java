@@ -3,13 +3,12 @@ package io.split.qos.server.modules;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import io.split.qos.server.guice.QOSPropertiesFinderHack;
+import io.split.testrunner.util.GuiceInitializator;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 
@@ -115,7 +114,7 @@ public class QOSPropertiesModule extends AbstractModule {
                 .stream()
                 .forEach(entry -> theProperties.setProperty(entry.getKey(), entry.getValue()));
 
-        Path propertiesPath = Paths.get(QOSPropertiesFinderHack.getPath());
+        Path propertiesPath = GuiceInitializator.getPath();
         // Loads the properties set in the properties file.
         if (Files.exists(propertiesPath)) {
             try {

@@ -1,4 +1,4 @@
-package io.split.qos.server.util;
+package io.split.testrunner.util;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;

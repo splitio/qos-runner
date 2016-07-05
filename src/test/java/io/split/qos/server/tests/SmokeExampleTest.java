@@ -1,6 +1,6 @@
 package io.split.qos.server.tests;
 
-import io.split.qos.server.util.Suites;
+import io.split.testrunner.util.Suites;
 import org.junit.Test;
 
 @Suites("SMOKE")

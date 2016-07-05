@@ -1,6 +1,5 @@
-package io.split.qos.server.guice;
+package io.split.testrunner;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -10,16 +9,22 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.integrations.slack.SlackCommon;
-import io.split.qos.server.util.QOSConfig;
+import io.split.qos.server.modules.QOSCommonModule;
+import io.split.qos.server.modules.QOSFailWithModule;
+import io.split.testrunner.guice.ExtraModules;
+import io.split.testrunner.guice.GuiceModules;
+import io.split.testrunner.util.GuiceInitializator;
+import io.split.testrunner.util.PropertiesConfig;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
  * The base class should use @RunWith with this Runners
  */
-public class QOSRunner extends BlockJUnit4ClassRunner {
+public class TestRunner extends BlockJUnit4ClassRunner {
 
     private final transient Injector injector;
 
@@ -29,17 +34,16 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
      * @param clazz The in test.
      * @throws InitializationError If something goes wrong.
      */
-    public QOSRunner(final Class<?> clazz) throws InitializationError {
+    public TestRunner(final Class<?> clazz) throws InitializationError {
         super(clazz);
 
         // This is for running tests from the IDE.
         // Basically you can set the annotation @QOSConfig and that will be used as properties file.
         // If it is not already set, meaning the server didn't set it.
-        if (Strings.isNullOrEmpty(QOSPropertiesFinderHack.getPath()) && clazz.isAnnotationPresent(QOSConfig.class)) {
-            QOSConfig annotation = clazz.getAnnotation(QOSConfig.class);
+        if (GuiceInitializator.getPath() == null && clazz.isAnnotationPresent(PropertiesConfig.class)) {
+            PropertiesConfig annotation = clazz.getAnnotation(PropertiesConfig.class);
             String configPath = annotation.value();
-            QOSPropertiesFinderHack.setPath(configPath);
-            QOSPropertiesFinderHack.setQos(true);
+            GuiceInitializator.setPath(Paths.get(configPath));
         }
 
         this.injector = this.createInjectorFor(clazz);
@@ -76,22 +80,22 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
             }
         }
 
-        if (QOSServerApplication.injector != null) {
-            modules.add(new CommonModule(
-                    QOSServerApplication.injector.getInstance(SlackCommon.class),
-                    QOSServerApplication.injector.getInstance(QOSServerState.class)));
-        }
-        if (QOSPropertiesFinderHack.isQos()) {
+        if (GuiceInitializator.isQos()) {
+            if (QOSServerApplication.injector != null) {
+                modules.add(new QOSCommonModule(
+                        QOSServerApplication.injector.getInstance(SlackCommon.class),
+                        QOSServerApplication.injector.getInstance(QOSServerState.class)));
+            }
             modules.add(getFailCondition(theClass));
         }
         return Guice.createInjector(modules);
     }
 
     private List<Class<? extends AbstractModule>> getGuiceModulesFor(final Class<?> clazz) throws InitializationError {
-        final QOSGuiceModules annotation = clazz.getAnnotation(QOSGuiceModules.class);
+        final GuiceModules annotation = clazz.getAnnotation(GuiceModules.class);
 
         if (annotation == null) {
-            final String message = String.format("Missing @QOSGuiceModules annotation for unit test '%s'", clazz.getName());
+            final String message = String.format("Missing @GuiceModules annotation for unit test '%s'", clazz.getName());
             throw new InitializationError(message);
         }
 
@@ -99,16 +103,16 @@ public class QOSRunner extends BlockJUnit4ClassRunner {
     }
 
     private List<Class<? extends AbstractModule>> getExtraModulesFor(final Class<?> clazz) throws InitializationError {
-        QOSExtraModules annotation = clazz.getAnnotation(QOSExtraModules.class);
+        ExtraModules annotation = clazz.getAnnotation(ExtraModules.class);
         return annotation == null ? Lists.newArrayList() : Lists.newArrayList(annotation.value());
     }
 
     private AbstractModule getFailCondition(Class<?> clazz) throws InitializationError {
         FailWith failWith = clazz.getAnnotation(FailWith.class);
         if (failWith == null) {
-            return new FailWithModule(SimpleFailCondition.class);
+            return new QOSFailWithModule(SimpleFailCondition.class);
         }
 
-        return new FailWithModule(failWith.value());
+        return new QOSFailWithModule(failWith.value());
     }
 }

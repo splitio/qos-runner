@@ -10,7 +10,7 @@ import io.split.qos.server.QOSServerBehaviour;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
-import io.split.qos.server.util.Util;
+import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
 import java.util.List;

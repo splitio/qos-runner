@@ -1,4 +1,4 @@
-package io.split.qos.server.guice;
+package io.split.qos.server.modules;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
@@ -13,13 +13,13 @@ import io.split.qos.server.integrations.slack.SlackCommon;
  *     the tests.
  * </p>
  */
-public class CommonModule extends AbstractModule {
+public class QOSCommonModule extends AbstractModule {
 
     private final SlackCommon slackCommon;
     private final QOSServerState state;
 
-    public CommonModule(SlackCommon slackCommon,
-                        QOSServerState serverState) {
+    public QOSCommonModule(SlackCommon slackCommon,
+                           QOSServerState serverState) {
         this.slackCommon = Preconditions.checkNotNull(slackCommon);
         this.state = Preconditions.checkNotNull(serverState);
     }

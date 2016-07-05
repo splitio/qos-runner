@@ -1,4 +1,4 @@
-package io.split.qos.server.guice;
+package io.split.testrunner.guice;
 
 import com.google.inject.AbstractModule;
 
@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface QOSGuiceModules {
+public @interface GuiceModules {
 
     /**
      * The Guice Modules classes needed by the class under test.

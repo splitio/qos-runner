@@ -1,9 +1,9 @@
-package io.split.qos.server.testrunner;
+package io.split.testrunner.junit;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import io.split.qos.server.util.Util;
+import io.split.testrunner.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.runner.JUnitCore;
@@ -18,15 +18,15 @@ import java.util.concurrent.Callable;
 /**
  * Simply encapsulates JUniteCore.run
  */
-public class QOSTestRunner implements Callable<QOSTestResult> {
-    private static final Log LOG = LogFactory.getLog(QOSTestRunner.class);
+public class JUnitRunner implements Callable<TestResult> {
+    private static final Log LOG = LogFactory.getLog(JUnitRunner.class);
 
     private final Method test;
     private final ByteArrayOutputStream outputStream;
     private boolean running;
 
     @Inject
-    public QOSTestRunner(
+    public JUnitRunner(
             @Assisted Method test,
             ByteArrayOutputStream outputStream) {
         this.test = Preconditions.checkNotNull(test);
@@ -41,7 +41,7 @@ public class QOSTestRunner implements Callable<QOSTestResult> {
      * @throws Exception if there was an exception running the test.
      */
     @Override
-    public QOSTestResult call() throws Exception {
+    public TestResult call() throws Exception {
         this.running = true;
         JUnitCore jUnitCore = getJUnitCore();
         String testName = String.format("%s#%s", test.getDeclaringClass().getCanonicalName(), test.getName());
@@ -51,7 +51,7 @@ public class QOSTestRunner implements Callable<QOSTestResult> {
             Result result = jUnitCore.run(Request.method(test.getDeclaringClass(), test.getName()));
             LOG.info(String.format("FINSHED Test %s in %s, result %s", testName,
                     Util.TO_PRETTY_FORMAT.apply(System.currentTimeMillis() - start), result.wasSuccessful()? "SUCCEEDED" : "FAILED"));
-            return new QOSTestResult(result, outputStream);
+            return new TestResult(result, outputStream);
         } finally {
             outputStream.close();
         }

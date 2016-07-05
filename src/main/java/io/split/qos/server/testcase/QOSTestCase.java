@@ -3,8 +3,8 @@ package io.split.qos.server.testcase;
 import com.google.inject.Inject;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
-import io.split.qos.server.guice.QOSGuiceModules;
-import io.split.qos.server.guice.QOSRunner;
+import io.split.testrunner.guice.GuiceModules;
+import io.split.testrunner.TestRunner;
 import io.split.qos.server.modules.QOSClientsModule;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.util.BroadcasterTestWatcher;
@@ -19,8 +19,8 @@ import org.junit.runner.RunWith;
  *     and it should work. IT SHOULD.
  * </p>
  */
-@RunWith(QOSRunner.class)
-@QOSGuiceModules({QOSPropertiesModule.class, QOSClientsModule.class})
+@RunWith(TestRunner.class)
+@GuiceModules({QOSPropertiesModule.class, QOSClientsModule.class})
 @FailWith(SimpleFailCondition.class)
 public class QOSTestCase {
 
