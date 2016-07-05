@@ -15,10 +15,10 @@ public class MethodCommandLineArguments {
     private static Class<?> hackClass;
 
     @Parameter(names = "-clazz", description = "Class to run", converter = ClassConverter.class, required = true)
-    private Class<?> clazz;
+    private Class<?> clazz = null;
 
     @Parameter(names = "-test", description = "Test to run", converter = MethodConverter.class, required = true)
-    private Method test;
+    private Method test = null;
 
     @Parameter(names = "-quantity", description = "How many times the test is going to run")
     private Integer quantity = 1;

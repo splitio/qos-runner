@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class CommandLineArgumentsModuleTest {
+public class TestCommandLineArgumentsModuleTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -22,7 +22,7 @@ public class CommandLineArgumentsModuleTest {
                 "-test",
                 "initalizeWithValidClassAndTest"
         };
-        CommandLineArgumentsModule module = new CommandLineArgumentsModule(arguments);
+        TestCommandLineArgumentsModule module = new TestCommandLineArgumentsModule(arguments);
         module.propertiesPath();
     }
 
@@ -38,7 +38,7 @@ public class CommandLineArgumentsModuleTest {
                 "-conf",
                 "inexistent"
         };
-        CommandLineArgumentsModule argumentsModule = new CommandLineArgumentsModule(arguments);
+        TestCommandLineArgumentsModule argumentsModule = new TestCommandLineArgumentsModule(arguments);
         argumentsModule.propertiesPath();
     }
 
@@ -52,7 +52,7 @@ public class CommandLineArgumentsModuleTest {
                 "-conf",
                 TestMethodRunnerTest.PROPERTIES
         };
-        CommandLineArgumentsModule argumentsModule = new CommandLineArgumentsModule(arguments);
+        TestCommandLineArgumentsModule argumentsModule = new TestCommandLineArgumentsModule(arguments);
         Assert.assertEquals("conf/qos.test.properties", argumentsModule.propertiesPath().toString());
     }
 

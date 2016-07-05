@@ -29,6 +29,7 @@ public class GuiceInitializator {
     private static Path propertiesPath;
     private static boolean qos = false;
     private static boolean method = false;
+    private static boolean suite = false;
 
     /**
      * @return whether the test was started from QOS Server
@@ -56,6 +57,20 @@ public class GuiceInitializator {
      */
     public static void setMethod() {
         method = true;
+    }
+
+    /**
+     * Set the run to TestSuiteRunner.
+     */
+    public static void setSuite() {
+        suite = true;
+    }
+
+    /**
+     * @return whether the test was started from TestSuiterunner
+     */
+    public static boolean isSuite() {
+        return suite;
     }
 
     /**

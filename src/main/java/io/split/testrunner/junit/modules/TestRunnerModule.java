@@ -1,4 +1,4 @@
-package io.split.methodrunner.modules;
+package io.split.testrunner.junit.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;

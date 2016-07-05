@@ -9,9 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Guice Module for Comand Line Arguments
+ * Guice Module for Command Line Arguments
  */
-public class CommandLineArgumentsModule extends AbstractModule {
+public class TestCommandLineArgumentsModule extends AbstractModule {
 
     private final MethodCommandLineArguments methodCommandLineArguments;
 
@@ -20,7 +20,7 @@ public class CommandLineArgumentsModule extends AbstractModule {
      *
      * @param arguments the command line arguments.
      */
-    public CommandLineArgumentsModule(String[] arguments) {
+    public TestCommandLineArgumentsModule(String[] arguments) {
         methodCommandLineArguments = MethodCommandLineArguments.initialize(Preconditions.checkNotNull(arguments));
     }
 
