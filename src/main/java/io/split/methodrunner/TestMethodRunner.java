@@ -24,6 +24,7 @@ import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.util.GuiceInitializator;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -158,6 +160,20 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
         List<TestResult> results = runner.call();
         List<TestResult> failed = failedTests(results);
         if (!failed.isEmpty()) {
+            LOG.info("FAILURES:");
+            failed
+                    .stream()
+                    .forEach(testResult -> testResult
+                            .getResult()
+                            .getFailures()
+                            .stream()
+                            .forEach(failure -> {
+                                LOG.info("---------------------------------------------------------");
+                                LOG.info(Util.id(failure.getDescription()));
+                                LOG.info(failure.getTestHeader());
+                                LOG.info(failure.getMessage());
+                                LOG.info(failure.getTrace());
+                    }));
             System.exit(1);
         }
     }

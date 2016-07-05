@@ -157,6 +157,20 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
         List<TestResult> results = runner.call();
         List<TestResult> failed = failedTests(results);
         if (!failed.isEmpty()) {
+            LOG.info("FAILURES:");
+            failed
+                    .stream()
+                    .forEach(testResult -> testResult
+                            .getResult()
+                            .getFailures()
+                            .stream()
+                            .forEach(failure -> {
+                                LOG.info("---------------------------------------------------------");
+                                LOG.info(Util.id(failure.getDescription()));
+                                LOG.info(failure.getTestHeader());
+                                LOG.info(failure.getMessage());
+                                LOG.info(failure.getTrace());
+                            }));
             System.exit(1);
         }
     }
