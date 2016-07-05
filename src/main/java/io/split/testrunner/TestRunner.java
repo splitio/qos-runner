@@ -86,8 +86,8 @@ public class TestRunner extends BlockJUnit4ClassRunner {
                         QOSServerApplication.injector.getInstance(SlackCommon.class),
                         QOSServerApplication.injector.getInstance(QOSServerState.class)));
             }
-            modules.add(getFailCondition(theClass));
         }
+        modules.add(getFailCondition(theClass));
         return Guice.createInjector(modules);
     }
 
