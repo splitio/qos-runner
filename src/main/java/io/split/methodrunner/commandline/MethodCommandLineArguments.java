@@ -7,6 +7,9 @@ import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Method;
 
+/**
+ * Parses command line arguments for tests to run.
+ */
 public class MethodCommandLineArguments {
 
     private static Class<?> hackClass;
@@ -54,6 +57,12 @@ public class MethodCommandLineArguments {
         return conf;
     }
 
+    /**
+     * Call this with the command line arguments to parse them.
+     *
+     * @param commandLineArgs the command line arguments
+     * @return an instances with the arguments parsed.
+     */
     public static MethodCommandLineArguments initialize(String[] commandLineArgs) {
         Preconditions.checkNotNull(commandLineArgs);
 
@@ -65,6 +74,9 @@ public class MethodCommandLineArguments {
         return result;
     }
 
+    /**
+     * Converts an argument to a class.
+     */
     public static class ClassConverter implements IStringConverter<Class<?>> {
         @Override
         public Class<?> convert(String value) {
@@ -78,6 +90,9 @@ public class MethodCommandLineArguments {
         }
     }
 
+    /**
+     * Converts an argument to a method.
+     */
     public static class MethodConverter implements IStringConverter<Method> {
         @Override
         public Method convert(String value) {

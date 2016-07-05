@@ -38,6 +38,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * Main class for running tests one at a time.
+ */
 @Singleton
 public class TestMethodRunner implements Callable<List<TestResult>> {
 
@@ -51,6 +54,22 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
     private final ListeningExecutorService executor;
     private final int timeoutInMinutes;
 
+    /**
+     * Default Constructor
+     *
+     * Needs
+     * <p>
+     *     <ul>
+     *         <li>Method, the test to run</li>
+     *         <li>Quantity, how many times to run the test</li>
+     *         <li>Parallel, how many runs in parallel</li>
+     *     </ul>
+     * </p>
+     *
+     * @param timeOutInMinutes How much time to wait until the test finishes running.
+     * @param arguments Command line Arguments
+     * @param testRunnerFactory Guice factory for creating tests.
+     */
     @Inject
     public TestMethodRunner(@Named(TestRunnerPropertiesModule.TIMEOUT_IN_MINUTES) String timeOutInMinutes,
                             MethodCommandLineArguments arguments,
@@ -64,6 +83,13 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
         this.timeoutInMinutes = Integer.valueOf(Preconditions.checkNotNull(timeOutInMinutes));
     }
 
+    /**
+     * Runs the test.
+     *
+     * @return a list with all the results of the test.
+     *
+     * @throws InterruptedException if a test gets interrupted.
+     */
     @Override
     public List<TestResult> call() throws InterruptedException {
         String testName = Util.id(method);
@@ -119,6 +145,12 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
         };
     }
 
+    /**
+     * This main class should be called with the required parameters to run a test.s
+     *
+     * @param args Check CommandLineArgumentsModule for a description of the tests.
+     * @throws Exception if something goes wrong.
+     */
     public static void main(String[] args) throws Exception {
         Preconditions.checkNotNull(args);
         Injector injector = createInjector(args);
@@ -130,6 +162,13 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
         }
     }
 
+    /**
+     * Given the command line arguments, it creates the guice injector.
+     *
+     * @param args Command line arguments.
+     *
+     * @return the injector used.
+     */
     @VisibleForTesting
     public static Injector createInjector(String[] args) {
         CommandLineArgumentsModule commandLineArgumentsModule = new CommandLineArgumentsModule(args);

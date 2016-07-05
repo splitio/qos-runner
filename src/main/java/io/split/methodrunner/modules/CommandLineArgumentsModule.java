@@ -8,14 +8,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Guice Module for Comand Line Arguments
+ */
 public class CommandLineArgumentsModule extends AbstractModule {
 
     private final MethodCommandLineArguments methodCommandLineArguments;
 
+    /**
+     * Default Cosntructor.
+     *
+     * @param arguments the command line arguments.
+     */
     public CommandLineArgumentsModule(String[] arguments) {
         methodCommandLineArguments = MethodCommandLineArguments.initialize(Preconditions.checkNotNull(arguments));
     }
 
+    /**
+     * @return the properties where the conf resides.
+     */
     public Path propertiesPath() {
         Path path = Paths.get(methodCommandLineArguments.conf());
         if (Files.exists(path)) {

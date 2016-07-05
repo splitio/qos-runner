@@ -12,6 +12,9 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Guice Module for parsing Properties file from the configuration file.
+ */
 public class TestRunnerPropertiesModule extends AbstractModule {
     public static final String TIMEOUT_IN_MINUTES = "TIMEOUT_IN_MINUTES";
 

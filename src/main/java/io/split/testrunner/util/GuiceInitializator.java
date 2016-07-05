@@ -17,7 +17,10 @@ import java.nio.file.Path;
  *             resides.
  *         </li>
  *         <li>
- *             If the test is being run from the IDE, QOSConfig will set the location of the properties file.
+ *             If the test is being run from the IDE, PropertiesConfig will set the location of the properties file.
+ *         </li>
+ *         <li>
+ *             If the test is being run from the testrunner, it is set there.
  *         </li>
  *     </ul>
  * </p>
@@ -27,27 +30,47 @@ public class GuiceInitializator {
     private static boolean qos = false;
     private static boolean method = false;
 
+    /**
+     * @return whether the test was started from QOS Server
+     */
     public static boolean isQos() {
         return qos;
     }
 
+    /**
+     * Set the run to QOS Server.
+     */
     public static void setQos() {
         qos = true;
     }
 
+    /**
+     * @return whether the test was started from TestMethodRunner
+     */
     public static boolean isMethod() {
         return method;
     }
 
+    /**
+     * Set the run to TestMethodRunner.
+     */
     public static void setMethod() {
         method = true;
     }
 
+    /**
+     * Set where the conf file is
+     *
+     * @param path where the conf file is.
+     */
     public static void setPath(Path path) {
         Preconditions.checkNotNull(path);
         propertiesPath = path;
     }
 
+    /**
+     * @return the path where the conf file is.
+     */
     public static Path getPath() {
         Preconditions.checkNotNull(
                 propertiesPath,
