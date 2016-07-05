@@ -15,11 +15,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 public class TestRunnerPropertiesModuleTest {
     @Rule

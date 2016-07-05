@@ -11,7 +11,7 @@ public class TestMethodRunnerTest {
     public static final String PROPERTIES = "conf/qos.test.properties";
 
     @Test
-    public void runValidTest() throws Exception {
+    public void runValidTest() throws InterruptedException {
         String[] arguments = {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",

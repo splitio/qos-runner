@@ -22,7 +22,8 @@ public class CommandLineArgumentsModuleTest {
                 "-test",
                 "initalizeWithValidClassAndTest"
         };
-        new CommandLineArgumentsModule(arguments);
+        CommandLineArgumentsModule module = new CommandLineArgumentsModule(arguments);
+        module.propertiesPath();
     }
 
     @Test

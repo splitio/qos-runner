@@ -65,7 +65,7 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
     }
 
     @Override
-    public List<TestResult> call() throws Exception {
+    public List<TestResult> call() throws InterruptedException {
         String testName = Util.id(method);
         long start = System.currentTimeMillis();
         LOG.info(String.format("STARTING TestMethodRunner %s, running it %s times %s in parallel", testName, quantity, parallel));

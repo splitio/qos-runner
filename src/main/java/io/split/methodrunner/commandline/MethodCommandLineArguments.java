@@ -73,7 +73,7 @@ public class MethodCommandLineArguments {
                 MethodCommandLineArguments.hackClass = theClass;
                 return theClass;
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException(String.format("Parameter -clazz should be a class, got : %s", value));
+                throw new IllegalArgumentException(String.format("Parameter -clazz should be a class, got : %s", value), e);
             }
         }
     }
@@ -85,7 +85,7 @@ public class MethodCommandLineArguments {
                 Preconditions.checkArgument(hackClass != null, "Need to declare -clazz argument first");
                 return hackClass.getMethod(value);
             } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException(String.format("Parameter -test should be a method of %s, got %s", hackClass.getCanonicalName(), value));
+                throw new IllegalArgumentException(String.format("Parameter -test should be a method of %s, got %s", hackClass.getCanonicalName(), value), e);
             }
         }
     }
