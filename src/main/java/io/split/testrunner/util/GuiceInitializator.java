@@ -3,6 +3,7 @@ package io.split.testrunner.util;
 import com.google.common.base.Preconditions;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * We need to inject the properties file both from the server, and from each test (each one has its own injector).
@@ -87,9 +88,6 @@ public class GuiceInitializator {
      * @return the path where the conf file is.
      */
     public static Path getPath() {
-        Preconditions.checkNotNull(
-                propertiesPath,
-                "Properties Path not set");
         return propertiesPath;
     }
 }
