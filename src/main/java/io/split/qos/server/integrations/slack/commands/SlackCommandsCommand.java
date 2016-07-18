@@ -9,6 +9,9 @@ import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
 import io.split.qos.server.modules.QOSServerModule;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Lists all the available commands that the bot can process.
  */
@@ -16,13 +19,17 @@ public class SlackCommandsCommand implements SlackCommandExecutor {
 
     private final String serverName;
     private final SlackCommandListener listener;
+    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackCommandsCommand(
             SlackCommandListener listener,
+            SlackCommonFormatter formatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
-        this.listener = listener;
+        this.listener = Preconditions.checkNotNull(listener);
+        this.formatter = Preconditions.checkNotNull(formatter);
+
     }
 
     @Override
@@ -33,23 +40,21 @@ public class SlackCommandsCommand implements SlackCommandExecutor {
         slackAttachment
                 .setColor("good");
 
-        StringBuilder commandsList = new StringBuilder();
-        commandsList.append("```");
-        listener.commands()
-                .stream()
-                .forEach(command -> commandsList
-                        .append(command.help())
-                        .append("\n"));
-        commandsList.append("```");
-
+        List<String> commands = listener
+                                    .commands()
+                                    .stream()
+                                    .map(executor -> executor.help())
+                                    .collect(Collectors.toList());
         session
                 .sendMessage(
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
-        session
-                .sendMessage(messagePosted.getChannel(),
-                        commandsList.toString());
+        formatter
+                .groupMessage(commands)
+                .forEach(group -> session
+                        .sendMessage(messagePosted.getChannel(),
+                                group));
         return true;
     }
 

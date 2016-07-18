@@ -17,14 +17,13 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.split.methodrunner.commandline.MethodCommandLineArguments;
 import io.split.methodrunner.modules.TestCommandLineArgumentsModule;
-import io.split.testrunner.junit.modules.TestRunnerModule;
 import io.split.methodrunner.modules.TestRunnerPropertiesModule;
-import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.junit.JUnitRunnerFactory;
+import io.split.testrunner.junit.TestResult;
+import io.split.testrunner.junit.modules.TestRunnerModule;
 import io.split.testrunner.util.GuiceInitializator;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**

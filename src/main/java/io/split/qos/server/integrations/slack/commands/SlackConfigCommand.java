@@ -9,7 +9,9 @@ import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Lists the configuration of the server (basically listing the properties file).
@@ -18,13 +20,16 @@ public class SlackConfigCommand implements SlackCommandExecutor {
 
     private final Properties configuration;
     private final String serverName;
+    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackConfigCommand(
+            SlackCommonFormatter formatter,
             @Named(QOSPropertiesModule.CONFIGURATION) Properties configuration,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.configuration = Preconditions.checkNotNull(configuration);
+        this.formatter = Preconditions.checkNotNull(formatter);
     }
 
 
@@ -36,21 +41,22 @@ public class SlackConfigCommand implements SlackCommandExecutor {
         slackAttachment
                 .setColor("good");
 
-        StringBuilder configList = new StringBuilder();
-        configList.append("```\n");
-        configuration
+        List<String> confs = configuration
                 .entrySet()
                 .stream()
-                .forEach(entry -> configList.append(String.format("%s=%s \n", entry.getKey(), entry.getValue())));
-        configList.append("```\n");
+                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
         session
                 .sendMessage(
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
-        session
-                .sendMessage(messagePosted.getChannel(),
-                        configList.toString());
+        formatter
+                .groupMessage(confs)
+                .forEach(group -> session
+                        .sendMessage(messagePosted.getChannel(),
+                                group));
 
         return true;
     }

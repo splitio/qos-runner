@@ -12,6 +12,7 @@ import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Runs all the tests of the QOS.
@@ -19,13 +20,16 @@ import java.util.List;
 public class SlackRunAllCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerBehaviour behaviour;
+    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackRunAllCommand(
             QOSServerBehaviour behaviour,
+            SlackCommonFormatter formatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.behaviour = behaviour;
+        this.formatter = Preconditions.checkNotNull(formatter);
     }
 
     @Override
@@ -38,22 +42,22 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
         slackAttachment
                 .setColor("good");
 
-        StringBuilder testsList = new StringBuilder();
-        testsList.append("```\n");
-        tests
+        List<String> toBeRun = tests
                 .stream()
-                .forEach(value -> testsList
-                        .append(String.format("%s \n", Util.id(value))));
-        testsList.append("```\n");
+                .map(value -> String.format("%s \n", Util.id(value)))
+                .collect(Collectors.toList());
 
         session
                 .sendMessage(
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
-        session
-                .sendMessage(messagePosted.getChannel(),
-                        testsList.toString());
+
+        formatter
+                .groupMessage(toBeRun)
+                .forEach(group -> session
+                        .sendMessage(messagePosted.getChannel(),
+                                group));
         return true;
     }
 

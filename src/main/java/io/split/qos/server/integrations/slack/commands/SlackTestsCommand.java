@@ -11,7 +11,9 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Runs one test of the server
@@ -21,15 +23,18 @@ public class SlackTestsCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
+    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackTestsCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
+            SlackCommonFormatter formatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.state = state;
+        this.formatter = Preconditions.checkNotNull(formatter);
     }
 
     @Override
@@ -42,10 +47,7 @@ public class SlackTestsCommand implements SlackCommandExecutor {
         slackAttachment
                 .setColor("good");
 
-        StringBuilder testsList = new StringBuilder();
-        testsList.append("```\n");
-        testsList.append(" class#test name | time last run | status last run\n");
-        tests.entrySet()
+        List<String> allTests = tests.entrySet()
                 .stream()
                 .sorted((o1, o2) -> {
                     if (o1.getValue().succeeded() == null && o2.getValue().succeeded() == null) {
@@ -59,7 +61,7 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                     }
                     return o1.getValue().succeeded().compareTo(o2.getValue().succeeded());
                 })
-                .forEach(value -> {
+                .map(value -> {
                     String status = null;
                     if (value.getValue().succeeded() == null) {
                         status = "--";
@@ -68,21 +70,23 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                     } else {
                         status = "FAILED";
                     }
-                    testsList
-                            .append(String.format("%s | %s | %s\n",
-                                    value.getKey(),
-                                    dateFormatter.formatDate(value.getValue().when()),
-                                    status));
-                });
-        testsList.append("```\n");
+                    return String.format("%s | %s | %s\n",
+                            value.getKey(),
+                            dateFormatter.formatDate(value.getValue().when()),
+                            status);
+                })
+                .collect(Collectors.toList());
         session
                 .sendMessage(
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
-        session
-                .sendMessage(messagePosted.getChannel(),
-                        testsList.toString());
+
+        formatter
+                .groupMessage(allTests)
+                .forEach(group -> session
+                        .sendMessage(messagePosted.getChannel(),
+                                group));
         return true;
     }
 

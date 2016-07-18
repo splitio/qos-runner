@@ -1,5 +1,6 @@
 package io.split.qos.server.integrations.slack.commands;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,14 +21,17 @@ public class SlackInfoCommand implements SlackCommandExecutor {
     private final QOSServerState state;
     private final String serverName;
     private final DateFormatter dateFormatter;
+    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackInfoCommand(
             QOSServerState state,
+            SlackCommonFormatter formatter,
             DateFormatter dateFormatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.state = state;
+        this.formatter = Preconditions.checkNotNull(formatter);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
     }
 
@@ -53,19 +57,16 @@ public class SlackInfoCommand implements SlackCommandExecutor {
         slackAttachment
                 .setColor(state.isActive() ? "good" : "warning");
 
-        StringBuilder info = new StringBuilder();
-        info.append("```");
-        info.append(text);
-        info.append("```");
-
         session
                 .sendMessage(
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
-        session
-                .sendMessage(messagePosted.getChannel(),
-                        info.toString());
+        formatter
+                .groupMessage(Lists.newArrayList(text))
+                .forEach(group -> session
+                        .sendMessage(messagePosted.getChannel(),
+                                group));
         return true;
     }
 

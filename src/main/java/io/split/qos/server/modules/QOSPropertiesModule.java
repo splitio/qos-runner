@@ -59,6 +59,10 @@ public class QOSPropertiesModule extends AbstractModule {
     // Root package where the tests are going to be looked.
     // Default io.split
     public static final String SUITES_PACKAGE = "SUITES_PACKAGE";
+    // For the commands that display a list of things (tests, commands, etc), the amount to group
+    // between ```. This is because there is a limited amount of lines that each ``` can have
+    // 20 by default.
+    public static final String MESSAGE_GROUPING = "MESSAGE_GROUPING";
     // For setting in which timezone to post the messages that are time related.
     // Default America/Los_Angeles
     public static final String TIME_ZONE = "TIME_ZONE";
@@ -97,6 +101,7 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(SUITES, "SMOKE");
         defaultProperties.put(SUITES_PACKAGE, "io.split");
         defaultProperties.put(TIME_ZONE, "America/Los_Angeles");
+        defaultProperties.put(MESSAGE_GROUPING, "20");
 
         // Test
         defaultProperties.put(CONSECUTIVE_FAILURES, "2");

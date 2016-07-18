@@ -3,7 +3,6 @@ package io.split.testrunner.util;
 import com.google.common.base.Preconditions;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 /**
  * We need to inject the properties file both from the server, and from each test (each one has its own injector).

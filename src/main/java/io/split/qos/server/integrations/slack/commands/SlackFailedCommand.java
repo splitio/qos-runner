@@ -21,14 +21,17 @@ public class SlackFailedCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
+    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackFailedCommand(
             QOSServerState state,
+            SlackCommonFormatter formatter,
             DateFormatter dateFormatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
+        this.formatter = Preconditions.checkNotNull(formatter);
         this.state = state;
     }
 
@@ -37,25 +40,22 @@ public class SlackFailedCommand implements SlackCommandExecutor {
         Map<String, QOSServerState.TestStatus> tests = state.tests();
         String title = String.format("[%s] Failed Tests QOS Server", serverName);
 
-        StringBuilder testsList = new StringBuilder();
-        testsList.append("```\n");
-        testsList.append(" class # test name | time last run | status last run\n");
         List<Map.Entry<String, QOSServerState.TestStatus>> failed = tests.entrySet()
                 .stream()
                 .filter(entry -> (entry.getValue().succeeded() != null && !entry.getValue().succeeded()))
                 .sorted((o1, o2) -> o1.getValue().when().compareTo(o2.getValue().when()))
                 .collect(Collectors.toList());
-        failed
+        List<String> failedTests = failed
                 .stream()
-                .forEach(value -> {
+                .map(value -> {
                     String status = "FAILED";
-                    testsList
-                            .append(String.format("%s | %s | %s\n",
-                                    value.getKey(),
-                                    dateFormatter.formatDate(value.getValue().when()),
-                                    status));
-                });
-        testsList.append("```\n");
+                    return String.format("%s | %s | %s\n",
+                            value.getKey(),
+                            dateFormatter.formatDate(value.getValue().when()),
+                            status);
+                })
+                .collect(Collectors.toList());
+
         String text = String.format("Total Failed Tests %s / %s", failed.size(), tests.size());
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
@@ -66,10 +66,13 @@ public class SlackFailedCommand implements SlackCommandExecutor {
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
+
         if (!failed.isEmpty()) {
-            session
-                    .sendMessage(messagePosted.getChannel(),
-                            testsList.toString());
+            formatter
+                    .groupMessage("class name # test name | time last run | status last run", failedTests)
+                            .forEach(group -> session
+                                    .sendMessage(messagePosted.getChannel(),
+                                    group));
         }
         return true;
     }
