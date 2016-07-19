@@ -2,6 +2,7 @@ package io.split.qos.server.integrations.slack.commands;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.split.qos.server.modules.QOSPropertiesModule;
@@ -14,6 +15,7 @@ public class SlackCommonFormatter {
 
     private final int messageGrouping;
 
+    @Inject
     public SlackCommonFormatter(
             @Named(QOSPropertiesModule.MESSAGE_GROUPING) String messageGrouping) {
         this.messageGrouping = Integer.valueOf(messageGrouping);
