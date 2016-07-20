@@ -70,7 +70,7 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                     } else {
                         status = "FAILED";
                     }
-                    return String.format("%s | %s | %s\n",
+                    return String.format("%s | %s | %s",
                             value.getKey(),
                             dateFormatter.formatDate(value.getValue().when()),
                             status);
@@ -83,7 +83,7 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                         slackAttachment);
 
         formatter
-                .groupMessage(allTests)
+                .groupMessage("class name # test name | time last run | status last run", allTests)
                 .forEach(group -> session
                         .sendMessage(messagePosted.getChannel(),
                                 group));

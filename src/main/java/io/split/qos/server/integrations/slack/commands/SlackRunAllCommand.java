@@ -44,7 +44,7 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
 
         List<String> toBeRun = tests
                 .stream()
-                .map(value -> String.format("%s \n", Util.id(value)))
+                .map(value -> Util.id(value))
                 .collect(Collectors.toList());
 
         session
