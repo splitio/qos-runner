@@ -36,7 +36,7 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         List<Method> tests = behaviour.runAllNow();
         String title = String.format("[%s] RUNNING ALL TESTS NOW", serverName);
-        String text = String.format("Running now %s tests triggered by ", tests.size(), messagePosted.getSender().getUserName());
+        String text = String.format("Running now %s tests triggered by %s", tests.size(), messagePosted.getSender().getUserName());
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
