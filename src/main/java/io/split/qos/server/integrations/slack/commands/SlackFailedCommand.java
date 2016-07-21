@@ -49,7 +49,7 @@ public class SlackFailedCommand implements SlackCommandExecutor {
                 .stream()
                 .map(value -> {
                     String status = "FAILED";
-                    return String.format("%s | %s | %s\n",
+                    return String.format("%s | %s | %s",
                             value.getKey(),
                             dateFormatter.formatDate(value.getValue().when()),
                             status);
