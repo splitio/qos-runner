@@ -73,7 +73,7 @@ public class SlackCommandIntegrationImpl extends AbstractSlackIntegration implem
 
     private boolean isBot(SlackMessagePosted message) {
         String content = message.getMessageContent();
-        return content.trim().startsWith(String.format("<@%s>:", botId()));
+        return content.trim().startsWith(String.format("<@%s>", botId()));
     }
 
 }
