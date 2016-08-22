@@ -34,7 +34,8 @@ public class SlackCommandGetter {
         return message
                 .getMessageContent()
                 .trim()
-                .replaceFirst(String.format("<@%s>:", slackCommon.botId()), "")
+                .replaceFirst(String.format("<@%s>", slackCommon.botId()), "")
+                .replaceFirst(":", "")
                 .trim();
     }
 }
