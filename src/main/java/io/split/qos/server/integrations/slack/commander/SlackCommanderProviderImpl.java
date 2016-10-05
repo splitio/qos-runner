@@ -18,6 +18,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     private final Provider<SlackRunAllCommand> runAllProvider;
     private final Provider<SlackRunTestCommand> runTestProvider;
     private final Provider<SlackConfigCommand> configProvider;
+    private final Provider<SlackGoGreenCommand> goGreenProvider;
 
     @Inject
     public SlackCommanderProviderImpl(
@@ -30,7 +31,8 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
             Provider<SlackFailedCommand> failedCommandProvider,
             Provider<SlackRunAllCommand> runAllCommandProvider,
             Provider<SlackRunTestCommand> runTestCommandProvider,
-            Provider<SlackConfigCommand> configCommandProvider) {
+            Provider<SlackConfigCommand> configCommandProvider,
+            Provider<SlackGoGreenCommand> goGreenCommandProvider) {
         this.infoProvider = Preconditions.checkNotNull(infoCommandProvider);
         this.pauseProvider = Preconditions.checkNotNull(pauseCommandProvider);
         this.resumeProvider = Preconditions.checkNotNull(resumeCommandProvider);
@@ -41,6 +43,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
         this.runAllProvider = Preconditions.checkNotNull(runAllCommandProvider);
         this.runTestProvider = Preconditions.checkNotNull(runTestCommandProvider);
         this.configProvider = Preconditions.checkNotNull(configCommandProvider);
+        this.goGreenProvider = Preconditions.checkNotNull(goGreenCommandProvider);
     }
 
     public SlackInfoCommand info() {
@@ -85,5 +88,10 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     @Override
     public SlackConfigCommand config() {
         return configProvider.get();
+    }
+
+    @Override
+    public SlackGoGreenCommand goGreen() {
+        return goGreenProvider.get();
     }
 }

@@ -18,9 +18,9 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommandInt
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.pausable.PausableScheduledThreadPoolExecutor;
-import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
+import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.util.TestsFinder;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Main Class that actually run the tests.
@@ -229,20 +230,49 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        // Doesnt disconnect
-        /**
-        if (commandIntegration.isEnabled()) {
-            commandIntegration.close();
-        }
-        if (!commandIntegration.isEnabled() && broadcastIntegration.isEnabled()) {
-            broadcastIntegration.close();
-        }
-         */
         if (pausableExecutor != null) {
             pausableExecutor.resume();
             pausableExecutor.shutdownNow();
             pausableExecutor.awaitTermination(shutdownWaitInMinutes, TimeUnit.MINUTES);
         }
+    }
+
+    public List<Method> runNotGreen(long since) {
+        List<Method> rerunning = Lists.newArrayList();
+        List<QOSTestsTracker.Tracked> notRunning = tracker.getNotRunning();
+        if (notRunning.isEmpty()) {
+            return rerunning;
+        }
+        List<QOSTestsTracker.Tracked> toBeRun = notRunning
+                .stream()
+                .filter(tracked -> {
+                    String key = Util.id(tracked.method());
+                    if (!state.tests().get(key).succeeded()) {
+                        return true;
+                    }
+                    return (state.tests().get(key).when() < since);
+                })
+                .collect(Collectors.toList());
+        if (toBeRun.isEmpty()) {
+            return Lists.newArrayList();
+        }
+        int step = (spreadTests) ? delayBetweenInSeconds / toBeRun.size() : 1;
+        int schedule = step;
+        for(QOSTestsTracker.Tracked track : toBeRun) {
+            track.future().cancel(true);
+            rerunning.add(track.method());
+            LOG.info(String.format("%s canceled, rerunning now",
+                    Util.id(track.method())));
+            JUnitRunner runner = testRunnerFactory.create(track.method(), Optional.empty());
+            ListenableFuture<TestResult> future = executor.schedule(
+                    runner,
+                    0,
+                    TimeUnit.SECONDS);
+            tracker.track(track.method(), runner, future);
+            Futures.addCallback(future, createCallback(track.method(), schedule, delayBetweenInSecondsWhenFail, delayBetweenInSeconds));
+            schedule += step;
+        }
+        return rerunning;
     }
 
     public List<Method> runAllNow() {

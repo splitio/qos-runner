@@ -18,4 +18,5 @@ public interface SlackCommandProvider {
     SlackRunAllCommand runAll();
     SlackRunTestCommand runTest();
     SlackConfigCommand config();
+    SlackGoGreenCommand goGreen();
 }
