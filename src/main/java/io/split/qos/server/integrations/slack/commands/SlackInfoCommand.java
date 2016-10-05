@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
+import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
@@ -56,17 +57,13 @@ public class SlackInfoCommand implements SlackCommandExecutor {
         SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
         slackAttachment
                 .setColor(state.isActive() ? "good" : "warning");
-
+        SlackPreparedMessage sent = new SlackPreparedMessage
+                .Builder()
+                .addAttachment(slackAttachment)
+                .withMessage(formatter.groupMessageAsOneLine(Lists.newArrayList(text)))
+                .build();
         session
-                .sendMessage(
-                        messagePosted.getChannel(),
-                        "",
-                        slackAttachment);
-        formatter
-                .groupMessage(Lists.newArrayList(text))
-                .forEach(group -> session
-                        .sendMessage(messagePosted.getChannel(),
-                                group));
+                .sendMessage(messagePosted.getChannel(), sent);
         return true;
     }
 

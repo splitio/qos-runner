@@ -25,6 +25,10 @@ public class SlackCommonFormatter {
         return groupMessage(Optional.empty(), lines);
     }
 
+    public String groupMessageAsOneLine(List<String> lines) {
+        return String.join("", groupMessage(Optional.empty(), lines));
+    }
+
     public List<String> groupMessage(String header, List<String> lines) {
         return groupMessage(Optional.of(header), lines);
     }

@@ -7,7 +7,7 @@ apply plugin: 'signing'
 
 group = "io.split"
 archivesBaseName = "qosrunner"
-version = "1.10"
+version = "1.11"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -25,8 +25,8 @@ dependencies {
     //Method and Suite
     compile 'com.beust:jcommander:1.48'
     
-    // Common
-    compile 'com.github.Ullink:simple-slack-api:0.5.1'
+    // Commoni
+    compile 'com.ullink.slack:simpleslackapi:0.6.0'
     compile 'com.google.inject:guice:4.0'
     compile 'com.google.inject.extensions:guice-assistedinject:4.0'
     compile 'junit:junit:4.12'
