@@ -5,15 +5,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
+import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Runs one test of the server
@@ -23,31 +22,31 @@ public class SlackTestsCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
-    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackTestsCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
-            SlackCommonFormatter formatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.state = state;
-        this.formatter = Preconditions.checkNotNull(formatter);
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         Map<String, QOSServerState.TestStatus> tests = state.tests();
-        String title = String.format("[%s] Tests QOS Server", serverName);
+        String title = String.format("[%s] Tests", serverName.toUpperCase());
         String text = String.format("Total Tests %s", tests.size());
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
                 .setColor("good");
+        SlackPreparedMessage.Builder sent = new SlackPreparedMessage
+                .Builder()
+                .addAttachment(slackAttachment);
 
-        List<String> allTests = tests.entrySet()
+        tests.entrySet()
                 .stream()
                 .sorted((o1, o2) -> {
                     if (o1.getValue().succeeded() == null && o2.getValue().succeeded() == null) {
@@ -61,32 +60,24 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                     }
                     return o1.getValue().succeeded().compareTo(o2.getValue().succeeded());
                 })
-                .map(value -> {
-                    String status = null;
-                    if (value.getValue().succeeded() == null) {
-                        status = "--";
-                    } else if (value.getValue().succeeded()) {
-                        status = "PASSED";
-                    } else {
-                        status = "FAILED";
-                    }
-                    return String.format("%s | %s | %s",
+                .forEach(value -> {
+                    String test = String.format("%s | %s",
                             value.getKey(),
-                            dateFormatter.formatDate(value.getValue().when()),
-                            status);
-                })
-                .collect(Collectors.toList());
+                            dateFormatter.formatDate(value.getValue().when()));
+                    SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
+                    if (value.getValue().succeeded() == null) {
+                        testAttachment.setColor("warning");
+                    } else if (value.getValue().succeeded()) {
+                        testAttachment.setColor("good");
+                    } else {
+                        testAttachment.setColor("danger");
+                    }
+                    sent.addAttachment(testAttachment);
+                });
         session
                 .sendMessage(
                         messagePosted.getChannel(),
-                        "",
-                        slackAttachment);
-
-        formatter
-                .groupMessage("class name # test name | time last run | status last run", allTests)
-                .forEach(group -> session
-                        .sendMessage(messagePosted.getChannel(),
-                                group));
+                        sent.build());
         return true;
     }
 

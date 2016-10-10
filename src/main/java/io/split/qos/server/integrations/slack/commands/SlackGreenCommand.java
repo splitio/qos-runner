@@ -36,11 +36,14 @@ public class SlackGreenCommand implements SlackCommandExecutor {
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         Long lastGreen = state.lastGreen();
         String title = String.format("[%s] Green", serverName.toUpperCase());
-        String text = String.format("Last Green %s %s", dateFormatter.formatDate(lastGreen), state.isPaused() ? "(Paused)" : "");
-
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor(lastGreen == null ? "warning" : "good");
+        SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
+        if (lastGreen == null) {
+            slackAttachment.setText("--");
+            slackAttachment.setColor("danger");
+        } else {
+            slackAttachment.setText(String.format("Last Green %s %s", dateFormatter.formatDate(lastGreen), state.isPaused() ? "(Paused)" : ""));
+            slackAttachment.setColor("good");
+        }
         session
                 .sendMessage(
                         messagePosted.getChannel(),

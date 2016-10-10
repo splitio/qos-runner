@@ -30,7 +30,7 @@ public class SlackPauseCommand implements SlackCommandExecutor {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         behaviour.pause(messagePosted.getSender().getUserName());
-        String title = String.format("PAUSE QOS Server '%s'", serverName);
+        String title = String.format("[%s] PAUSE", serverName.toUpperCase());
         String text = "Server PAUSED by " + messagePosted.getSender().getUserName();
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);

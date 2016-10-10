@@ -20,26 +20,19 @@ public class SlackConfigCommand implements SlackCommandExecutor {
 
     private final Properties configuration;
     private final String serverName;
-    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackConfigCommand(
-            SlackCommonFormatter formatter,
             @Named(QOSPropertiesModule.CONFIGURATION) Properties configuration,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.configuration = Preconditions.checkNotNull(configuration);
-        this.formatter = Preconditions.checkNotNull(formatter);
     }
 
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] Config QOS Server", serverName);
-
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
-        slackAttachment
-                .setColor("good");
+        String title = String.format("[%s] Config", serverName.toUpperCase());
 
         List<String> confs = configuration
                 .entrySet()
@@ -47,17 +40,15 @@ public class SlackConfigCommand implements SlackCommandExecutor {
                 .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
+        SlackAttachment slackAttachment = new SlackAttachment(title, "", String.join("\n", confs), null);
+        slackAttachment
+                .setColor("good");
+
         session
                 .sendMessage(
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
-        formatter
-                .groupMessage(confs)
-                .forEach(group -> session
-                        .sendMessage(messagePosted.getChannel(),
-                                group));
-
         return true;
     }
 

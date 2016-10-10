@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class SlackRunTestCommand implements SlackCommandExecutor {
-    private static final String TITLE = "[%s] Run Test QOS Server";
+    private static final String TITLE = "[%s] Run Test";
 
     private final String serverName;
     private final QOSServerBehaviour behaviour;
@@ -56,7 +56,7 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
             methodExecuted = behaviour.runTestNow(Optional.of(arguments.get(0)), arguments.get(1));
         }
         if (!methodExecuted.isPresent()) {
-            String title = String.format(TITLE, serverName);
+            String title = String.format(TITLE, serverName.toUpperCase());
             String text = String.format("Could not find test %s", arguments);
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
@@ -69,7 +69,7 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
                             slackAttachment);
         } else {
             Method method = methodExecuted.get();
-            String title = String.format(TITLE, serverName);
+            String title = String.format(TITLE, serverName.toUpperCase());
             String text = String.format("Test Started %s", Util.id(method));
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
@@ -85,7 +85,7 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
     }
 
     private void slackEmpty(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format(TITLE, serverName);
+        String title = String.format(TITLE, serverName.toUpperCase());
         String text = "Run Test needs an actual test to run";
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment

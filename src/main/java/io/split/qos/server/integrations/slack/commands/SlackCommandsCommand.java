@@ -19,42 +19,34 @@ public class SlackCommandsCommand implements SlackCommandExecutor {
 
     private final String serverName;
     private final SlackCommandListener listener;
-    private final SlackCommonFormatter formatter;
 
     @Inject
     public SlackCommandsCommand(
             SlackCommandListener listener,
-            SlackCommonFormatter formatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.listener = Preconditions.checkNotNull(listener);
-        this.formatter = Preconditions.checkNotNull(formatter);
-
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("Commands QOS Server '%s'", serverName);
-
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
-        slackAttachment
-                .setColor("good");
+        String title = String.format("[%s] Commands", serverName.toUpperCase());
 
         List<String> commands = listener
-                                    .commands()
-                                    .stream()
-                                    .map(executor -> executor.help())
-                                    .collect(Collectors.toList());
+                .commands()
+                .stream()
+                .map(SlackCommandExecutor::help)
+                .collect(Collectors.toList());
+
+
+        SlackAttachment slackAttachment = new SlackAttachment(title, "", String.join("\n", commands), null);
+        slackAttachment
+                .setColor("good");
         session
                 .sendMessage(
                         messagePosted.getChannel(),
                         "",
                         slackAttachment);
-        formatter
-                .groupMessage(commands)
-                .forEach(group -> session
-                        .sendMessage(messagePosted.getChannel(),
-                                group));
         return true;
     }
 

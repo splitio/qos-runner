@@ -32,4 +32,5 @@ sonar-project.properties
 *.ipr
 .DS_Store
 .gradle/
+conf/qos.test.properties
 build/

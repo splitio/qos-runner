@@ -29,7 +29,7 @@ public class SlackResumeCommand implements SlackCommandExecutor {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         behaviour.resume(messagePosted.getSender().getUserName());
-        String title = String.format("RESUME QOS Server '%s'", serverName);
+        String title = String.format("[%s] RESUME", serverName.toUpperCase());
         String text = "Server RESUMED by " + messagePosted.getSender().getUserName();
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
