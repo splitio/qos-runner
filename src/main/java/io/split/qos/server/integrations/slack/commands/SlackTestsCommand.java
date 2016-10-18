@@ -1,6 +1,7 @@
 package io.split.qos.server.integrations.slack.commands;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -12,6 +13,7 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +24,8 @@ public class SlackTestsCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
+
+    private static final int CHUNK_SIZE = 100;
 
     @Inject
     public SlackTestsCommand(
@@ -36,16 +40,7 @@ public class SlackTestsCommand implements SlackCommandExecutor {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         Map<String, QOSServerState.TestStatus> tests = state.tests();
-        String title = String.format("[%s] Tests", serverName.toUpperCase());
-        String text = String.format("Total Tests %s", tests.size());
-
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor("good");
-        SlackPreparedMessage.Builder sent = new SlackPreparedMessage
-                .Builder()
-                .addAttachment(slackAttachment);
-
+        List<SlackAttachment> toBeAdded = Lists.newArrayList();
         tests.entrySet()
                 .stream()
                 .sorted((o1, o2) -> {
@@ -72,12 +67,27 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                     } else {
                         testAttachment.setColor("danger");
                     }
-                    sent.addAttachment(testAttachment);
+                    toBeAdded.add(testAttachment);
                 });
-        session
-                .sendMessage(
-                        messagePosted.getChannel(),
-                        sent.build());
+        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
+        int iteration = 0;
+        for(int index = 0; index < partitions.size(); index++) {
+            String title = String.format("[%s] Tests", serverName.toUpperCase());
+            String text = String.format("Total Tests %s, tests %s - %s", tests.size(), 1 + CHUNK_SIZE * iteration, CHUNK_SIZE * (iteration+1));
+
+            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
+            slackAttachment
+                    .setColor("good");
+
+            SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
+                    .Builder()
+                    .addAttachment(slackAttachment)
+                    .addAttachments(partitions.get(index));
+            session.sendMessage(
+                    messagePosted.getChannel(),
+                    partitionSend.build());
+            iteration++;
+        }
         return true;
     }
 
