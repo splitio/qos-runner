@@ -45,11 +45,14 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
                             .setColor("good");
                     toBeAdded.add(testAttachment);
                 });
-        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, 10);
+        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
         int iteration = 0;
         for(int index = 0; index < partitions.size(); index++) {
             String title = String.format("[%s] Tests", serverName.toUpperCase());
-            String text = String.format("Total Tests to Run %s, tests %s - %s", tests.size(), 1 + CHUNK_SIZE * iteration, CHUNK_SIZE * (iteration+1));
+            String text = String.format("Total Tests to Run %s, tests %s - %s",
+                    tests.size(),
+                    1 + CHUNK_SIZE * iteration,
+                    CHUNK_SIZE * iteration + partitions.get(index).size());
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
             slackAttachment
@@ -57,6 +60,7 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
 
             SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
                     .Builder()
+                    .addAttachment(slackAttachment)
                     .addAttachments(partitions.get(index));
             session.sendMessage(
                     messagePosted.getChannel(),

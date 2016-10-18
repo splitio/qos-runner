@@ -73,7 +73,10 @@ public class SlackTestsCommand implements SlackCommandExecutor {
         int iteration = 0;
         for(int index = 0; index < partitions.size(); index++) {
             String title = String.format("[%s] Tests", serverName.toUpperCase());
-            String text = String.format("Total Tests %s, tests %s - %s", tests.size(), 1 + CHUNK_SIZE * iteration, CHUNK_SIZE * (iteration+1));
+            String text = String.format("Total Tests %s, tests %s - %s",
+                    tests.size(),
+                    1 + CHUNK_SIZE * iteration,
+                    CHUNK_SIZE * iteration + partitions.get(index).size());
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
             slackAttachment
