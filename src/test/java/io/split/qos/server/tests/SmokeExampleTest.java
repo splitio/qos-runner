@@ -1,4 +1,4 @@
-package io.split.testrunner.util;
+package io.split.qos.server.tests;
 
 import io.split.testrunner.util.Suites;
 import org.junit.Test;

@@ -25,7 +25,7 @@ public class SlackTestsCommand implements SlackCommandExecutor {
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
 
-    private static final int CHUNK_SIZE = 100;
+    private static final int CHUNK_SIZE = 50;
 
     @Inject
     public SlackTestsCommand(

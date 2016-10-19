@@ -22,7 +22,7 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerBehaviour behaviour;
 
-    private static final int CHUNK_SIZE = 100;
+    private static final int CHUNK_SIZE = 50;
 
     @Inject
     public SlackRunAllCommand(
