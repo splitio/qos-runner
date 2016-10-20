@@ -9,6 +9,7 @@ import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
+import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
 
@@ -21,32 +22,37 @@ public class SlackInfoCommand implements SlackCommandExecutor {
     private final QOSServerState state;
     private final String serverName;
     private final DateFormatter dateFormatter;
+    private final String suites;
 
     @Inject
     public SlackInfoCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
-            @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
+            @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
+            @Named(QOSPropertiesModule.SUITES) String suites) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.state = state;
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
+        this.suites = Preconditions.checkNotNull(suites);
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         String text = null;
         if (state.isActive()) {
-            text = String.format("Status %s [since %s]\nLast test finished %s\nResumed by %s",
+            text = String.format("Status: %s [since %s]\nLast test finished: %s\nSuites: %s\nResumed by: %s",
                     state.status(),
                     dateFormatter.formatDate(state.activeSince()),
                     dateFormatter.formatDate(state.lastTestFinished()),
+                    suites,
                     state.who());
         }
         if (state.isPaused()) {
-            text = String.format("Status: %s [since %s]\nLast test finished %s\nPaused by %s",
+            text = String.format("Status: %s [since %s]\nLast test finished: %s\nSuites: %s\nPaused by: %s",
                     state.status(),
                     dateFormatter.formatDate(state.pausedSince()),
                     dateFormatter.formatDate(state.lastTestFinished()),
+                    suites,
                     state.who());
         }
         String title = String.format("INFO QOS Server '%s'", serverName);
