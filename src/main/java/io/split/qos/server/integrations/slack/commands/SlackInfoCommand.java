@@ -55,7 +55,7 @@ public class SlackInfoCommand implements SlackCommandExecutor {
                     suites,
                     state.who());
         }
-        String title = String.format("INFO QOS Server '%s'", serverName);
+        String title = String.format("[%s] INFO", serverName.toUpperCase());
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, "");
         slackAttachment
 

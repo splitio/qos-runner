@@ -61,4 +61,10 @@ public class SlackCommanderProviderForTest implements SlackCommandProvider {
     public SlackConfigCommand config() {
         return null;
     }
+
+    @Override
+    public SlackPingCommand ping() {
+        return null;
+    }
+
 }
