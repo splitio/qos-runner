@@ -10,6 +10,7 @@ import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
+import io.split.testrunner.util.SlackColors;
 
 /**
  * Gives that last time all the tests ran and were green.
@@ -21,13 +22,16 @@ public class SlackGreenCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
+    private final SlackColors colors;
 
     @Inject
     public SlackGreenCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
+            SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
+        this.colors = slackColors;
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.state = state;
     }
@@ -39,10 +43,10 @@ public class SlackGreenCommand implements SlackCommandExecutor {
         SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
         if (lastGreen == null) {
             slackAttachment.setText("--");
-            slackAttachment.setColor("danger");
+            slackAttachment.setColor(colors.getFailed());
         } else {
             slackAttachment.setText(String.format("Last Green %s %s", dateFormatter.formatDate(lastGreen), state.isPaused() ? "(Paused)" : ""));
-            slackAttachment.setColor("good");
+            slackAttachment.setColor(colors.getSuccess());
         }
         session
                 .sendMessage(

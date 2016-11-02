@@ -8,6 +8,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.testrunner.util.SlackColors;
 
 import java.util.List;
 import java.util.Properties;
@@ -20,13 +21,16 @@ public class SlackConfigCommand implements SlackCommandExecutor {
 
     private final Properties configuration;
     private final String serverName;
+    private final SlackColors colors;
 
     @Inject
     public SlackConfigCommand(
+            SlackColors slackColors,
             @Named(QOSPropertiesModule.CONFIGURATION) Properties configuration,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.configuration = Preconditions.checkNotNull(configuration);
+        this.colors = Preconditions.checkNotNull(slackColors);
     }
 
 
@@ -42,7 +46,7 @@ public class SlackConfigCommand implements SlackCommandExecutor {
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", String.join("\n", confs), null);
         slackAttachment
-                .setColor("good");
+                .setColor(colors.getInfo());
 
         session
                 .sendMessage(

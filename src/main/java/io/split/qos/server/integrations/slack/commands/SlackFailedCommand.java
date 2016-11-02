@@ -10,6 +10,7 @@ import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
+import io.split.testrunner.util.SlackColors;
 
 import java.util.List;
 import java.util.Map;
@@ -22,15 +23,18 @@ public class SlackFailedCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
+    private final SlackColors colors;
 
     @Inject
     public SlackFailedCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
+            SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.state = state;
+        this.colors = slackColors;
     }
 
     @Override
@@ -53,7 +57,7 @@ public class SlackFailedCommand implements SlackCommandExecutor {
         String text = String.format("Total Failed Tests %s / %s", failed.size(), tests.size());
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
-                .setColor(failed.isEmpty() ? "good" : "danger");
+                .setColor(failed.isEmpty() ? colors.getSuccess() : colors.getFailed());
 
         SlackPreparedMessage.Builder sent = new SlackPreparedMessage
                 .Builder()
@@ -65,7 +69,7 @@ public class SlackFailedCommand implements SlackCommandExecutor {
                     .forEach(failedTest -> {
                         SlackAttachment failedAttachment = new SlackAttachment("", "", failedTest, null);
                         failedAttachment
-                                .setColor("warning");
+                                .setColor(colors.getWarning());
                         sent.addAttachment(failedAttachment);
                     });
         }

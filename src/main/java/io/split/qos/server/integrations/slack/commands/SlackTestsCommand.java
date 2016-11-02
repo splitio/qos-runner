@@ -12,6 +12,7 @@ import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
+import io.split.testrunner.util.SlackColors;
 
 import java.util.List;
 import java.util.Map;
@@ -26,15 +27,18 @@ public class SlackTestsCommand implements SlackCommandExecutor {
     private final DateFormatter dateFormatter;
 
     private static final int CHUNK_SIZE = 50;
+    private final SlackColors colors;
 
     @Inject
     public SlackTestsCommand(
+            SlackColors slackColors,
             QOSServerState state,
             DateFormatter dateFormatter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.state = state;
+        this.colors = slackColors;
     }
 
     @Override
@@ -61,11 +65,11 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                             dateFormatter.formatDate(value.getValue().when()));
                     SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
                     if (value.getValue().succeeded() == null) {
-                        testAttachment.setColor("warning");
+                        testAttachment.setColor(colors.getWarning());
                     } else if (value.getValue().succeeded()) {
-                        testAttachment.setColor("good");
+                        testAttachment.setColor(colors.getSuccess());
                     } else {
-                        testAttachment.setColor("danger");
+                        testAttachment.setColor(colors.getFailed());
                     }
                     toBeAdded.add(testAttachment);
                 });
@@ -80,7 +84,7 @@ public class SlackTestsCommand implements SlackCommandExecutor {
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
             slackAttachment
-                    .setColor("good");
+                    .setColor(colors.getInfo());
 
             SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
                     .Builder()

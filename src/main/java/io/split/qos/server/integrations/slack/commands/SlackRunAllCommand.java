@@ -10,6 +10,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerBehaviour;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.testrunner.util.SlackColors;
 import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
@@ -23,11 +24,14 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
     private final QOSServerBehaviour behaviour;
 
     private static final int CHUNK_SIZE = 50;
+    private final SlackColors colors;
 
     @Inject
     public SlackRunAllCommand(
+            SlackColors slackColors,
             QOSServerBehaviour behaviour,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
+        this.colors = slackColors;
         this.serverName = Preconditions.checkNotNull(serverName);
         this.behaviour = behaviour;
     }
@@ -42,7 +46,7 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
                 .forEach(test -> {
                     SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
                     testAttachment
-                            .setColor("good");
+                            .setColor(colors.getInfo());
                     toBeAdded.add(testAttachment);
                 });
         List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
@@ -56,7 +60,7 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
             slackAttachment
-                    .setColor("good");
+                    .setColor(colors.getInfo());
 
             SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
                     .Builder()

@@ -12,6 +12,7 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
+import io.split.testrunner.util.SlackColors;
 
 /**
  * Slacks some info about the server.
@@ -23,15 +24,18 @@ public class SlackInfoCommand implements SlackCommandExecutor {
     private final String serverName;
     private final DateFormatter dateFormatter;
     private final String suites;
+    private final SlackColors colors;
 
     @Inject
     public SlackInfoCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
+            SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
             @Named(QOSPropertiesModule.SUITES) String suites) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.state = state;
+        this.colors = slackColors;
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.suites = Preconditions.checkNotNull(suites);
     }
@@ -59,7 +63,7 @@ public class SlackInfoCommand implements SlackCommandExecutor {
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, "");
         slackAttachment
 
-                .setColor(state.isActive() ? "good" : "warning");
+                .setColor(state.isActive() ? colors.getInfo() : colors.getWarning());
         SlackPreparedMessage sent = new SlackPreparedMessage
                 .Builder()
                 .addAttachment(slackAttachment)

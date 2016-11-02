@@ -9,6 +9,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerBehaviour;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.testrunner.util.SlackColors;
 
 /**
  * Pauses the server. No new tests will be added, currently running tests
@@ -18,12 +19,15 @@ import io.split.qos.server.modules.QOSServerModule;
 public class SlackPauseCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerBehaviour behaviour;
+    private final SlackColors colors;
 
     @Inject
     public SlackPauseCommand(
             QOSServerBehaviour behaviour,
+            SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
+        this.colors = slackColors;
         this.behaviour = behaviour;
     }
 
@@ -34,8 +38,7 @@ public class SlackPauseCommand implements SlackCommandExecutor {
         String text = "Server PAUSED by " + messagePosted.getSender().getUserName();
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor("warning");
+        slackAttachment.setColor(colors.getWarning());
 
         session
                 .sendMessage(

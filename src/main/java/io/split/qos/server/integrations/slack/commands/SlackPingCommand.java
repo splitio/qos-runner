@@ -9,6 +9,7 @@ import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.testrunner.util.SlackColors;
 
 /**
  * Created on 11/1/16.
@@ -17,19 +18,22 @@ import io.split.qos.server.modules.QOSServerModule;
 public class SlackPingCommand implements SlackCommandExecutor {
 
     private final String serverName;
+    private final SlackColors colors;
 
     @Inject
     public SlackPingCommand(
+            SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
+        this.colors = slackColors;
         this.serverName = Preconditions.checkNotNull(serverName);
     }
 
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] PING", serverName.toUpperCase());
+        String title = String.format("[%s] PONG", serverName.toUpperCase());
         SlackAttachment slackAttachment = new SlackAttachment(title, "", "", "");
-        slackAttachment.setColor("good");
+        slackAttachment.setColor(colors.getInfo());
         SlackPreparedMessage sent = new SlackPreparedMessage
                 .Builder()
                 .addAttachment(slackAttachment)

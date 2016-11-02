@@ -10,6 +10,7 @@ import io.split.qos.server.QOSServerBehaviour;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.testrunner.util.SlackColors;
 import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
@@ -22,13 +23,16 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerBehaviour behaviour;
     private final SlackCommandGetter slackCommandGetter;
+    private final SlackColors colors;
 
     @Inject
     public SlackRunTestCommand(
+            SlackColors slackColors,
             QOSServerBehaviour behaviour,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
             SlackCommandGetter slackCommandGetter) {
         this.serverName = Preconditions.checkNotNull(serverName);
+        this.colors = slackColors;
         this.behaviour = behaviour;
         this.slackCommandGetter = Preconditions.checkNotNull(slackCommandGetter);
     }
@@ -61,7 +65,7 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
             slackAttachment
-                    .setColor("danger");
+                    .setColor(colors.getFailed());
             session
                     .sendMessage(
                             messagePosted.getChannel(),
@@ -74,7 +78,7 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
 
             SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
             slackAttachment
-                    .setColor("good");
+                    .setColor(colors.getSuccess());
             session
                     .sendMessage(
                             messagePosted.getChannel(),
