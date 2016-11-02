@@ -40,7 +40,7 @@ public class SlackFailedCommand implements SlackCommandExecutor {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         Map<String, QOSServerState.TestStatus> tests = state.tests();
-        String title = String.format("[%s] Failed Tests", serverName.toUpperCase());
+        String title = String.format("[%s] FAILED TESTS", serverName.toUpperCase());
 
         List<Map.Entry<String, QOSServerState.TestStatus>> failed = tests.entrySet()
                 .stream()

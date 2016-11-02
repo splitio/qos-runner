@@ -8,6 +8,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.testrunner.util.SlackColors;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,18 +20,21 @@ public class SlackCommandsCommand implements SlackCommandExecutor {
 
     private final String serverName;
     private final SlackCommandListener listener;
+    private final SlackColors colors;
 
     @Inject
     public SlackCommandsCommand(
             SlackCommandListener listener,
+            SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
+        this.colors = slackColors;
         this.listener = Preconditions.checkNotNull(listener);
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] Commands", serverName.toUpperCase());
+        String title = String.format("[%s] COMMANDs", serverName.toUpperCase());
 
         List<String> commands = listener
                 .commands()
@@ -41,7 +45,7 @@ public class SlackCommandsCommand implements SlackCommandExecutor {
 
         SlackAttachment slackAttachment = new SlackAttachment(title, "", String.join("\n", commands), null);
         slackAttachment
-                .setColor("good");
+                .setColor(colors.getInfo());
         session
                 .sendMessage(
                         messagePosted.getChannel(),

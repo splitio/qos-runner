@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class SlackRunTestCommand implements SlackCommandExecutor {
-    private static final String TITLE = "[%s] Run Test";
+    private static final String TITLE = "[%s] RUN TEST";
 
     private final String serverName;
     private final QOSServerBehaviour behaviour;

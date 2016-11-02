@@ -36,7 +36,7 @@ public class SlackConfigCommand implements SlackCommandExecutor {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] Config", serverName.toUpperCase());
+        String title = String.format("[%s] CONFIG", serverName.toUpperCase());
 
         List<String> confs = configuration
                 .entrySet()

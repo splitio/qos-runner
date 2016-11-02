@@ -39,7 +39,7 @@ public class SlackGreenCommand implements SlackCommandExecutor {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         Long lastGreen = state.lastGreen();
-        String title = String.format("[%s] Green", serverName.toUpperCase());
+        String title = String.format("[%s] GREEN", serverName.toUpperCase());
         SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
         if (lastGreen == null) {
             slackAttachment.setText("--");

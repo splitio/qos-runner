@@ -46,13 +46,13 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
                 .forEach(test -> {
                     SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
                     testAttachment
-                            .setColor(colors.getInfo());
+                            .setColor(colors.getWarning());
                     toBeAdded.add(testAttachment);
                 });
         List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
         int iteration = 0;
         for(int index = 0; index < partitions.size(); index++) {
-            String title = String.format("[%s] Tests", serverName.toUpperCase());
+            String title = String.format("[%s] TESTS", serverName.toUpperCase());
             String text = String.format("Total Tests to Run %s, tests %s - %s",
                     tests.size(),
                     1 + CHUNK_SIZE * iteration,
