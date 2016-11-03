@@ -60,6 +60,11 @@ public class SlackGreenCommand implements SlackCommandExecutor {
                 }
             }
             slackAttachment.setColor(colors.getFailed());
+            session
+                    .sendMessage(
+                            messagePosted.getChannel(),
+                            "",
+                            slackAttachment);
         } else {
             String title = String.format("[%s] GREEN", serverName.toUpperCase());
             SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
