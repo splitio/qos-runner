@@ -53,10 +53,10 @@ public class SlackGreenCommand implements SlackCommandExecutor {
                         .stream()
                         .map(testFailed -> testFailed.name())
                         .collect(Collectors.toList());
-                if (failedNames.size() <= 5) {
+                if (failedNames.size() >= 5) {
                     slackAttachment.setText(String.format("%s tests failing.", failedNames.size()));
                 } else {
-                    slackAttachment.setText(String.format("%s tests failing: [%s].", failedNames.size(), String.join(",", failedNames)));
+                    slackAttachment.setText(String.format("%s tests failing: \n %s.", failedNames.size(), String.join("\n", failedNames)));
                 }
             }
             slackAttachment.setColor(colors.getFailed());
