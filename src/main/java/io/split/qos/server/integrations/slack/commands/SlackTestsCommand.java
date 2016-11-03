@@ -48,13 +48,13 @@ public class SlackTestsCommand implements SlackCommandExecutor {
         tests.entrySet()
                 .stream()
                 .sorted((o1, o2) -> {
-                    if (o1.getValue().succeeded() == null && o2.getValue().succeeded() == null) {
+                    if (!o1.getValue().hasFinished() && !o2.getValue().hasFinished()) {
                         return 0;
                     }
-                    if (o1.getValue().succeeded() == null) {
+                    if (!o1.getValue().hasFinished()) {
                         return 1;
                     }
-                    if (o2.getValue().succeeded() == null) {
+                    if (!o2.getValue().hasFinished()) {
                         return -1;
                     }
                     return o1.getValue().succeeded().compareTo(o2.getValue().succeeded());

@@ -194,6 +194,10 @@ public class QOSServerState {
             return when;
         }
 
+        public boolean hasFinished() {
+            return when() != null;
+        }
+
         public Boolean succeeded() {
             return succeeded;
         }
