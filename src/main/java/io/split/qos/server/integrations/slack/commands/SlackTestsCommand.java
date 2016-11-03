@@ -49,19 +49,19 @@ public class SlackTestsCommand implements SlackCommandExecutor {
                 .stream()
                 .sorted((o1, o2) -> {
                     if (o1.getValue().hasFinished() &&  !o1.getValue().succeeded()) {
-                        return -1;
+                        return 1;
                     }
                     if (o2.getValue().hasFinished() &&  !o2.getValue().succeeded()) {
-                        return 1;
+                        return -1;
                     }
                     if (!o1.getValue().hasFinished() && !o2.getValue().hasFinished()) {
                         return 0;
                     }
                     if (!o1.getValue().hasFinished()) {
-                        return 1;
+                        return -1;
                     }
                     if (!o2.getValue().hasFinished()) {
-                        return -1;
+                        return 1;
                     }
                     return o1.getValue().succeeded().compareTo(o2.getValue().succeeded());
                 })
