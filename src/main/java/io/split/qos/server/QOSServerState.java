@@ -10,7 +10,9 @@ import org.junit.runner.Description;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Maintains the state of the server that is shared accross the app.
@@ -121,6 +123,16 @@ public class QOSServerState {
         return tests;
     }
 
+    public List<TestFailed> failedTests() {
+        return tests
+                .entrySet()
+                .stream()
+                .filter(entry -> (entry.getValue().succeeded() != null && !entry.getValue().succeeded()))
+                .sorted((o1, o2) -> o1.getValue().when().compareTo(o2.getValue().when()))
+                .map(entry -> new TestFailed(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
     public boolean isActive() {
         return Status.ACTIVE.equals(status());
     }
@@ -147,6 +159,22 @@ public class QOSServerState {
 
     public Long lastGreen() {
         return lastGreen;
+    }
+
+    public static class TestFailed {
+        private final String name;
+        private final TestStatus status;
+
+        private TestFailed(String name, TestStatus status) {
+            this.name = name;
+            this.status = status;
+        }
+
+        public String name() { return name; }
+
+        public TestStatus status() {
+            return status;
+        }
     }
 
     public static class TestStatus {

@@ -12,6 +12,9 @@ import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Gives that last time all the tests ran and were green.
  *
@@ -39,20 +42,35 @@ public class SlackGreenCommand implements SlackCommandExecutor {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         Long lastGreen = state.lastGreen();
-        String title = String.format("[%s] GREEN", serverName.toUpperCase());
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
         if (lastGreen == null) {
-            slackAttachment.setText("--");
+            String title = String.format("[%s] NOT GREEN", serverName.toUpperCase());
+            SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
+            List<QOSServerState.TestFailed> failed = state.failedTests();
+            if (failed.isEmpty()) {
+                slackAttachment.setText("No test failing, waiting cycle of green tests.");
+            } else {
+                List<String> failedNames = failed
+                        .stream()
+                        .map(testFailed -> testFailed.name())
+                        .collect(Collectors.toList());
+                if (failedNames.size() <= 5) {
+                    slackAttachment.setText(String.format("%s tests failing.", failedNames.size()));
+                } else {
+                    slackAttachment.setText(String.format("%s tests failing: [%s].", failedNames.size(), String.join(",", failedNames)));
+                }
+            }
             slackAttachment.setColor(colors.getFailed());
         } else {
+            String title = String.format("[%s] GREEN", serverName.toUpperCase());
+            SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
             slackAttachment.setText(String.format("Last Green %s %s", dateFormatter.formatDate(lastGreen), state.isPaused() ? "(Paused)" : ""));
             slackAttachment.setColor(colors.getSuccess());
+            session
+                    .sendMessage(
+                            messagePosted.getChannel(),
+                            "",
+                            slackAttachment);
         }
-        session
-                .sendMessage(
-                        messagePosted.getChannel(),
-                        "",
-                        slackAttachment);
         return true;
     }
 

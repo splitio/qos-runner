@@ -13,7 +13,6 @@ import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,22 +38,17 @@ public class SlackFailedCommand implements SlackCommandExecutor {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        Map<String, QOSServerState.TestStatus> tests = state.tests();
         String title = String.format("[%s] FAILED TESTS", serverName.toUpperCase());
 
-        List<Map.Entry<String, QOSServerState.TestStatus>> failed = tests.entrySet()
-                .stream()
-                .filter(entry -> (entry.getValue().succeeded() != null && !entry.getValue().succeeded()))
-                .sorted((o1, o2) -> o1.getValue().when().compareTo(o2.getValue().when()))
-                .collect(Collectors.toList());
+        List<QOSServerState.TestFailed> failed = state.failedTests();
         List<String> failedTests = failed
                 .stream()
                 .map(value -> String.format("%s | %s",
-                        value.getKey(),
-                        dateFormatter.formatDate(value.getValue().when())))
+                        value.name(),
+                        dateFormatter.formatDate(value.status().when())))
                 .collect(Collectors.toList());
 
-        String text = String.format("Total Failed Tests %s / %s", failed.size(), tests.size());
+        String text = String.format("Total Failed Tests %s / %s", failed.size(), state.tests().size());
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
                 .setColor(failed.isEmpty() ? colors.getSuccess() : colors.getFailed());
