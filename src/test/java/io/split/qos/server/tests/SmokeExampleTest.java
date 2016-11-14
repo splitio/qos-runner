@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * THIS IS USED BY UNIT TESTS.
  */
-@Suites("SMOKE")
+@Suites("SMOKE_FOR_TEST")
 public class SmokeExampleTest {
 
     @Test
