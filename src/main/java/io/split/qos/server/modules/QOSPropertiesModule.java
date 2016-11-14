@@ -53,6 +53,10 @@ public class QOSPropertiesModule extends AbstractModule {
     // all the tests when the servers starts.
     // Default true
     public static final String SPREAD_TESTS = "SPREAD_TESTS";
+    // If true, there will be no cycle, failed tests will be rescheduled according to
+    // DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL, but succeeded ones won't be rescheduled
+    // Default false
+    public static final String ONE_RUN = "ONE_RUN";
     // Which suites to run.
     // Default SMOKE
     public static final String SUITES = "SUITES";
@@ -98,6 +102,7 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(DELAY_BETWEEN_IN_SECONDS, "300");
         defaultProperties.put(DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL, "60");
         defaultProperties.put(SPREAD_TESTS, "true");
+        defaultProperties.put(ONE_RUN, "false");
         defaultProperties.put(SUITES, "SMOKE");
         defaultProperties.put(SUITES_PACKAGE, "io.split");
         defaultProperties.put(TIME_ZONE, "America/Los_Angeles");

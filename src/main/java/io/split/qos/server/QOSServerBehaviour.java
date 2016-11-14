@@ -60,12 +60,14 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     private final String serverName;
     private final QOSTestsTracker tracker;
     private final Integer delayBetweenInSecondsWhenFail;
+    private final boolean oneRun;
 
     @Inject
     public QOSServerBehaviour(
             @Named(QOSPropertiesModule.DELAY_BETWEEN_IN_SECONDS) String delayBetweenInSeconds,
             @Named(QOSPropertiesModule.DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL) String delayBetweenInSecondsWhenFail,
             @Named(QOSPropertiesModule.SPREAD_TESTS) String spreadTests,
+            @Named(QOSPropertiesModule.ONE_RUN) String oneRun,
             @Named(QOSPropertiesModule.PARALLEL_TESTS) String parallelTests,
             @Named(QOSPropertiesModule.SHUTDOWN_WAIT_IN_MINUTES) String shutdownWaitInMinutes,
             @Named(QOSPropertiesModule.SUITES) String suites,
@@ -79,6 +81,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
         this.delayBetweenInSeconds = Integer.valueOf(Preconditions.checkNotNull(delayBetweenInSeconds));
         this.delayBetweenInSecondsWhenFail = Integer.valueOf(Preconditions.checkNotNull(delayBetweenInSecondsWhenFail));
         this.spreadTests = Boolean.valueOf(Preconditions.checkNotNull(spreadTests));
+        this.oneRun = Boolean.valueOf(Preconditions.checkNotNull(oneRun));
         this.shutdownWaitInMinutes = Integer.valueOf(Preconditions.checkNotNull(shutdownWaitInMinutes));
         this.parallelTests = Integer.valueOf(Preconditions.checkNotNull(parallelTests));
         this.pausableExecutor = new PausableScheduledThreadPoolExecutor(this.parallelTests);
@@ -179,16 +182,19 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
              */
             @Override
             public void onSuccess(TestResult result) {
-                int triggerAgain = result.getResult().wasSuccessful()? when : ifFailed;
-                LOG.info(String.format("%s finished, rerunning in %s seconds",
-                        method.getName(), triggerAgain));
-                JUnitRunner runner = testRunnerFactory.create(method, Optional.empty());
-                ListenableFuture<TestResult> future = executor.schedule(
-                        runner,
-                        triggerAgain,
-                        TimeUnit.SECONDS);
-                tracker.track(method, runner, future);
-                Futures.addCallback(future, createCallback(method, afterFirst, ifFailed, afterFirst));
+                // If test failed or oneRun was false... run the test
+                if (!result.getResult().wasSuccessful() || !oneRun) {
+                    int triggerAgain = result.getResult().wasSuccessful()? when : ifFailed;
+                    LOG.info(String.format("%s finished, rerunning in %s seconds",
+                            method.getName(), triggerAgain));
+                    JUnitRunner runner = testRunnerFactory.create(method, Optional.empty());
+                    ListenableFuture<TestResult> future = executor.schedule(
+                            runner,
+                            triggerAgain,
+                            TimeUnit.SECONDS);
+                    tracker.track(method, runner, future);
+                    Futures.addCallback(future, createCallback(method, afterFirst, ifFailed, afterFirst));
+                }
                 processOutput(result.getOut());
             }
 
