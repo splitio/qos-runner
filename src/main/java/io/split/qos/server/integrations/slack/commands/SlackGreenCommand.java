@@ -51,7 +51,7 @@ public class SlackGreenCommand implements SlackCommandExecutor {
             } else {
                 List<String> failedNames = failed
                         .stream()
-                        .map(testFailed -> testFailed.name())
+                        .map(QOSServerState.TestFailed::name)
                         .collect(Collectors.toList());
                 if (failedNames.size() >= 5) {
                     slackAttachment.setText(String.format("%s tests failing.", failedNames.size()));

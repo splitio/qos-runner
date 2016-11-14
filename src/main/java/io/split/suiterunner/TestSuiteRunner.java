@@ -76,24 +76,21 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
         LOG.info(String.format("STARTING TestSuiteRunner for suites [%s], running %s tests in parallel", suites, parallel));
         List<Class> classesToTest = TestsFinder.getTestClassesOfPackage(suites, suitesPackage);
         LOG.info(String.format("Test Classes to run: %s", classesToTest));
-        try {
-            classesToTest.stream()
-                    .forEach(test -> Lists.newArrayList(test.getMethods())
-                            .stream()
-                            .filter(method -> method.isAnnotationPresent(Test.class)
-                                    && !method.isAnnotationPresent(Ignore.class))
+        classesToTest.stream()
+                .forEach(test -> Lists.newArrayList(test.getMethods())
+                        .stream()
+                        .filter(method -> method.isAnnotationPresent(Test.class)
+                                && !method.isAnnotationPresent(Ignore.class))
 
-                            .forEach(method -> {
-                                totalTests++;
-                                Util.pause(Util.getRandom(500, 2000));
-                                ListenableFuture<TestResult> future = executor.submit(testRunnerFactory.create(method, Optional.empty()));
-                                Futures.addCallback(future, createCallback(method));
-                            }));
-            LOG.info(String.format("Total tests running: %s", totalTests));
-            executor.awaitTermination(timeoutInMinutes, TimeUnit.MINUTES);
-            LOG.info(String.format("FINISHED TestSuiteRunner for suites [%s] in %s", suites, Util.TO_PRETTY_FORMAT.apply(System.currentTimeMillis() - start)));
-        } finally {
-        }
+                        .forEach(method -> {
+                            totalTests++;
+                            Util.pause(Util.getRandom(500, 2000));
+                            ListenableFuture<TestResult> future = executor.submit(testRunnerFactory.create(method, Optional.empty()));
+                            Futures.addCallback(future, createCallback(method));
+                        }));
+        LOG.info(String.format("Total tests running: %s", totalTests));
+        executor.awaitTermination(timeoutInMinutes, TimeUnit.MINUTES);
+        LOG.info(String.format("FINISHED TestSuiteRunner for suites [%s] in %s", suites, Util.TO_PRETTY_FORMAT.apply(System.currentTimeMillis() - start)));
         return ImmutableList.copyOf(results);
     }
 
