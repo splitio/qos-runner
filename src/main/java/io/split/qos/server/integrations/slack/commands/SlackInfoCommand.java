@@ -25,6 +25,7 @@ public class SlackInfoCommand implements SlackCommandExecutor {
     private final DateFormatter dateFormatter;
     private final String suites;
     private final SlackColors colors;
+    private final String description;
 
     @Inject
     public SlackInfoCommand(
@@ -32,10 +33,12 @@ public class SlackInfoCommand implements SlackCommandExecutor {
             DateFormatter dateFormatter,
             SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
-            @Named(QOSPropertiesModule.SUITES) String suites) {
+            @Named(QOSPropertiesModule.SUITES) String suites,
+            @Named(QOSPropertiesModule.DESCRIPTION) String description) {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.state = state;
         this.colors = slackColors;
+        this.description = Preconditions.checkNotNull(description);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.suites = Preconditions.checkNotNull(suites);
     }
@@ -44,7 +47,8 @@ public class SlackInfoCommand implements SlackCommandExecutor {
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         String text = null;
         if (state.isActive()) {
-            text = String.format("Status: %s [since %s]\nLast test finished: %s\nSuites: %s\nResumed by: %s",
+            text = String.format("Description: %s \n\nStatus: %s [since %s]\nLast test finished: %s\nSuites: %s\nResumed by: %s",
+                    description,
                     state.status(),
                     dateFormatter.formatDate(state.activeSince()),
                     dateFormatter.formatDate(state.lastTestFinished()),
@@ -52,7 +56,8 @@ public class SlackInfoCommand implements SlackCommandExecutor {
                     state.who());
         }
         if (state.isPaused()) {
-            text = String.format("Status: %s [since %s]\nLast test finished: %s\nSuites: %s\nPaused by: %s",
+            text = String.format("Description: %s \n\nStatus: %s [since %s]\nLast test finished: %s\nSuites: %s\nPaused by: %s",
+                    description,
                     state.status(),
                     dateFormatter.formatDate(state.pausedSince()),
                     dateFormatter.formatDate(state.lastTestFinished()),
