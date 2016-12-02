@@ -13,6 +13,7 @@ import io.split.testrunner.util.DateFormatter;
 import org.junit.runner.Description;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Singleton
 public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration implements SlackBroadcaster {
@@ -37,24 +38,25 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
     }
 
     @Override
-    public void firstFailure(Description description, Throwable error, String serverName, Long duration) {
+    public void firstFailure(Description description, Throwable error, String serverName, Long duration,
+                             Optional<String> titleLink) {
         if (digestEnabled()) {
-            broadcastFailure(description, error, digestChannel(), serverName, duration);
+            broadcastFailure(description, error, digestChannel(), serverName, duration, titleLink);
         }
     }
 
     @Override
-    public void recovery(Description description, String serverName, Long duration) {
+    public void recovery(Description description, String serverName, Long duration, Optional<String> titleLink) {
         if (digestEnabled()) {
-            broadcastRecovery(description, serverName, duration);
+            broadcastRecovery(description, serverName, duration, titleLink);
         }
     }
 
     @Override
-    public void success(Description description, String serverName, Long duration) {
+    public void success(Description description, String serverName, Long duration, Optional<String> titleLink) {
         if (verboseEnabled()) {
             if (broadcastSuccess || !this.isInitializedByServer()) {
-                broadcastSuccess(description, serverName, duration);
+                broadcastSuccess(description, serverName, duration, titleLink);
             }
         }
     }
@@ -97,9 +99,10 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
     }
 
     @Override
-    public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure, Long duration) {
+    public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure,
+                                   Long duration, Optional<String> titleLink) {
         if (digestEnabled()) {
-            reBroadcastFailure(description, error, digestChannel(), serverName, whenFirstFailure, duration);
+            reBroadcastFailure(description, error, digestChannel(), serverName, whenFirstFailure, duration, titleLink);
         }
     }
 
@@ -108,7 +111,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                                     SlackChannel channel,
                                     String serverName,
                                     Long whenFirstFailure,
-                                    Long duration) {
+                                    Long duration,
+                                    Optional<String> titleLink) {
         String text = String.format("%s#%s finished in %s",
                                         description.getClassName(),
                                         description.getMethodName(),
@@ -120,6 +124,7 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
                 .setColor("danger");
+        titleLink.ifPresent(link -> slackAttachment.setTitleLink(link));
 
         slackSession()
                 .sendMessage(channel,
@@ -152,7 +157,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
 
     private void broadcastRecovery(Description description,
                                    String serverName,
-                                   Long duration) {
+                                   Long duration,
+                                   Optional<String> titleLink) {
         String text = String.format("%s#%s finished in %s", description.getClassName(), description.getMethodName(),
                 dateFormatter.formatHour(duration));
         String title = String.format("[%s] RECOVERED", serverName.toUpperCase());
@@ -160,6 +166,7 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
                 .setColor("good");
+        titleLink.ifPresent(link -> slackAttachment.setTitleLink(link));
 
         slackSession()
                 .sendMessage(
@@ -171,23 +178,25 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
 
     private void broadcastSuccess(Description description,
                                   String serverName,
-                                  Long duration) {
+                                  Long duration,
+                                  Optional<String> titleLink) {
         slackSession()
                 .sendMessage(
                         verboseChannel(),
                         "",
-                        createHeaderAttachment(description, true, serverName, duration));
+                        createHeaderAttachment(description, true, serverName, duration, titleLink));
     }
 
     private void broadcastFailure(Description description,
                                   Throwable error,
                                   SlackChannel channel,
                                   String serverName,
-                                  Long duration) {
+                                  Long duration,
+                                  Optional<String> titleLink) {
         slackSession()
                 .sendMessage(channel,
                         "",
-                        createHeaderAttachment(description, false, serverName, duration));
+                        createHeaderAttachment(description, false, serverName, duration, titleLink));
 
         String title = "Reason";
         String text = error.getMessage();
@@ -215,7 +224,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
     private SlackAttachment createHeaderAttachment(Description description,
                                                    boolean succeeded,
                                                    String serverName,
-                                                   Long duration) {
+                                                   Long duration,
+                                                   Optional<String> titleLink) {
         String text = String.format("%s#%s finished in %s", description.getClassName(), description.getMethodName(),
                 dateFormatter.formatHour(duration));
         String title = String.format("[%s] %s", serverName.toUpperCase(), succeeded ? "SUCCEEDED" : "FAILED");
@@ -223,6 +233,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
                 .setColor(succeeded ? "good" : "danger");
+        titleLink
+                .ifPresent(link -> slackAttachment.setTitleLink(link));
         return slackAttachment;
     }
 

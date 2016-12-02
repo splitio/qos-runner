@@ -1,6 +1,7 @@
 package io.split.qos.server.util;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Rule for broadcasting success/failures.
@@ -29,6 +31,8 @@ public class BroadcasterTestWatcher extends TestWatcher {
     private static final Map<String, Long> started = Maps.newConcurrentMap();
     private final FailCondition failCondition;
     private final QOSServerState state;
+    //Hack to set the title link at runtime
+    private Optional<String> titleLink;
 
     @Inject
     public BroadcasterTestWatcher(
@@ -38,6 +42,12 @@ public class BroadcasterTestWatcher extends TestWatcher {
         this.slack = Preconditions.checkNotNull(integrationTestFactory).slackBroadcastIntegration();
         this.failCondition = Preconditions.checkNotNull(failCondition);
         this.state = Preconditions.checkNotNull(state);
+        this.titleLink = Optional.empty();
+    }
+
+    public void setTitleLink(String titleLink) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(titleLink));
+        this.titleLink = Optional.of(titleLink);
     }
 
     @Override
@@ -50,9 +60,9 @@ public class BroadcasterTestWatcher extends TestWatcher {
         Broadcast broadcast = failCondition.success(description);
         if (slack.isEnabled()) {
             if (Broadcast.RECOVERY.equals(broadcast)) {
-                slack.recovery(description, serverName, length);
+                slack.recovery(description, serverName, length, titleLink);
             }
-            slack.success(description, serverName, length);
+            slack.success(description, serverName, length, titleLink);
         }
     }
 
@@ -66,10 +76,10 @@ public class BroadcasterTestWatcher extends TestWatcher {
         if (slack.isEnabled()) {
             if (Broadcast.FIRST.equals(broadcast)) {
                 state.testFailed(description);
-                slack.firstFailure(description, e, serverName, length);
+                slack.firstFailure(description, e, serverName, length, titleLink);
             }
             if (Broadcast.REBROADCAST.equals(broadcast)) {
-                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(description), length);
+                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(description), length, titleLink);
             }
         }
     }
