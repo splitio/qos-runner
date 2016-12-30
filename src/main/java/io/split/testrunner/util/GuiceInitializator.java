@@ -1,8 +1,10 @@
 package io.split.testrunner.util;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * We need to inject the properties file both from the server, and from each test (each one has its own injector).
@@ -26,7 +28,7 @@ import java.nio.file.Path;
  * </p>
  */
 public class GuiceInitializator {
-    private static Path propertiesPath;
+    private static List<Path> propertiesPath = Lists.newArrayList();
     private static boolean qos = false;
     private static boolean method = false;
     private static boolean suite = false;
@@ -78,15 +80,22 @@ public class GuiceInitializator {
      *
      * @param path where the conf file is.
      */
-    public static void setPath(Path path) {
+    public static void addPath(Path path) {
         Preconditions.checkNotNull(path);
-        propertiesPath = path;
+        propertiesPath.add(path);
+    }
+
+    public static void addAllPaths(List<Path> paths) {
+        Preconditions.checkNotNull(paths);
+        for(Path path : paths) {
+            addPath(path);
+        }
     }
 
     /**
-     * @return the path where the conf file is.
+     * @return the paths where the conf file is.
      */
-    public static Path getPath() {
+    public static List<Path> getPaths() {
         return propertiesPath;
     }
 }

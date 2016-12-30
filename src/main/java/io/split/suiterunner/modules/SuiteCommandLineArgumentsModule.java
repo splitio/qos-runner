@@ -1,12 +1,14 @@
 package io.split.suiterunner.modules;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import io.split.suiterunner.commandline.SuiteCommandLineArguments;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Guice Module for Command Line Arguments
@@ -26,13 +28,15 @@ public class SuiteCommandLineArgumentsModule extends AbstractModule {
     /**
      * @return the properties where the conf resides.
      */
-    public Path propertiesPath() {
-        Path path = Paths.get(suiteCommandLineArguments.conf());
-        if (Files.exists(path)) {
-            return path;
-        } else {
-            throw new IllegalArgumentException(String.format("File %s does not exists", suiteCommandLineArguments.conf()));
+    public List<Path> propertiesPath() {
+        List<Path> result = Lists.newArrayList();
+        for(String conf : suiteCommandLineArguments.confs()) {
+            if (!Files.exists(Paths.get(conf))) {
+                throw new IllegalArgumentException(String.format("File %s does not exist", conf));
+            }
+            result.add(Paths.get(conf));
         }
+        return result;
     }
 
     @Override

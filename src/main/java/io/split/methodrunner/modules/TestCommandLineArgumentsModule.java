@@ -1,12 +1,14 @@
 package io.split.methodrunner.modules;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import io.split.methodrunner.commandline.MethodCommandLineArguments;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Guice Module for Command Line Arguments
@@ -27,13 +29,15 @@ public class TestCommandLineArgumentsModule extends AbstractModule {
     /**
      * @return the properties where the conf resides.
      */
-    public Path propertiesPath() {
-        Path path = Paths.get(methodCommandLineArguments.conf());
-        if (Files.exists(path)) {
-            return path;
-        } else {
-            throw new IllegalArgumentException(String.format("File %s does not exists", methodCommandLineArguments.conf()));
+    public List<Path> propertiesPath() {
+        List<Path> result = Lists.newArrayList();
+        for(String conf : methodCommandLineArguments.confs()) {
+            if (!Files.exists(Paths.get(conf))) {
+                throw new IllegalArgumentException(String.format("File %s does not exist", conf));
+            }
+            result.add(Paths.get(conf));
         }
+        return result;
     }
 
     @Override

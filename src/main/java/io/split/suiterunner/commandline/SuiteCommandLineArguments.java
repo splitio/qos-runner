@@ -3,9 +3,11 @@ package io.split.suiterunner.commandline;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Parses command line arguments for the suites to run.
@@ -15,8 +17,12 @@ public class SuiteCommandLineArguments {
     /**
      * @return Where the properties file resides.
      */
-    public String conf() {
-        return conf;
+    public List<String> confs() {
+        return Arrays
+                .asList(confs.split(","))
+                .stream()
+                .filter(s -> !Strings.isNullOrEmpty(s))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -49,8 +55,8 @@ public class SuiteCommandLineArguments {
     @Parameter(names = "-parallel", description = "How many tests in parallel are going to run")
     private Integer parallel = 1;
 
-    @Parameter(names = "-conf", description = "Path to the properties file if exists", required = true)
-    private String conf = "";
+    @Parameter(names = "-confs", description = "Path to the properties file if exists", required = true)
+    private String confs = "";
 
     /**
      * Call this with the command line arguments to parse them.

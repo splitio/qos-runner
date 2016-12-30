@@ -4,8 +4,12 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Parses command line arguments for tests to run.
@@ -26,8 +30,8 @@ public class MethodCommandLineArguments {
     @Parameter(names = "-parallel", description = "How many tests in parallel are going to run")
     private Integer parallel = 1;
 
-    @Parameter(names = "-conf", description = "Path to the properties file if exists", required = true)
-    private String conf = "";
+    @Parameter(names = "-confs", description = "Path to the properties file if exists", required = true)
+    private String confs = "";
 
     /**
      * @return the test to run.
@@ -53,8 +57,12 @@ public class MethodCommandLineArguments {
     /**
      * @return Where the properties file resides.
      */
-    public String conf() {
-        return conf;
+    public List<String> confs() {
+        return Arrays
+                .asList(confs.split(","))
+                .stream()
+                .filter(s -> !Strings.isNullOrEmpty(s))
+                .collect(Collectors.toList());
     }
 
     /**

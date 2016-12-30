@@ -1,13 +1,19 @@
 package io.split.methodrunner.modules;
 
 import com.beust.jcommander.ParameterException;
-import io.split.methodrunner.TestMethodRunnerTest;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
 
 public class TestCommandLineArgumentsModuleTest {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -29,13 +35,13 @@ public class TestCommandLineArgumentsModuleTest {
     @Test
     public void createWithInexistentNoConf() {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("does not exists");
+        expectedException.expectMessage("does not exist");
         String[] arguments = {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
                 "-test",
                 "initalizeWithValidClassAndTest",
-                "-conf",
+                "-confs",
                 "inexistent"
         };
         TestCommandLineArgumentsModule argumentsModule = new TestCommandLineArgumentsModule(arguments);
@@ -43,17 +49,19 @@ public class TestCommandLineArgumentsModuleTest {
     }
 
     @Test
-    public void createWithExistentNoConf() {
+    public void createWithExistentNoConf() throws IOException {
+        File conf = temporaryFolder.newFile("conf");
         String[] arguments = {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
                 "-test",
                 "initalizeWithValidClassAndTest",
-                "-conf",
-                TestMethodRunnerTest.PROPERTIES
+                "-confs",
+                conf.getAbsolutePath()
         };
         TestCommandLineArgumentsModule argumentsModule = new TestCommandLineArgumentsModule(arguments);
-        Assert.assertEquals("conf/qos.test.properties", argumentsModule.propertiesPath().toString());
+        Assert.assertEquals(conf.getAbsolutePath(), argumentsModule.propertiesPath().get(0).toString());
+        Assert.assertEquals(1, argumentsModule.propertiesPath().size());
     }
 
 }

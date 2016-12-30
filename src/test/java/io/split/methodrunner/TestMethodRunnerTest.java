@@ -3,15 +3,21 @@ package io.split.methodrunner;
 import com.google.inject.Injector;
 import io.split.testrunner.junit.TestResult;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class TestMethodRunnerTest {
-    public static final String PROPERTIES = "conf/qos.test.properties";
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void runValidTest() throws InterruptedException {
+    public void runValidTest() throws InterruptedException, IOException {
+        File conf = temporaryFolder.newFile("conf");
         String[] arguments = {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
@@ -21,8 +27,8 @@ public class TestMethodRunnerTest {
                 "2",
                 "-quantity",
                 "2",
-                "-conf",
-                PROPERTIES
+                "-confs",
+                conf.getAbsolutePath()
         };
         Injector injector = TestMethodRunner.createInjector(arguments);
         TestMethodRunner runner = injector.getInstance(TestMethodRunner.class);

@@ -1,12 +1,19 @@
 package io.split.methodrunner.commandline;
 
-import io.split.methodrunner.TestMethodRunnerTest;
+import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MethodCommandLineArgumentsTest {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -38,24 +45,26 @@ public class MethodCommandLineArgumentsTest {
     }
 
     @Test
-    public void initalizeWithValidClassAndTest() {
+    public void initalizeWithValidClassAndTest() throws IOException {
+        File conf = temporaryFolder.newFile("conf");
         String[] arguments = {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
                 "-test",
                 "initalizeWithValidClassAndTest",
-                "-conf",
-                TestMethodRunnerTest.PROPERTIES
+                "-confs",
+                conf.getAbsolutePath()
         };
         MethodCommandLineArguments theArgs = MethodCommandLineArguments.initialize(arguments);
         Assert.assertEquals("initalizeWithValidClassAndTest", theArgs.test().getName());
         Assert.assertEquals(1, theArgs.quantity());
         Assert.assertEquals(1, theArgs.parallel());
-        Assert.assertEquals(TestMethodRunnerTest.PROPERTIES, theArgs.conf());
+        Assert.assertEquals(Lists.newArrayList(conf.getAbsolutePath()), theArgs.confs());
     }
 
     @Test
-    public void initalizeWithQuantityParallelAndConf() {
+    public void initalizeWithQuantityParallelAndConf() throws IOException {
+        File conf = temporaryFolder.newFile("conf");
         String[] arguments = {
                 "-clazz",
                 "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
@@ -65,13 +74,13 @@ public class MethodCommandLineArgumentsTest {
                 "3",
                 "-quantity",
                 "5",
-                "-conf",
-                TestMethodRunnerTest.PROPERTIES
+                "-confs",
+                conf.getAbsolutePath()
         };
         MethodCommandLineArguments theArgs = MethodCommandLineArguments.initialize(arguments);
         Assert.assertEquals("initalizeWithValidClassAndTest", theArgs.test().getName());
         Assert.assertEquals(5, theArgs.quantity());
         Assert.assertEquals(3, theArgs.parallel());
-        Assert.assertEquals(TestMethodRunnerTest.PROPERTIES, theArgs.conf());
+        Assert.assertEquals(Lists.newArrayList(conf.getAbsolutePath()), theArgs.confs());
     }
 }

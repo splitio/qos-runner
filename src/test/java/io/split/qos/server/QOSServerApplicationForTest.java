@@ -1,20 +1,24 @@
 package io.split.qos.server;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
-import io.split.testrunner.util.GuiceInitializator;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModuleForTest;
 import io.split.qos.server.resources.HealthResource;
+import io.split.testrunner.util.GuiceInitializator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QOSServerApplicationForTest extends Application<QOSServerConfigurationForTest> {
     private static final Logger LOG = LoggerFactory.getLogger(QOSServerApplicationForTest.class);
@@ -31,10 +35,17 @@ public class QOSServerApplicationForTest extends Application<QOSServerConfigurat
     public void run(QOSServerConfigurationForTest configuration, Environment environment) throws Exception {
         name = configuration.getServerName();
 
+        String config = configuration.getConfig();
         // HACK so it can be loaded by the tests, since they use another guice injector.
-        LOG.info("Setting Conf variable to: " + configuration.getConfig());
-        GuiceInitializator.setPath(Paths.get(configuration.getConfig()));
-
+        LOG.info("Setting Confs to: " + config);
+        if (Strings.isNullOrEmpty(config)) {
+            throw new IllegalArgumentException("Please set Config in the yaml");
+        }
+        List<Path> toBeAdded = Arrays.stream(config.split(","))
+                .filter(s -> !Strings.isNullOrEmpty(s))
+                .map(s -> Paths.get(s))
+                .collect(Collectors.toList());
+        GuiceInitializator.addAllPaths(toBeAdded);
         //Not IDEAL but have to keep compatibility with DropWizard 0.9.2, so cannot use
         //GuiceWizard.
         List<Module> modules = Lists.newArrayList(

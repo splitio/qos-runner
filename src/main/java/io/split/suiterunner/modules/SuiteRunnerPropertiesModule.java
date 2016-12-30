@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -35,18 +36,19 @@ public class SuiteRunnerPropertiesModule extends AbstractModule {
                 .stream()
                 .forEach(entry -> theProperties.setProperty(entry.getKey(), entry.getValue()));
 
-        Path propertiesPath = GuiceInitializator.getPath();
-        // Loads the properties set in the properties file.
-        if (Files.exists(propertiesPath)) {
-            try {
-                theProperties.load(new FileInputStream(propertiesPath.toFile()));
-            } catch (IOException e) {
-                throw new IllegalStateException("Failed to load properties file " + propertiesPath, e);
+        List<Path> paths = GuiceInitializator.getPaths();
+        for(Path propertiesPath : paths) {
+            // Loads the properties set in the properties file.
+            if (Files.exists(propertiesPath)) {
+                try {
+                    theProperties.load(new FileInputStream(propertiesPath.toFile()));
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to load properties file " + propertiesPath, e);
+                }
+            } else {
+                throw new IllegalArgumentException("Properties file does not exist " + propertiesPath);
             }
-        } else {
-            throw new IllegalArgumentException("Properties file does not exist " + propertiesPath);
         }
-
         Names.bindProperties(binder(), theProperties);
     }
 }

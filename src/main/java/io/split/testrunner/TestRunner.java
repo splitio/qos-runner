@@ -19,6 +19,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,10 +41,12 @@ public class TestRunner extends BlockJUnit4ClassRunner {
         // This is for running tests from the IDE.
         // Basically you can set the annotation @QOSConfig and that will be used as properties file.
         // If it is not already set, meaning the server didn't set it.
-        if (GuiceInitializator.getPath() == null && clazz.isAnnotationPresent(PropertiesConfig.class)) {
+        if (GuiceInitializator.getPaths().isEmpty() && clazz.isAnnotationPresent(PropertiesConfig.class)) {
             PropertiesConfig annotation = clazz.getAnnotation(PropertiesConfig.class);
-            String configPath = annotation.value();
-            GuiceInitializator.setPath(Paths.get(configPath));
+            Arrays.asList(annotation.value())
+                    .stream()
+                    .forEach(path -> GuiceInitializator.addPath(Paths.get(path)));
+
         }
 
         this.injector = this.createInjectorFor(clazz);

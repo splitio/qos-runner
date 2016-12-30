@@ -7,7 +7,7 @@ apply plugin: 'signing'
 
 group = "io.split"
 archivesBaseName = "qosrunner"
-version = "1.31"
+version = "2.0"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 

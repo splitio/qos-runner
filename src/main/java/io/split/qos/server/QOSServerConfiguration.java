@@ -20,6 +20,7 @@ public class QOSServerConfiguration extends Configuration {
         return serverName;
     }
 
+    //Comma separated list of configs.
     @JsonProperty
     public String getConfig() {
         return config;

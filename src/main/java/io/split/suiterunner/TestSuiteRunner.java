@@ -182,12 +182,11 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
     @VisibleForTesting
     public static Injector createInjector(String[] args) {
         SuiteCommandLineArgumentsModule suiteCommandLineArgumentsModule= new SuiteCommandLineArgumentsModule(args);
-        GuiceInitializator.setPath(suiteCommandLineArgumentsModule.propertiesPath());
+        GuiceInitializator.addAllPaths(suiteCommandLineArgumentsModule.propertiesPath());
         GuiceInitializator.setSuite();
         List<Module> modules = Lists.newArrayList(suiteCommandLineArgumentsModule,
                 new SuiteRunnerPropertiesModule(),
                 new TestRunnerModule());
-
         return Guice.createInjector(modules);
     }
 

@@ -16,7 +16,7 @@ public class SuiteCommandLineArgumentsTest {
     @Test
     public void testNoArguments() {
         expectedException.expect(ParameterException.class);
-        expectedException.expectMessage("The following options are required: -suitesPackage -conf -suites");
+        expectedException.expectMessage("The following options are required: -suitesPackage -suites -confs");
         String[] arguments = { };
         SuiteCommandLineArguments.initialize(arguments);
     }
@@ -24,7 +24,7 @@ public class SuiteCommandLineArgumentsTest {
     @Test
     public void testWithParameters() {
         String[] arguments = {
-                "-conf",
+                "-confs",
                 "conf",
                 "-suites",
                 "a,b,c",
@@ -32,7 +32,7 @@ public class SuiteCommandLineArgumentsTest {
                 "package"
         };
         SuiteCommandLineArguments lineArguments = SuiteCommandLineArguments.initialize(arguments);
-        Assert.assertEquals("conf", lineArguments.conf());
+        Assert.assertEquals("conf", lineArguments.confs().get(0));
         Assert.assertEquals(Arrays.asList("a", "b", "c"), lineArguments.suites());
         Assert.assertEquals("package", lineArguments.suitesPackage());
         Assert.assertEquals(1, lineArguments.parallel());
@@ -41,7 +41,7 @@ public class SuiteCommandLineArgumentsTest {
     @Test
     public void testWithParallel() {
         String[] arguments = {
-                "-conf",
+                "-confs",
                 "conf",
                 "-suites",
                 "a,b,c",
@@ -51,7 +51,7 @@ public class SuiteCommandLineArgumentsTest {
                 "3"
         };
         SuiteCommandLineArguments lineArguments = SuiteCommandLineArguments.initialize(arguments);
-        Assert.assertEquals("conf", lineArguments.conf());
+        Assert.assertEquals("conf", lineArguments.confs().get(0));
         Assert.assertEquals(Arrays.asList("a", "b", "c"), lineArguments.suites());
         Assert.assertEquals("package", lineArguments.suitesPackage());
         Assert.assertEquals(3, lineArguments.parallel());
