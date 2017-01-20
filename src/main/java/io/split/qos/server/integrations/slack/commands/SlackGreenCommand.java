@@ -47,8 +47,11 @@ public class SlackGreenCommand implements SlackCommandExecutor {
             SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
             List<QOSServerState.TestFailed> failed = state.failedTests();
             if (failed.isEmpty()) {
-                slackAttachment.setText("No test failing, waiting cycle of green tests.");
+                slackAttachment.setTitle(String.format("[%s] WAITING CYCLE", serverName.toUpperCase()));
+                slackAttachment.setText("No test failing, waiting cycle of all successful tests.");
+                slackAttachment.setColor(colors.getWarning());
             } else {
+                slackAttachment.setColor(colors.getFailed());
                 List<String> failedNames = failed
                         .stream()
                         .map(QOSServerState.TestFailed::name)
@@ -59,7 +62,6 @@ public class SlackGreenCommand implements SlackCommandExecutor {
                     slackAttachment.setText(String.format("%s tests failing: \n %s.", failedNames.size(), String.join("\n", failedNames)));
                 }
             }
-            slackAttachment.setColor(colors.getFailed());
             session
                     .sendMessage(
                             messagePosted.getChannel(),
