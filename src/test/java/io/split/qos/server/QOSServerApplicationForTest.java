@@ -33,6 +33,7 @@ public class QOSServerApplicationForTest extends Application<QOSServerConfigurat
 
     @Override
     public void run(QOSServerConfigurationForTest configuration, Environment environment) throws Exception {
+        GuiceInitializator.initialize();
         name = configuration.getServerName();
 
         String config = configuration.getConfig();

@@ -19,6 +19,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     private final Provider<SlackRunTestCommand> runTestProvider;
     private final Provider<SlackConfigCommand> configProvider;
     private final Provider<SlackPingCommand> pingProvider;
+    private final Provider<SlackStoryCommand> storyProvider;
 
     @Inject
     public SlackCommanderProviderImpl(
@@ -32,7 +33,8 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
             Provider<SlackRunAllCommand> runAllCommandProvider,
             Provider<SlackRunTestCommand> runTestCommandProvider,
             Provider<SlackConfigCommand> configCommandProvider,
-            Provider<SlackPingCommand> pingCommandProvider) {
+            Provider<SlackPingCommand> pingCommandProvider,
+            Provider<SlackStoryCommand> storyCommandProvider) {
         this.infoProvider = Preconditions.checkNotNull(infoCommandProvider);
         this.pauseProvider = Preconditions.checkNotNull(pauseCommandProvider);
         this.resumeProvider = Preconditions.checkNotNull(resumeCommandProvider);
@@ -44,28 +46,35 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
         this.runTestProvider = Preconditions.checkNotNull(runTestCommandProvider);
         this.configProvider = Preconditions.checkNotNull(configCommandProvider);
         this.pingProvider = Preconditions.checkNotNull(pingCommandProvider);
+        this.storyProvider = Preconditions.checkNotNull(storyCommandProvider);
     }
 
+    @Override
     public SlackInfoCommand info() {
         return infoProvider.get();
     }
 
+    @Override
     public SlackPauseCommand pause() {
         return pauseProvider.get();
     }
 
+    @Override
     public SlackResumeCommand resume() {
         return resumeProvider.get();
     }
 
+    @Override
     public SlackTestsCommand tests() {
         return testsProvider.get();
     }
 
+    @Override
     public SlackGreenCommand green() {
         return greenProvider.get();
     }
 
+    @Override
     public SlackCommandsCommand commands() {
         return commandsProvider.get();
     }
@@ -93,5 +102,10 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     @Override
     public SlackPingCommand ping() {
         return pingProvider.get();
+    }
+
+    @Override
+    public SlackStoryCommand story() {
+        return storyProvider.get();
     }
 }

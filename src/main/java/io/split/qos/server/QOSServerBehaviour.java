@@ -61,6 +61,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     private final QOSTestsTracker tracker;
     private final Integer delayBetweenInSecondsWhenFail;
     private final boolean oneRun;
+    private final TestsFinder testFinder;
 
     @Inject
     public QOSServerBehaviour(
@@ -75,6 +76,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
             JUnitRunnerFactory testRunnerFactory,
             IntegrationServerFactory integrationServerFactory,
+            TestsFinder testsFinder,
             QOSServerState state,
             QOSTestsTracker tracker) {
 
@@ -95,6 +97,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
         this.serverName = Preconditions.checkNotNull(serverName);
         this.pause("Initialization");
         this.tracker = Preconditions.checkNotNull(tracker);
+        this.testFinder = Preconditions.checkNotNull(testsFinder);
     }
 
     /**
@@ -117,7 +120,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             broadcastIntegration.initialize();
         }
 
-        List<Method> methodsToTest = TestsFinder.getTestMethodsOfPackage(suites, suitesPackage);
+        List<Method> methodsToTest = testFinder.getTestMethodsOfPackage(suites, suitesPackage);
         int total = methodsToTest.size();
         int schedule = 0;
         if (total == 0) {

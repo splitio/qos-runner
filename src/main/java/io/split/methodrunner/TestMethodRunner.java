@@ -185,6 +185,7 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
      */
     @VisibleForTesting
     public static Injector createInjector(String[] args) {
+        GuiceInitializator.initialize();
         TestCommandLineArgumentsModule testCommandLineArgumentsModule = new TestCommandLineArgumentsModule(args);
         GuiceInitializator.addAllPaths(testCommandLineArgumentsModule.propertiesPath());
         GuiceInitializator.setMethod();

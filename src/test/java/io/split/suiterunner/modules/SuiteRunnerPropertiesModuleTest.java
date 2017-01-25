@@ -9,7 +9,6 @@ import com.google.inject.name.Names;
 import io.split.methodrunner.modules.TestRunnerPropertiesModule;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.testrunner.util.GuiceInitializator;
-import io.split.testrunner.util.Suites;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-@Suites("SUITE1")
 public class SuiteRunnerPropertiesModuleTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -33,6 +31,7 @@ public class SuiteRunnerPropertiesModuleTest {
 
     @Test
     public void testWithEmpty() {
+        GuiceInitializator.initialize();
         expectedException.expect(RuntimeException.class);
         GuiceInitializator.addPath(Paths.get(""));
         List<Module> modules = Lists.newArrayList(new SuiteRunnerPropertiesModule());
@@ -41,6 +40,7 @@ public class SuiteRunnerPropertiesModuleTest {
 
     @Test
     public void testWithInexistent() {
+        GuiceInitializator.initialize();
         expectedException.expect(RuntimeException.class);
         GuiceInitializator.addPath(Paths.get("inexistent"));
         List<Module> modules = Lists.newArrayList(new SuiteRunnerPropertiesModule());
@@ -49,7 +49,8 @@ public class SuiteRunnerPropertiesModuleTest {
 
     @Test
     public void testWithExistent() throws IOException {
-        File conf = temporaryFolder.newFile("conf");
+        GuiceInitializator.initialize();
+        File conf = temporaryFolder.newFile("conf2");
         BufferedWriter output = new BufferedWriter(new FileWriter(conf.getAbsolutePath(), true));
         output.write("TIMEOUT_IN_MINUTES=21");
         output.newLine();

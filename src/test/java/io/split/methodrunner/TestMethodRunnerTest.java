@@ -20,9 +20,9 @@ public class TestMethodRunnerTest {
         File conf = temporaryFolder.newFile("conf");
         String[] arguments = {
                 "-clazz",
-                "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
+                "io.split.methodrunner.SuiteForTestMethodRunner",
                 "-test",
-                "initalizeWithValidClassAndTest",
+                "firstTest",
                 "-parallel",
                 "2",
                 "-quantity",

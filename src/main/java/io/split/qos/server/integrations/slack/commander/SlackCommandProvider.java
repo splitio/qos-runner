@@ -19,4 +19,5 @@ public interface SlackCommandProvider {
     SlackRunTestCommand runTest();
     SlackConfigCommand config();
     SlackPingCommand ping();
+    SlackStoryCommand story();
 }

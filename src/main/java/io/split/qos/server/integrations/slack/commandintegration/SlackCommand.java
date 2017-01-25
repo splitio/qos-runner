@@ -1,5 +1,7 @@
 package io.split.qos.server.integrations.slack.commandintegration;
 
+import com.google.common.base.Preconditions;
+
 import java.util.List;
 
 /**
@@ -17,8 +19,8 @@ public class SlackCommand {
      * @param arguments Arguments of the command.
      */
     SlackCommand(String command, List<String> arguments) {
-        this.command = command;
-        this.arguments = arguments;
+        this.command = Preconditions.checkNotNull(command);
+        this.arguments = Preconditions.checkNotNull(arguments);
     }
 
     public String command() {

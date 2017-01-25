@@ -2,6 +2,7 @@ package io.split.suiterunner;
 
 import com.google.inject.Injector;
 import io.split.testrunner.junit.TestResult;
+import io.split.testrunner.util.GuiceInitializator;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,10 +19,11 @@ public class TestSuiteRunnerTest {
 
     @Test
     public void runValidSuite() throws IOException, InterruptedException {
-        File conf = temporaryFolder.newFile("conf");
+        GuiceInitializator.initialize();
+        File conf = temporaryFolder.newFile();
         String[] arguments = {
                 "-suites",
-                "SUITE1,suite2",
+                "SUITE_FOR_TEST_SUITE,suite2",
                 "-suitesPackage",
                 "io.split",
                 "-parallel",
@@ -32,12 +34,7 @@ public class TestSuiteRunnerTest {
         Injector injector = TestSuiteRunner.createInjector(arguments);
         TestSuiteRunner runner = injector.getInstance(TestSuiteRunner.class);
         List<TestResult> results = runner.call();
-        Assert.assertEquals(6, results.size());
+        Assert.assertEquals(1, results.size());
         Assert.assertTrue(results.get(0).getResult().wasSuccessful());
-        Assert.assertTrue(results.get(1).getResult().wasSuccessful());
-        Assert.assertTrue(results.get(2).getResult().wasSuccessful());
-        Assert.assertTrue(results.get(3).getResult().wasSuccessful());
-        Assert.assertTrue(results.get(4).getResult().wasSuccessful());
-        Assert.assertTrue(results.get(5).getResult().wasSuccessful());
     }
 }

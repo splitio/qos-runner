@@ -3,6 +3,7 @@ package io.split.qos.server.testcase;
 import com.google.inject.Inject;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
+import io.split.qos.server.stories.StoriesRule;
 import io.split.testrunner.guice.GuiceModules;
 import io.split.testrunner.TestRunner;
 import io.split.qos.server.modules.QOSClientsModule;
@@ -27,4 +28,8 @@ public class QOSTestCase {
     @Inject
     @Rule
     public BroadcasterTestWatcher broadcasterTestWatcher;
+
+    @Inject
+    @Rule
+    public StoriesRule storiesRule;
 }

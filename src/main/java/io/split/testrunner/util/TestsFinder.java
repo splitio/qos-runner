@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.ClassPath;
+import com.google.inject.Singleton;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ import java.util.List;
 /**
  * Used to find the classes that are annotated with the suite.
  */
+@Singleton
 public class TestsFinder {
 
     private static final ClassLoader CLASS_LOADER = TestsFinder.class.getClassLoader();
@@ -30,7 +32,7 @@ public class TestsFinder {
      * @throws IOException if failed to initialize the class loader.
      */
     @SuppressWarnings("unchecked")
-    public static List<Class> getTestClassesOfPackage(List<String> suites, String suitesPackage) throws IOException {
+    public List<Class> getTestClassesOfPackage(List<String> suites, String suitesPackage) throws IOException {
         Preconditions.checkNotNull(suites);
         Preconditions.checkArgument(!suites.isEmpty());
         Preconditions.checkArgument(!Strings.isNullOrEmpty(suitesPackage));
@@ -48,7 +50,7 @@ public class TestsFinder {
         }));
     }
 
-    public static List<Method> getTestMethodsOfPackage(List<String> suites, String suitesPackage) throws IOException {
+    public List<Method> getTestMethodsOfPackage(List<String> suites, String suitesPackage) throws IOException {
         Preconditions.checkNotNull(suites);
         Preconditions.checkArgument(!suites.isEmpty());
         Preconditions.checkArgument(!Strings.isNullOrEmpty(suitesPackage));
