@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Declare this rule if you want to have Stories.
+ */
 public class StoriesRule implements TestRule {
 
     private final QOSStories stories;
