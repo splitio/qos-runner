@@ -34,10 +34,10 @@ public class QOSStories {
                         return false;
                     }
                     String testId = entry.getKey();
+                    if (!testId.contains(fuzzyMethod)) {
+                        return false;
+                    }
                     if (fuzzyClass.isPresent()) {
-                        if (!testId.contains(fuzzyMethod)) {
-                            return false;
-                        }
                         if (!testId.contains(fuzzyClass.get())) {
                             return false;
                         }
@@ -45,7 +45,7 @@ public class QOSStories {
                     return true;
                 })
                 .findAny();
-        if (!any.isPresent()) {
+        if (any.isPresent()) {
             return Optional.of(any.get().getValue());
         }
         return Optional.empty();
