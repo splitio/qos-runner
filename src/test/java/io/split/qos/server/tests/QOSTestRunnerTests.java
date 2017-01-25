@@ -4,7 +4,6 @@ import io.split.qos.server.BaseCaseForTest;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.junit.TestResult;
-import io.split.qos.server.util.SmokeExampleTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,7 +14,7 @@ public class QOSTestRunnerTests extends BaseCaseForTest {
 
     @Test
     public void testSucceed() throws Exception {
-        Method emptyMethod = SmokeExampleTest.class.getMethod("testOne");
+        Method emptyMethod = MockTestForTestRunnerTests.class.getMethod("testOne");
 
         JUnitRunnerFactory runnerFactory = injector().getInstance(JUnitRunnerFactory.class);
         JUnitRunner qosTestRunner = runnerFactory.create(emptyMethod, Optional.empty());

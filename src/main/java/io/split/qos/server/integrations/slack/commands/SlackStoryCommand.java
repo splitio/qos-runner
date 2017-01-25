@@ -121,7 +121,11 @@ public class SlackStoryCommand implements SlackCommandExecutor {
                     .steps()
                     .stream()
                     .forEach(step -> {
-                        SlackAttachment stepAttachment = new SlackAttachment(step.description(), "", "", null);
+                        SlackAttachment stepAttachment = new SlackAttachment(
+                                step.title(),
+                                "",
+                                step.description().isPresent() ? step.description().get() : "",
+                                null);
                         stepAttachment.setColor(slackColors.getWarning());
                         toBeAdded.add(stepAttachment);
                     });

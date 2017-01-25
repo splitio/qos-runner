@@ -57,9 +57,15 @@ public class Story {
         return finished;
     }
 
-    public void addStep(String stepDescription) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(stepDescription));
-        steps.add(new Step(stepDescription, System.currentTimeMillis()));
+    public void addStep(String title, String description) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(title));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(description));
+        steps.add(new Step(title, description, System.currentTimeMillis()));
+    }
+
+    public void addStep(String title) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(title));
+        steps.add(new Step(title, System.currentTimeMillis()));
     }
 
     public void start(long started) {
