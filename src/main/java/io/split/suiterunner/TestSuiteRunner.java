@@ -53,12 +53,14 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
     private final ListeningExecutorService executor;
     private final List<TestResult> results;
     private final int parallel;
+    private final TestsFinder testFinder;
     private int totalTests;
 
     @Inject
     public TestSuiteRunner(
             @Named(SuiteRunnerPropertiesModule.TIMEOUT_IN_MINUTES) String timeOutInMinutes,
             SuiteCommandLineArguments arguments,
+            TestsFinder testFinder,
             JUnitRunnerFactory testRunnerFactory) {
         this.testRunnerFactory = Preconditions.checkNotNull(testRunnerFactory);
         this.suites = arguments.suites();
@@ -68,13 +70,14 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
         this.executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(parallel));
         this.totalTests = 0;
         this.results = Collections.synchronizedList(Lists.newArrayList());
+        this.testFinder = Preconditions.checkNotNull(testFinder);
     }
 
     @Override
     public List<TestResult> call() throws IOException, InterruptedException {
         long start = System.currentTimeMillis();
         LOG.info(String.format("STARTING TestSuiteRunner for suites [%s], running %s tests in parallel", suites, parallel));
-        List<Class> classesToTest = TestsFinder.getTestClassesOfPackage(suites, suitesPackage);
+        List<Class> classesToTest = testFinder.getTestClassesOfPackage(suites, suitesPackage);
         LOG.info(String.format("Test Classes to run: %s", classesToTest));
         classesToTest.stream()
                 .forEach(test -> Lists.newArrayList(test.getMethods())
@@ -181,6 +184,7 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
      */
     @VisibleForTesting
     public static Injector createInjector(String[] args) {
+        GuiceInitializator.initialize();
         SuiteCommandLineArgumentsModule suiteCommandLineArgumentsModule= new SuiteCommandLineArgumentsModule(args);
         GuiceInitializator.addAllPaths(suiteCommandLineArgumentsModule.propertiesPath());
         GuiceInitializator.setSuite();

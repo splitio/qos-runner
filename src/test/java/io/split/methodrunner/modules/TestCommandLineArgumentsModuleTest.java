@@ -24,9 +24,9 @@ public class TestCommandLineArgumentsModuleTest {
         expectedException.expectMessage("-conf");
         String[] arguments = {
                 "-clazz",
-                "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
+                "io.split.methodrunner.SuiteForTestMethodRunner",
                 "-test",
-                "initalizeWithValidClassAndTest"
+                "firstTest",
         };
         TestCommandLineArgumentsModule module = new TestCommandLineArgumentsModule(arguments);
         module.propertiesPath();
@@ -38,9 +38,9 @@ public class TestCommandLineArgumentsModuleTest {
         expectedException.expectMessage("does not exist");
         String[] arguments = {
                 "-clazz",
-                "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
+                "io.split.methodrunner.SuiteForTestMethodRunner",
                 "-test",
-                "initalizeWithValidClassAndTest",
+                "firstTest",
                 "-confs",
                 "inexistent"
         };
@@ -53,9 +53,9 @@ public class TestCommandLineArgumentsModuleTest {
         File conf = temporaryFolder.newFile("conf");
         String[] arguments = {
                 "-clazz",
-                "io.split.methodrunner.commandline.MethodCommandLineArgumentsTest",
+                "io.split.methodrunner.SuiteForTestMethodRunner",
                 "-test",
-                "initalizeWithValidClassAndTest",
+                "firstTest",
                 "-confs",
                 conf.getAbsolutePath()
         };

@@ -40,6 +40,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
 
     @Override
     public void run(QOSServerConfiguration configuration, Environment environment) throws Exception {
+        GuiceInitializator.initialize();
         name = configuration.getServerName();
 
         String config = configuration.getConfig();

@@ -75,6 +75,12 @@ public class GuiceInitializator {
         return suite;
     }
 
+    public static void initialize() {
+        propertiesPath = Lists.newArrayList();
+        qos = false;
+        method = false;
+        suite = false;
+    }
     /**
      * Set where the conf file is
      *

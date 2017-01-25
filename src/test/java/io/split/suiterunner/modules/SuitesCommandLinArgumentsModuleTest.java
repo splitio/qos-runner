@@ -1,7 +1,6 @@
 package io.split.suiterunner.modules;
 
 import com.beust.jcommander.ParameterException;
-import io.split.testrunner.util.Suites;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,7 +10,6 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 
-@Suites("SUITE2")
 public class SuitesCommandLinArgumentsModuleTest {
 
     @Rule

@@ -1,5 +1,6 @@
 package io.split.methodrunner.modules;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -37,6 +38,7 @@ public class TestRunnerPropertiesModule extends AbstractModule {
                 .forEach(entry -> theProperties.setProperty(entry.getKey(), entry.getValue()));
 
         List<Path> paths = GuiceInitializator.getPaths();
+        List<Path> doNotExist = Lists.newArrayList();
         for(Path propertiesPath : paths) {
             // Loads the properties set in the properties file.
             if (Files.exists(propertiesPath)) {
@@ -46,8 +48,11 @@ public class TestRunnerPropertiesModule extends AbstractModule {
                     throw new IllegalStateException("Failed to load properties file " + propertiesPath, e);
                 }
             } else {
-                throw new IllegalArgumentException("Properties file does not exist " + propertiesPath);
+                doNotExist.add(propertiesPath);
             }
+        }
+        if (!doNotExist.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Properties %s of %s do not exist", doNotExist, paths));
         }
 
         Names.bindProperties(binder(), theProperties);

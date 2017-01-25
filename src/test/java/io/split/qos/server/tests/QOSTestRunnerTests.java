@@ -4,6 +4,7 @@ import io.split.qos.server.BaseCaseForTest;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.junit.TestResult;
+import io.split.qos.server.util.SmokeExampleTest;
 import org.junit.Assert;
 import org.junit.Test;
 
