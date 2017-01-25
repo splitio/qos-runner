@@ -12,6 +12,7 @@ import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.qos.server.modules.QOSCommonModule;
 import io.split.qos.server.modules.QOSFailWithModule;
 import io.split.qos.server.stories.QOSStories;
+import io.split.qos.server.stories.Story;
 import io.split.testrunner.guice.ExtraModules;
 import io.split.testrunner.guice.GuiceModules;
 import io.split.testrunner.util.GuiceInitializator;
@@ -91,7 +92,8 @@ public class TestRunner extends BlockJUnit4ClassRunner {
                         QOSServerApplication.injector.getInstance(SlackCommon.class),
                         QOSServerApplication.injector.getInstance(QOSServerState.class),
                         QOSServerApplication.injector.getInstance(QOSStories.class),
-                        QOSServerApplication.injector.getInstance(TestsFinder.class)));
+                        QOSServerApplication.injector.getInstance(TestsFinder.class),
+                        QOSServerApplication.injector.getInstance(Story.class)));
             }
         }
         modules.add(getFailCondition(theClass));

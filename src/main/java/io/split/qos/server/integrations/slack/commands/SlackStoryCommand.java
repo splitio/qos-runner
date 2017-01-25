@@ -50,8 +50,11 @@ public class SlackStoryCommand implements SlackCommandExecutor {
         SlackCommand slackCommand = slackCommandGetter.get(messagePosted).get();
         List<String> arguments = slackCommand.arguments();
         Optional<Story> theStory;
+        if (!arguments.isEmpty() && arguments.get(0).equals(serverName)) {
+            arguments.remove(0);
+        }
         if (arguments.isEmpty()) {
-            theStory = stories.getLatestStory();
+            theStory = stories.getLatestFailedStory();
         } else if (arguments.size() == 1) {
             theStory = stories.getStory(Optional.empty(), arguments.get(0));
         } else {
@@ -69,41 +72,75 @@ public class SlackStoryCommand implements SlackCommandExecutor {
     private void slackStory(Story story, SlackMessagePosted messagePosted, SlackSession session) {
         List<SlackAttachment> toBeAdded = Lists.newArrayList();
 
+        String color = story.isSucceeded() ? slackColors.getSuccess() : slackColors.getFailed();
+        /** Story Test Id**/
+        if (story.testId().isPresent()) {
+            SlackAttachment slackAttachment = new SlackAttachment("Test: ", "", story.testId().get(), null);
+            slackAttachment
+                    .setColor(color);
+            toBeAdded.add(slackAttachment);
+        }
         /** Story Title **/
-        String desciption = String.format("Test started: %s, duration %s",
-                dateFormater.formatDate(story.started()),
-                dateFormater.formatHour(story.finished() - story.started()));
-        SlackAttachment slackAttachment = new SlackAttachment(story.title(), "", desciption, null);
-        slackAttachment
-                .setColor(slackColors.getSuccess());
-        toBeAdded.add(slackAttachment);
+        if (story.title().isPresent()) {
+            SlackAttachment slackAttachment = new SlackAttachment("Title: ", "", story.title().get(), null);
+            slackAttachment
+                    .setColor(color);
+            toBeAdded.add(slackAttachment);
+        }
+        /** Description **/
+        if (story.description().isPresent()) {
+            SlackAttachment slackAttachment = new SlackAttachment("Description: ", "", story.description().get(), null);
+            slackAttachment
+                    .setColor(color);
+            toBeAdded.add(slackAttachment);
+        }
+        /** Time **/
+        if (story.started().isPresent()) {
+            String started = dateFormater.formatDate(story.started().get());
+            String duration = (story.finished().isPresent())
+                    ? dateFormater.formatHour(story.finished().get() - story.started().get())
+                    : "N/A";
+            String time = String.format("Test started: %s, duration %s",
+                    started,
+                    duration);
+            SlackAttachment slackAttachment = new SlackAttachment("Time: ", "", time, null);
+            slackAttachment
+                    .setColor(color);
+            toBeAdded.add(slackAttachment);
+        }
 
-        /** Story Description **/
-        slackAttachment = new SlackAttachment(story.description(), "", "", null);
-        slackAttachment
-                .setColor(slackColors.getSuccess());
-        toBeAdded.add(slackAttachment);
+        /** Steps **/
+        if (!story.steps().isEmpty()) {
+            SlackAttachment slackAttachment = new SlackAttachment("--------- STEPS ---------", "", "", null);
+            slackAttachment
+                    .setColor(color);
+            toBeAdded.add(slackAttachment);
 
-        /** Each Step **/
-        story
-                .steps()
-                .stream()
-                .forEach(step -> {
-                    SlackAttachment stepAttachment = new SlackAttachment(step.description(), "", "", null);
-                    stepAttachment.setColor(slackColors.getWarning());
-                    toBeAdded.add(stepAttachment);
-                });
+            /** Each Step **/
+            story
+                    .steps()
+                    .stream()
+                    .forEach(step -> {
+                        SlackAttachment stepAttachment = new SlackAttachment(step.description(), "", "", null);
+                        stepAttachment.setColor(slackColors.getWarning());
+                        toBeAdded.add(stepAttachment);
+                    });
+        } else {
+            SlackAttachment slackAttachment = new SlackAttachment("NO STEPS", "", "No @steps associated", null);
+            slackAttachment
+                    .setColor(color);
+            toBeAdded.add(slackAttachment);
+        }
 
         List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
         int iteration = 0;
         for(int index = 0; index < partitions.size(); index++) {
             /** Story Header **/
-            String title = String.format(TITLE, serverName.toUpperCase());
-            String description = String.format("Part %s of %s", iteration + 1, partitions.size());
-            SlackAttachment titleAttachment = new SlackAttachment(title, "", desciption, null);
-            slackAttachment
+            String storyTitle = String.format(TITLE, serverName.toUpperCase());
+            String desc = String.format("Part %s of %s", iteration + 1, partitions.size());
+            SlackAttachment titleAttachment = new SlackAttachment(storyTitle, "", desc, null);
+            titleAttachment
                     .setColor(slackColors.getInfo());
-
 
             SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
                     .Builder()
@@ -121,12 +158,14 @@ public class SlackStoryCommand implements SlackCommandExecutor {
         String text = "";
         if (arguments.isEmpty()) {
             text = "Could not find latest failed story";
-        } else if (arguments.size() == 1) {
-            text = "Could not find story for test with name " + arguments.get(0);
         } else {
-            text = String.format("Could not find story for test of class %s with name %s",
-                    arguments.get(0),
-                    arguments.get(1));
+            if (arguments.size() == 1) {
+                text = "Could not find story for test with name " + arguments.get(0);
+            } else {
+                text = String.format("Could not find story for test of class %s with name %s",
+                        arguments.get(0),
+                        arguments.get(1));
+            }
         }
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment

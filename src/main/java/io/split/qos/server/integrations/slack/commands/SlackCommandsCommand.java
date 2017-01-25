@@ -34,7 +34,7 @@ public class SlackCommandsCommand implements SlackCommandExecutor {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] COMMANDs", serverName.toUpperCase());
+        String title = String.format("[%s] COMMANDS", serverName.toUpperCase());
 
         List<String> commands = listener
                 .commands()

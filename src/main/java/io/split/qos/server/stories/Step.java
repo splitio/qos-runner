@@ -7,7 +7,7 @@ public class Step {
     private final long started;
     private final String description;
 
-    public Step(String description, long started) {
+    Step(String description, long started) {
         this.started = started;
         this.description = Preconditions.checkNotNull(description);
     }

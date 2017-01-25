@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
  * Base test case. All the classes should extend this.
  *
  * <p>
- *     If you feel adventurous, in your base case you could add the annotations and also add the rule
+ *     If you feel adventurous, in your base case you could add the annotations and also add the rules
  *     and it should work. IT SHOULD.
  * </p>
  */

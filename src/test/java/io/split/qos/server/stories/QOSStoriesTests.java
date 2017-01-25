@@ -1,7 +1,7 @@
-package io.split.qos.server.tests;
+package io.split.qos.server.stories;
 
-import io.split.qos.server.stories.QOSStories;
-import io.split.qos.server.stories.Story;
+import io.split.qos.server.BaseCaseForTest;
+import io.split.qos.server.tests.QOSServerBehaviourTests;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -11,14 +11,21 @@ import java.util.Optional;
 public class QOSStoriesTests {
 
     @Test
-    public void getLastWorks() {
+    public void getLastFailedWorks() {
         QOSStories qosStories = new QOSStories();
-        Assert.assertTrue(!qosStories.getLatestStory().isPresent());
+        Assert.assertFalse(qosStories.getLatestFailedStory().isPresent());
         Story firstStory = new Story();
         Story lastStory = new Story();
         qosStories.addStory(Description.createSuiteDescription(this.getClass()), firstStory);
         qosStories.addStory(Description.createSuiteDescription(QOSStoriesTests.class), lastStory);
-        Assert.assertEquals(lastStory, qosStories.getLatestStory().get());
+        Assert.assertFalse(qosStories.getLatestFailedStory().isPresent());
+        Story failedStory = new Story();
+        failedStory.setSucceeded(false);
+        qosStories.addStory(Description.createSuiteDescription(QOSServerBehaviourTests.class), failedStory);
+        Assert.assertEquals(failedStory, qosStories.getLatestFailedStory().get());
+        Story oneMore = new Story();
+        qosStories.addStory(Description.createSuiteDescription(BaseCaseForTest.class), oneMore);
+        Assert.assertEquals(failedStory, qosStories.getLatestFailedStory().get());
     }
 
     @Test

@@ -15,12 +15,12 @@ import java.util.Optional;
 public class QOSStories {
 
     private final Map<String, Story> stories;
-    private Story latest;
+    private Optional<Story> latestFailed;
 
     @Inject
     public QOSStories() {
         this.stories= Maps.newConcurrentMap();
-        this.latest = null;
+        this.latestFailed = Optional.empty();
     }
 
     public Optional<Story> getStory(Optional<String> fuzzyClass, String fuzzyMethod) {
@@ -51,17 +51,16 @@ public class QOSStories {
         return Optional.empty();
     }
 
-    public Optional<Story> getLatestStory() {
-        if (latest == null) {
-            return Optional.empty();
-        }
-        return Optional.of(latest);
+    public Optional<Story> getLatestFailedStory() {
+        return latestFailed;
     }
 
     public void addStory(Description description, Story story) {
         Preconditions.checkNotNull(description);
         Preconditions.checkNotNull(story);
         stories.put(Util.id(description), story);
-        latest = story;
+        if (!story.isSucceeded()) {
+            latestFailed = Optional.of(story);
+        }
     }
 }
