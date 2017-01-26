@@ -121,7 +121,7 @@ public class SlackStoryCommand implements SlackCommandExecutor {
                     .steps()
                     .stream()
                     .forEach(step -> {
-                        String title = String.format("[%s] %s", dateFormater.formatDate(step.started()), step.title());
+                        String title = String.format("%s [%s]", step.title(), dateFormater.formatDate(step.started()));
                         SlackAttachment stepAttachment = new SlackAttachment(
                                 title,
                                 "",
