@@ -111,7 +111,8 @@ public class SlackStoryCommand implements SlackCommandExecutor {
 
         /** Steps **/
         if (!story.steps().isEmpty()) {
-            SlackAttachment slackAttachment = new SlackAttachment("--------- STEPS ---------", "", "", null);
+            String theStepTitle = "------------------------------ STEPS ------------------------------";
+            SlackAttachment slackAttachment = new SlackAttachment(theStepTitle, "", "", null);
             slackAttachment
                     .setColor(color);
             toBeAdded.add(slackAttachment);
