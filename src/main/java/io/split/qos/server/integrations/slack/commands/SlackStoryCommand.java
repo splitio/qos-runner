@@ -124,7 +124,7 @@ public class SlackStoryCommand implements SlackCommandExecutor {
                         SlackAttachment stepAttachment = new SlackAttachment(
                                 step.title(),
                                 "",
-                                step.description().isPresent() ? step.description().get() : "",
+                                String.join("\n", step.descriptions()),
                                 null);
                         stepAttachment.setColor(slackColors.getWarning());
                         toBeAdded.add(stepAttachment);

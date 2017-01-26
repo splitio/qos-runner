@@ -1,25 +1,33 @@
 package io.split.qos.server.stories;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Preconditions;
 
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 
 public class Step {
 
     private final long started;
-    private final Optional<String> description;
+    private final List<String> descriptions;
     private final String title;
 
-    Step(String title, String description, long started) {
+    Step(long started, String title, List<String> descriptions) {
         this.started = started;
         this.title = Preconditions.checkNotNull(title);
-        this.description = Optional.of(Preconditions.checkNotNull(description));
+        this.descriptions = Preconditions.checkNotNull(descriptions);
     }
 
-    Step(String title, long started) {
+    Step(long started, String title) {
         this.started = started;
         this.title = Preconditions.checkNotNull(title);
-        this.description = Optional.empty();
+        this.descriptions = Lists.newArrayList();
+    }
+
+    Step(long started, String title, String... descriptions) {
+        this.started = started;
+        this.title = Preconditions.checkNotNull(title);
+        this.descriptions = Arrays.asList(Preconditions.checkNotNull(descriptions));
     }
 
     public Long started() {
@@ -30,7 +38,7 @@ public class Step {
         return title;
     }
 
-    public Optional<String> description() {
-        return description;
+    public List<String> descriptions() {
+        return descriptions;
     }
 }
