@@ -175,3 +175,29 @@ Pause the execution of tests. Tests that were currently running will finish
 Resume the execution of tests.
 
 ![Resume](https://github.com/splitio/qos-runner/blob/master/imgs/resume.png)
+
+### RUNALL
+
+Runs immediately all the tests.
+
+![Runall](https://github.com/splitio/qos-runner/blob/master/imgs/runall.png)
+
+### RUN
+
+Runs one test. Need to specify the class (Optional) and the test name.
+
+![Run](https://github.com/splitio/qos-runner/blob/master/imgs/run.png)
+
+### STORY
+
+Tells the story of one test. Need to specify the class (Optional) and the test name. Check later section for information about story.
+
+![Story](https://github.com/splitio/qos-runner/blob/master/imgs/story.png)
+
+### CONFIG
+
+Lists all the config properties of the server. For more info on how to add configuration properties, check later section.
+
+![Config](https://github.com/splitio/qos-runner/blob/master/imgs/config.png)
+
+
