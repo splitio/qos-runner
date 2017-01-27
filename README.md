@@ -200,7 +200,7 @@ Lists all the config properties of the server. For more info on how to add confi
 
 ![Config](https://github.com/splitio/qos-runner/blob/master/imgs/config.png)
 
-### Configuration
+## Configuration
 
 QOS-Runner uses [Guice](https://github.com/google/guice) for dependency injection. All the properties defined in the properties file will be accesed across the different classes with a simple @Inject annotation.
 
