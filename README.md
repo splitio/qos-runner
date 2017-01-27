@@ -72,6 +72,8 @@ DELAY_BETWEEN_IN_SECONDS=300
 DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL=5
 # If true, tests will be spread accross DELAY_BETWEEN_IN_SECONDS. i.e if you have 50 tests and cycle is 300 seconds, more or less every 6 seconds a test will run
 SPREAD_TESTS=true
+# When a test fails and keeps failing, it wont keep pushing notifications, instead will wait for this time until rebroadcasting
+RE_BROADCAST_FAILURE_IN_MINUTES=60
 
 # Comma separated list of Suites to run (@Suites tag)
 SUITES=SMOKE_FOR_TEST
@@ -90,15 +92,33 @@ Main class: io.split.qos.server.QOSServerApplication
 Program Arguments: server conf/qos.test.server.yml
 ```
 
-## Slack Commands
+## Slack Notifications
 
-QOS-Runner responds to commands in the Slack Console. For the examples, we will assume that the Slack Bot is names _@stagingbot_ and the _serverName_ defined in the yaml is _JAVA_.
+QOS-Runner pushes commands in the Slack Console. For the examples, we will assume that the Slack Bot is names _@stagingbot_ and the _serverName_ defined in the yaml is _JAVA_.
 
 ### TEST SUCCEEDED
 
 When a test runs and succeeds, it will push to the VERBOSE channel:
 
 ![Succeeded](https://github.com/splitio/qos-runner/blob/master/imgs/succeeded.png)
+
+### TEST FAILED
+
+When a test fails (consider CONSECUTIVE_FAILURES), it will push to the DIGEST channel
+
+![Failed](https://github.com/splitio/qos-runner/blob/master/imgs/failed.png)
+
+### TEST RECOVERED
+
+After a test has been failing, if it succeeds, it will push to the DIGEST channel
+
+![Recovered](https://github.com/splitio/qos-runner/blob/master/imgs/recovered.png)
+
+### TEST KEEPS FAILING
+
+If a test keeps failing after RE_BROADCAST_FAILURE_IN_MINUTES, it will push to DIGEST channel
+
+![KeepsFailing](https://github.com/splitio/qos-runner/blob/master/imgs/keeps_failing.png)
 
 ### INFO
 
