@@ -96,6 +96,10 @@ QOS-Runner responds to commands in the Slack Console. For the examples, we will 
 
 ### TEST SUCCEEDED
 
+When a test runs and succeeds, it will push to the VERBOSE channel:
+
+![Succeeded](https://github.com/splitio/qos-runner/blob/master/imgs/succeeded.png)
+
 ### INFO
 
 ```
