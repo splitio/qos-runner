@@ -91,7 +91,7 @@ public class QOSPropertiesModule extends AbstractModule {
 
     static {
         // Common
-        defaultProperties.put(SLACK_INTEGRATION, "false");
+        defaultProperties.put(SLACK_INTEGRATION, "true");
         defaultProperties.put(SLACK_BOT_TOKEN, "");
         defaultProperties.put(SLACK_VERBOSE_CHANNEL, "");
         defaultProperties.put(SLACK_DIGEST_CHANNEL, "");
@@ -110,7 +110,7 @@ public class QOSPropertiesModule extends AbstractModule {
 
         // Test
         defaultProperties.put(CONSECUTIVE_FAILURES, "2");
-        defaultProperties.put(BROADCAST_SUCCESS, "false");
+        defaultProperties.put(BROADCAST_SUCCESS, "true");
         defaultProperties.put(RE_BROADCAST_FAILURE_IN_MINUTES, "60");
     }
 
