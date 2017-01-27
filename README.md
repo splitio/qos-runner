@@ -81,7 +81,7 @@ SUITES_PACKAGE=io.split
 
 ### Starting the Sever.
 
-Simply run the Main class: _io.split.qos.server.QOSServerApplication_
+Simply run the Main class: _io.split.qos.server.QOSServerApplication_.  
 With the program arguments: _server path_to_the_yml_
 
 For example:
