@@ -146,6 +146,12 @@ Simple ping pong to check the server is there.
 
 ![Ping](https://github.com/splitio/qos-runner/blob/master/imgs/ping.png)
 
+### GREEN
+
+Shows if all the tests are succeeding and if there has been a full cycle of all the tests succeeding. More detailed explanation of what "green" means in different section.
+
+![Green](https://github.com/splitio/qos-runner/blob/master/imgs/green.png)
+
 ### TESTS
 
 List all the tests that the server runs
@@ -158,3 +164,14 @@ List all the tests that are currently failing.
 
 ![Failed](https://github.com/splitio/qos-runner/blob/master/imgs/failed_tests.png)
 
+### PAUSE
+
+Pause the execution of tests. Tests that were currently running will finish
+
+![Pause](https://github.com/splitio/qos-runner/blob/master/imgs/pause.png)
+
+### RESUME
+
+Resume the execution of tests.
+
+![Resume](https://github.com/splitio/qos-runner/blob/master/imgs/resume.png)
