@@ -200,4 +200,40 @@ Lists all the config properties of the server. For more info on how to add confi
 
 ![Config](https://github.com/splitio/qos-runner/blob/master/imgs/config.png)
 
+### Configuration
 
+QOS-Runner uses [Guice](https://github.com/google/guice) for dependency injection. All the properties defined in the properties file will be accesed across the different classes with a simple @Inject annotation.
+
+For example:
+
+Config file:
+
+```
+URL=https://www.google.com/
+```
+
+Can be used anywhere in the code by simply:
+
+```
+public class RequestTreatmentsGetterFactory {
+    @Inject
+    public RequestTreatmentsGetterFactory(@Named("URL) String url) {
+    }
+}
+```
+
+or
+
+```
+public class RequestTreatmentsGetterFactory {
+    @Inject
+    @Named("URL) 
+    private String url;
+}
+```
+
+Check Guice for more information about dependency injection.
+
+### Multiple configuratin files
+
+QOS-Runner allows a list of configuration files on the _config_ parameter in the yaml. That means it will import all the properties on those files. If for any case a property is duplicated, the value of the rightmost file on the list takes priority.
