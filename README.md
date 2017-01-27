@@ -89,3 +89,14 @@ For example:
 Main class: io.split.qos.server.QOSServerApplication
 Program Arguments: server conf/qos.test.server.yml
 ```
+
+## Slack Commands
+
+QOS-Runner responds to commands in the Slack Console. For the examples, we will assume that the Slack Bot is names _@stagingbot_ and the _serverName_ defined in the yaml is _JAVA_.
+
+### TEST SUCCEEDED
+
+### INFO
+
+```
+@bot
