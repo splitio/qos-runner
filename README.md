@@ -278,3 +278,40 @@ For Example, with a suite of 3 tests,  being _Ti_ time, _Pn_ being test _n_ pass
 * For instant _T6_, test 1 recovers, but it cannot return green since test 3 hasn't run yet since test 1 failed, so there is no full cycle of all green tests.
 * For isntant _T7_, now we have a full cycle of green tests, and _T5_ is returned as time.
 
+## Story
+
+Stories allow you to annotate your tests with a description and also to record the different steps that the test is performing. When a test fails, besides the stacktrace, you can use the story command for debugging.
+
+### Title and Description
+
+If you want the story of your test to have a Title and Description, you can annotate your test with the _@Title_ and _@Description_ tag.
+```
+@Test
+@Title("User falls according their segments")
+@Description("Sets a treatment that according to the segment will fall in one or another.")
+public void ifThenElseStatement() throws Exception {
+    ...
+}
+
+```
+
+![TitleAndDescription](https://github.com/splitio/qos-runner/blob/master/imgs/title_description.png)
+
+### Steps
+
+If you want to add a step to your test, simply get the singleton _Story_ using _@Inject_ and call one of the addStep() methods.
+
+```
+@Inject
+private Story story;
+
+public void aMethod(String name, String treatments, String definition) {
+    story.addStep("Updating Split", name,
+                "Treatments:", treatments),
+                "Definition:", definitions);
+}
+
+```
+
+![Steps](https://github.com/splitio/qos-runner/blob/master/imgs/steps.png)
+
