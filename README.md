@@ -24,7 +24,7 @@ public class SmokeExampleTest extends QOSTestCase {
     }
 }
 ```
-If you cannot extend _QOSTestCase_, simply in your base case declare the rules and the annotations that are defined in _QOSTestCase_.
+If you cannot extend _QOSTestCase_, simply in your base class declare the rules and the annotations that are defined in _QOSTestCase_.
 
 ## QOS Server Configuration
 
