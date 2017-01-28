@@ -98,10 +98,20 @@ Program Arguments: server conf/qos.test.server.yml
 
 ## [Slack Notifications] (https://github.com/splitio/qos-runner/wiki/Slack-Notifications)
 
+QOS-Runner pushes notifications to channels when tests fail/succeeds/recovers.
+
 ## [Slack Commands] (https://github.com/splitio/qos-runner/wiki/Slack-Commands)
+
+QOS-Runner can receive commands for pausing/resuming the tests, listing the tests, etc.
 
 ## [Configuration] (https://github.com/splitio/qos-runner/wiki/Configuration)
 
+Using the properties files for configuring your QOS-Runner.
+
 ## [Green Command] (https://github.com/splitio/qos-runner/wiki/Green-Command)
 
+In depth explanation of how the green command works.
+
 ## [Story] (https://github.com/splitio/qos-runner/wiki/Story)
+
+In depth explanation of how to add stories to your tests for debugging and logging purposes.
