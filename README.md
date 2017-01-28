@@ -237,3 +237,44 @@ Check Guice for more information about dependency injection.
 ### Multiple configuratin files
 
 QOS-Runner allows a list of configuration files on the _config_ parameter in the yaml. That means it will import all the properties on those files. If for any case a property is duplicated, the value of the rightmost file on the list takes priority.
+
+## Green Command
+
+The green command tells you if there has been a cycle that all the tests passed, and in that case, when did the cycle started. If _green_ returns that the server is green, you are sure that *all* the tests passed since the date being shown.
+
+For Example, with a suite of 3 tests,  being _Ti_ time, _Pn_ being test _n_ passed and _Fn_ test _n_ failed.
+
+### Example 1
+
+| T1 | T2 | T3 | T4 | T5 | T6 |
+| --- | --- | --- | --- | --- | --- |
+| P1 |  |  |  |  |  |
+|  | P2 |  |  |  |  |
+|  |  | P3 |  |  |  |
+|  |  |  | P1 |  |  |
+|  |  |  |  | P2 |  |
+
+* For instant _T1_ or _T2_ green command is executed, it will return that it is not green. Since At that point at least test number 3 was not executed.
+* For instant _T3_ the command is executed, then it will return green, with time _T1_ since the cycle of all tests green started in _T1_
+* For instant _T4_, it will return green and time _T2_
+* For instant _T5_, it will do so with _T3_
+
+### Example 2
+
+| T1 | T2 | T3 | T4 | T5 | T6 | T7 |
+| --- | --- | --- | --- | --- | --- | --- |
+| P1 |  |  |  |  |  | |
+|  | P2 |  |  |  |  | |
+|  |  | P3 |  |  |  | |
+|  |  |  | F1 |  |  | |
+|  |  |  |  | P2 |  | |
+|  |  |  |  |  | P1 | |
+|  |  |  |  |  |  | P3 |
+
+* For instant _T1_ or _T2_, not green.
+* For instant _T3_ it will return green and time _T1_
+* For instant _T4_, since test 1 failed, it wont return green.
+* For instant _T5_, still test 1 failing, so no green.
+* For instant _T6_, test 1 recovers, but it cannot return green since test 3 hasn't run yet since test 1 failed, so there is no full cycle of all green tests.
+* For isntant _T7_, now we have a full cycle of green tests, and _T5_ is returned as time.
+
