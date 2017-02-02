@@ -93,18 +93,26 @@ public class QOSServerState {
         this.tests.put(Util.id(method), TestStatus.get(null, null));
     }
 
-    public void testSucceeded(Description description) {
+    public void testSucceeded(String testId) {
         this.lastTestFinished = DateTime.now().getMillis();
-        this.tests.put(Util.id(description), TestStatus.get(lastTestFinished, true));
-        this.succeededInARow.put(Util.id(description), lastTestFinished);
+        this.tests.put(testId, TestStatus.get(lastTestFinished, true));
+        this.succeededInARow.put(testId, lastTestFinished);
         if (succeededInARow.size() == tests.size()) {
             lastGreen = Collections.min(succeededInARow.values());
         }
     }
 
+    public void testSucceeded(Description description) {
+        testSucceeded(Util.id(description));;
+    }
+
     public void testFailed(Description description) {
+        testFailed(Util.id(description));
+    }
+
+    public void testFailed(String testId) {
         this.lastTestFinished = DateTime.now().getMillis();
-        this.tests.put(Util.id(description), TestStatus.get(lastTestFinished, false));
+        this.tests.put(testId, TestStatus.get(lastTestFinished, false));
         this.succeededInARow.clear();
         this.lastGreen = null;
     }

@@ -1,5 +1,6 @@
 package io.split.qos.server;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -18,9 +19,9 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommandInt
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.pausable.PausableScheduledThreadPoolExecutor;
-import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
+import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.util.TestsFinder;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,6 +37,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Main Class that actually run the tests.
@@ -120,10 +122,8 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             broadcastIntegration.initialize();
         }
 
-        List<Method> methodsToTest = testFinder.getTestMethodsOfPackage(suites, suitesPackage);
-        int total = methodsToTest.size();
-        int schedule = 0;
-        if (total == 0) {
+        List<Method> sheduled = scheduleTests();
+        if (sheduled.size() == 0) {
             LOG.error("Could not find tests to run on " + suites + " package " + suitesPackage);
             if (broadcastIntegration.isEnabled()) {
                 String message = String.format("No tests found for %s, suites %s, package %s", serverName, suites, suitesPackage);
@@ -134,6 +134,27 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                 broadcastIntegration.broadcastVerbose("", slackAttachment);
             }
             return null;
+        }
+        if (broadcastIntegration.isEnabled()) {
+            String message = String.format("QOS Server '%s' is up", serverName);
+            SlackAttachment slackAttachment = new SlackAttachment(
+                    String.format("[%s] UP", serverName.toUpperCase()), "", message, null);
+            slackAttachment
+                    .setColor("good");
+
+            broadcastIntegration.broadcastVerbose("", slackAttachment);
+        }
+        resume("Initialization");
+        return null;
+    }
+
+    @VisibleForTesting
+    public List<Method> scheduleTests() throws Exception {
+        List<Method> methodsToTest = testFinder.getTestMethodsOfPackage(suites, suitesPackage);
+        int total = methodsToTest.size();
+        int schedule = 0;
+        if (total == 0) {
+            return Lists.newArrayList();
         }
         int step = (spreadTests) ? delayBetweenInSeconds / total : 1;
         LOG.info(String.format("Test Methods to run: %s, total tests to run %s, delay %s seconds, step between each test %s seconds",
@@ -155,17 +176,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                     delayBetweenInSeconds));
             schedule += step;
         }
-        if (broadcastIntegration.isEnabled()) {
-            String message = String.format("QOS Server '%s' is up", serverName);
-            SlackAttachment slackAttachment = new SlackAttachment(
-                    String.format("[%s] UP", serverName.toUpperCase()), "", message, null);
-            slackAttachment
-                    .setColor("good");
-
-            broadcastIntegration.broadcastVerbose("", slackAttachment);
-        }
-        resume("Initialization");
-        return null;
+        return  methodsToTest;
     }
 
     public void pause(String who) {
@@ -256,7 +267,23 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
 
     public List<Method> runAllNow() {
         List<Method> rerunning = Lists.newArrayList();
-        List<QOSTestsTracker.Tracked> notRunning = tracker.getNotRunning();
+        List<QOSTestsTracker.Tracked> notRunning = tracker
+                .getNotRunning()
+                .stream()
+                .sorted((firstTracked, secondTracked) -> {
+                    String firstId = Util.id(firstTracked.method());
+                    String secondId = Util.id(secondTracked.method());
+                    QOSServerState.TestStatus firstStatus = state.tests().get(firstId);
+                    QOSServerState.TestStatus secondStatus = state.tests().get(secondId);
+                    if (firstStatus == null || firstStatus.when() == null) {
+                        return -1;
+                    }
+                    if (secondStatus == null || secondStatus.when() == null) {
+                        return 1;
+                    }
+                    return firstStatus.when().compareTo(secondStatus.when());
+                })
+                .collect(Collectors.toList());
         if (notRunning.isEmpty()) {
             return rerunning;
         }
