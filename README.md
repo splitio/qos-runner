@@ -24,7 +24,7 @@ public class SmokeExampleTest extends QOSTestCase {
     }
 }
 ```
-If you cannot extend _QOSTestCase_, simply in your base case declare the rules and the annotations that are defined in _QOSTestCase_.
+If you cannot extend _QOSTestCase_, simply in your base class declare the rules and the annotations that are defined in _QOSTestCase_.
 
 ## QOS Server Configuration
 
@@ -96,185 +96,22 @@ Main class: io.split.qos.server.QOSServerApplication
 Program Arguments: server conf/qos.test.server.yml
 ```
 
-## Slack Notifications
+## [Slack Notifications] (https://github.com/splitio/qos-runner/wiki/Slack-Notifications)
 
-QOS-Runner pushes commands in the Slack Console. For the examples, we will assume that the Slack Bot is names _@stagingbot_ and the _serverName_ defined in the yaml is _JAVA_.
+QOS-Runner pushes notifications to channels when tests fail/succeeds/recovers.
 
-### TEST SUCCEEDED
+## [Slack Commands] (https://github.com/splitio/qos-runner/wiki/Slack-Commands)
 
-When a test runs and succeeds, it will push to the VERBOSE channel:
+QOS-Runner can receive commands for pausing/resuming the tests, listing the tests, etc.
 
-![Succeeded](https://github.com/splitio/qos-runner/blob/master/imgs/succeeded.png)
+## [Configuration] (https://github.com/splitio/qos-runner/wiki/Configuration)
 
-### TEST FAILED
+Using the properties files for configuring your QOS-Runner.
 
-When a test fails (consider CONSECUTIVE_FAILURES), it will push to the DIGEST channel
+## [Green Command] (https://github.com/splitio/qos-runner/wiki/Green-Command)
 
-![Failed](https://github.com/splitio/qos-runner/blob/master/imgs/failed.png)
+In depth explanation of how the green command works.
 
-### TEST RECOVERED
+## [Story] (https://github.com/splitio/qos-runner/wiki/Story)
 
-After a test has been failing, if it succeeds, it will push to the DIGEST channel
-
-![Recovered](https://github.com/splitio/qos-runner/blob/master/imgs/recovered.png)
-
-### TEST KEEPS FAILING
-
-If a test keeps failing after RE_BROADCAST_FAILURE_IN_MINUTES, it will push to DIGEST channel
-
-![KeepsFailing](https://github.com/splitio/qos-runner/blob/master/imgs/keeps_failing.png)
-
-## Slack Commands
-
-QOS-Runner will interface with its users via Slack, responding to different inquiries
-
-### INFO
-
-Basic information of the server, like Description, Status (Paused or Active), Suites running, etc.
-
-![Info](https://github.com/splitio/qos-runner/blob/master/imgs/info.png)
-
-### COMMANDS
-
-Lists the commands that the QOS-Server supports.
-
-![Commands](https://github.com/splitio/qos-runner/blob/master/imgs/commands.png)
-
-### PING
-
-Simple ping pong to check the server is there.
-
-![Ping](https://github.com/splitio/qos-runner/blob/master/imgs/ping.png)
-
-### GREEN
-
-Shows if all the tests are succeeding and if there has been a full cycle of all the tests succeeding. More detailed explanation of what "green" means in different section.
-
-![Green](https://github.com/splitio/qos-runner/blob/master/imgs/green.png)
-
-### TESTS
-
-List all the tests that the server runs
-
-![Tests](https://github.com/splitio/qos-runner/blob/master/imgs/tests.png)
-
-### FAILED
-
-List all the tests that are currently failing.
-
-![Failed](https://github.com/splitio/qos-runner/blob/master/imgs/failed_tests.png)
-
-### PAUSE
-
-Pause the execution of tests. Tests that were currently running will finish
-
-![Pause](https://github.com/splitio/qos-runner/blob/master/imgs/pause.png)
-
-### RESUME
-
-Resume the execution of tests.
-
-![Resume](https://github.com/splitio/qos-runner/blob/master/imgs/resume.png)
-
-### RUNALL
-
-Runs immediately all the tests.
-
-![Runall](https://github.com/splitio/qos-runner/blob/master/imgs/runall.png)
-
-### RUN
-
-Runs one test. Need to specify the class (Optional) and the test name.
-
-![Run](https://github.com/splitio/qos-runner/blob/master/imgs/run.png)
-
-### STORY
-
-Tells the story of one test. Need to specify the class (Optional) and the test name. Check later section for information about story.
-
-![Story](https://github.com/splitio/qos-runner/blob/master/imgs/story.png)
-
-### CONFIG
-
-Lists all the config properties of the server. For more info on how to add configuration properties, check later section.
-
-![Config](https://github.com/splitio/qos-runner/blob/master/imgs/config.png)
-
-## Configuration
-
-QOS-Runner uses [Guice](https://github.com/google/guice) for dependency injection. All the properties defined in the properties file will be accesed across the different classes with a simple @Inject annotation.
-
-For example:
-
-Config file:
-
-```
-URL=https://www.google.com/
-```
-
-Can be used anywhere in the code by simply:
-
-```
-public class RequestTreatmentsGetterFactory {
-    @Inject
-    public RequestTreatmentsGetterFactory(@Named("URL) String url) {
-    }
-}
-```
-
-or
-
-```
-public class RequestTreatmentsGetterFactory {
-    @Inject
-    @Named("URL) 
-    private String url;
-}
-```
-
-Check Guice for more information about dependency injection.
-
-### Multiple configuratin files
-
-QOS-Runner allows a list of configuration files on the _config_ parameter in the yaml. That means it will import all the properties on those files. If for any case a property is duplicated, the value of the rightmost file on the list takes priority.
-
-## Green Command
-
-The green command tells you if there has been a cycle that all the tests passed, and in that case, when did the cycle started. If _green_ returns that the server is green, you are sure that *all* the tests passed since the date being shown.
-
-For Example, with a suite of 3 tests,  being _Ti_ time, _Pn_ being test _n_ passed and _Fn_ test _n_ failed.
-
-### Example 1
-
-| T1 | T2 | T3 | T4 | T5 | T6 |
-| --- | --- | --- | --- | --- | --- |
-| P1 |  |  |  |  |  |
-|  | P2 |  |  |  |  |
-|  |  | P3 |  |  |  |
-|  |  |  | P1 |  |  |
-|  |  |  |  | P2 |  |
-
-* For instant _T1_ or _T2_ green command is executed, it will return that it is not green. Since At that point at least test number 3 was not executed.
-* For instant _T3_ the command is executed, then it will return green, with time _T1_ since the cycle of all tests green started in _T1_
-* For instant _T4_, it will return green and time _T2_
-* For instant _T5_, it will do so with _T3_
-
-### Example 2
-
-| T1 | T2 | T3 | T4 | T5 | T6 | T7 |
-| --- | --- | --- | --- | --- | --- | --- |
-| P1 |  |  |  |  |  | |
-|  | P2 |  |  |  |  | |
-|  |  | P3 |  |  |  | |
-|  |  |  | F1 |  |  | |
-|  |  |  |  | P2 |  | |
-|  |  |  |  |  | P1 | |
-|  |  |  |  |  |  | P3 |
-
-* For instant _T1_ or _T2_, not green.
-* For instant _T3_ it will return green and time _T1_
-* For instant _T4_, since test 1 failed, it wont return green.
-* For instant _T5_, still test 1 failing, so no green.
-* For instant _T6_, test 1 recovers, but it cannot return green since test 3 hasn't run yet since test 1 failed, so there is no full cycle of all green tests.
-* For isntant _T7_, now we have a full cycle of green tests, and _T5_ is returned as time.
-
+In depth explanation of how to add stories to your tests for debugging and logging purposes.
