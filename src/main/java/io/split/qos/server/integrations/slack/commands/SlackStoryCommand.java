@@ -50,7 +50,7 @@ public class SlackStoryCommand implements SlackCommandExecutor {
         SlackCommand slackCommand = slackCommandGetter.get(messagePosted).get();
         List<String> arguments = slackCommand.arguments();
         Optional<Story> theStory;
-        if (!arguments.isEmpty() && arguments.get(0).equals(serverName)) {
+        if (!arguments.isEmpty() && arguments.get(0).equalsIgnoreCase(serverName)) {
             arguments.remove(0);
         }
         if (arguments.isEmpty()) {
