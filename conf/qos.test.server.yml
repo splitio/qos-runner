@@ -2,6 +2,10 @@ serverName: qos-server
 
 config: conf/qos.test.properties
 
+register:
+  qosDashboardURL: http://www.google.com
+  qosRunnerURL: http://www.google.com
+
 server:
   type: simple
   applicationContextPath: /api

@@ -20,6 +20,30 @@ public class QOSServerConfiguration extends Configuration {
         return serverName;
     }
 
+    public Register register;
+
+    @JsonProperty
+    public Register getRegister() {
+        return register;
+    }
+
+    public static class Register {
+        @NotEmpty
+        private String qosDashboardURL;
+
+        @NotEmpty
+        private String qosRunnerURL;
+
+        @JsonProperty
+        public String getQosDashboardURL() {
+            return this.qosDashboardURL;
+        }
+
+        @JsonProperty
+        public String getQosRunnerURL() {
+            return qosRunnerURL;
+        }
+    }
     //Comma separated list of configs.
     @JsonProperty
     public String getConfig() {

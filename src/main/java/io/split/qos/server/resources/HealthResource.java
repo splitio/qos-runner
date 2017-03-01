@@ -1,7 +1,6 @@
 package io.split.qos.server.resources;
 
 import com.google.inject.Singleton;
-import io.split.qos.server.QOSServerState;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -17,18 +16,11 @@ import javax.ws.rs.core.Response;
 @Singleton
 public class HealthResource {
 
-    private final QOSServerState state;
-
     @Inject
-    public HealthResource(QOSServerState state) {
-        this.state = state;
-    }
+    public HealthResource() { }
 
-    /**
-     * @return the current state.
-     */
     @GET
     public Response ok() {
-        return Response.ok(state).build();
+        return Response.ok("ok").build();
     }
 }
