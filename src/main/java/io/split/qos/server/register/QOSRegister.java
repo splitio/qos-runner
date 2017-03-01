@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +24,22 @@ public class QOSRegister {
     private final ScheduledExecutorService executor;
     private final HttpPoster poster;
     private final String serverName;
+    private final String botToken;
 
     @Inject
     public QOSRegister(HttpPoster poster,
-                       @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
+                       @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
+                       @Named(QOSPropertiesModule.SLACK_BOT_TOKEN) String botToken) {
         this.executor = Executors.newSingleThreadScheduledExecutor();
         this.poster = Preconditions.checkNotNull(poster);
+        this.botToken = Preconditions.checkNotNull(botToken);
         this.serverName = Preconditions.checkNotNull(serverName);
     }
 
     public void register(String qosDashboardURL, String qosRunnerURL) {
         URL registerURL = generateRegisterURL(qosDashboardURL);
         URL apiURL = generateApiURL(qosRunnerURL);
-        RegisterDTO dto = new RegisterDTO(serverName, apiURL.toString());
+        RegisterDTO dto = new RegisterDTO(serverName, apiURL.toString(), botToken);
         executor.scheduleAtFixedRate(new Register(registerURL, poster, dto), 0, 5, TimeUnit.MINUTES);
     }
 
