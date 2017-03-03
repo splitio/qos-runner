@@ -9,6 +9,7 @@ import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerBehaviour;
+import io.split.qos.server.QOSServerState;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.testrunner.util.SlackColors;
 import io.split.testrunner.util.Util;
@@ -25,19 +26,25 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
 
     private static final int CHUNK_SIZE = 50;
     private final SlackColors colors;
+    private final QOSServerState state;
 
     @Inject
     public SlackRunAllCommand(
             SlackColors slackColors,
             QOSServerBehaviour behaviour,
+            QOSServerState state,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
-        this.colors = slackColors;
+        this.colors = Preconditions.checkNotNull(slackColors);
+        this.state = Preconditions.checkNotNull(state);
         this.serverName = Preconditions.checkNotNull(serverName);
-        this.behaviour = behaviour;
+        this.behaviour = Preconditions.checkNotNull(behaviour);
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
+        if (state.isPaused()) {
+            behaviour.resume(messagePosted.getSender().getUserName());
+        }
         List<Method> tests = behaviour.runAllNow();
         List<SlackAttachment> toBeAdded = Lists.newArrayList();
         tests
