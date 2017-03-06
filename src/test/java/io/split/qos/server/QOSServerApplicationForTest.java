@@ -4,11 +4,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.name.Names;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModuleForTest;
+import io.split.qos.server.resources.ConfigResource;
+import io.split.qos.server.resources.GreenResource;
 import io.split.qos.server.resources.HealthResource;
 import io.split.testrunner.util.GuiceInitializator;
 import org.slf4j.Logger;
@@ -18,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 public class QOSServerApplicationForTest extends Application<QOSServerConfigurationForTest> {
@@ -55,7 +60,9 @@ public class QOSServerApplicationForTest extends Application<QOSServerConfigurat
         );
 
         injector = Guice.createInjector(modules);
-        environment.jersey().register(new HealthResource(injector.getInstance(QOSServerState.class)));
+        environment.jersey().register(new HealthResource());
+        environment.jersey().register(new GreenResource(injector.getInstance(QOSServerState.class)));
+        environment.jersey().register(new ConfigResource(injector.getInstance(Key.get(Properties.class, Names.named(QOSPropertiesModule.CONFIGURATION)))));
 
         QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
 

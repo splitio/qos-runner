@@ -7,7 +7,7 @@ apply plugin: 'signing'
 
 group = "io.split"
 archivesBaseName = "qosrunner"
-version = "3.9"
+version = "4.1"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -25,14 +25,14 @@ dependencies {
     //Method and Suite
     compile 'com.beust:jcommander:1.48'
     
-    // Commoni
+    // Common
     compile 'com.ullink.slack:simpleslackapi:0.6.0'
     compile 'com.google.inject:guice:4.0'
     compile 'com.google.inject.extensions:guice-assistedinject:4.0'
     compile 'junit:junit:4.12'
     compile 'commons-lang:commons-lang:2.6' 
     compile 'com.google.guava:guava:19.0'
-
+    compile 'com.google.code.gson:gson:2.8.0'
 }
 
 configurations.all {

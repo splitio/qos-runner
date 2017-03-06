@@ -1,6 +1,5 @@
 package io.split.qos.server;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -38,26 +37,20 @@ import java.util.stream.Collectors;
 @Singleton
 public class QOSServerState {
 
-    @JsonProperty
     private Long lastGreen;
 
-    @JsonProperty
     private Status status;
 
-    @JsonProperty
     private Long activeSince;
 
-    @JsonProperty
     private Long lastTestFinished;
 
-    @JsonProperty
     private Long pausedSince;
 
-    @JsonProperty
     private Map<String, Long> succeededInARow;
 
-    @JsonProperty
     private Map<String, TestStatus> tests;
+
     private String who;
 
     @Inject
