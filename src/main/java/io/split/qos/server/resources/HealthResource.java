@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 @Singleton
 public class HealthResource {
 
+
     @Inject
     public HealthResource() { }
 
