@@ -64,29 +64,29 @@ public class QOSServerState {
         this.tests = Maps.newConcurrentMap();
     }
 
-    public void resume(String who) {
+    public synchronized void resume(String who) {
         this.status = Status.ACTIVE;
         this.who = who;
         this.activeSince = DateTime.now().getMillis();
         this.pausedSince = null;
     }
 
-    public void pause(String who) {
+    public synchronized void pause(String who) {
         this.status = Status.PAUSED;
         this.who = who;
         this.pausedSince = DateTime.now().getMillis();
         this.activeSince = null;
     }
 
-    public void registerTest(Description description) {
+    public synchronized void registerTest(Description description) {
         this.tests.put(Util.id(description), TestStatus.get(null, null));
     }
 
-    public void registerTest(Method method) {
+    public synchronized void registerTest(Method method) {
         this.tests.put(Util.id(method), TestStatus.get(null, null));
     }
 
-    public void testSucceeded(String testId) {
+    public synchronized void testSucceeded(String testId) {
         this.lastTestFinished = DateTime.now().getMillis();
         this.tests.put(testId, TestStatus.get(lastTestFinished, true));
         this.succeededInARow.put(testId, lastTestFinished);
@@ -95,15 +95,15 @@ public class QOSServerState {
         }
     }
 
-    public void testSucceeded(Description description) {
+    public synchronized void testSucceeded(Description description) {
         testSucceeded(Util.id(description));;
     }
 
-    public void testFailed(Description description) {
+    public synchronized void testFailed(Description description) {
         testFailed(Util.id(description));
     }
 
-    public void testFailed(String testId) {
+    public synchronized void testFailed(String testId) {
         this.lastTestFinished = DateTime.now().getMillis();
         this.tests.put(testId, TestStatus.get(lastTestFinished, false));
         this.succeededInARow.clear();
@@ -116,15 +116,15 @@ public class QOSServerState {
         ;
     }
 
-    public Status status() {
+    public synchronized Status status() {
         return status;
     }
 
-    public Map<String, TestStatus> tests() {
+    public synchronized Map<String, TestStatus> tests() {
         return tests;
     }
 
-    public List<TestFailed> failedTests() {
+    public synchronized List<TestFailed> failedTests() {
         return tests
                 .entrySet()
                 .stream()
@@ -134,31 +134,31 @@ public class QOSServerState {
                 .collect(Collectors.toList());
     }
 
-    public boolean isActive() {
+    public synchronized boolean isActive() {
         return Status.ACTIVE.equals(status());
     }
 
-    public boolean isPaused() {
+    public synchronized boolean isPaused() {
         return Status.PAUSED.equals(status());
     }
 
-    public String who() {
+    public synchronized String who() {
         return who;
     }
 
-    public Long activeSince() {
+    public synchronized Long activeSince() {
         return activeSince;
     }
 
-    public Long pausedSince() {
+    public synchronized Long pausedSince() {
         return pausedSince;
     }
 
-    public Long lastTestFinished() {
+    public synchronized Long lastTestFinished() {
         return lastTestFinished;
     }
 
-    public Long lastGreen() {
+    public synchronized Long lastGreen() {
         return lastGreen;
     }
 
