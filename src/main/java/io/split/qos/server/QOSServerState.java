@@ -106,6 +106,10 @@ public class QOSServerState {
     public synchronized void testFailed(String testId) {
         this.lastTestFinished = DateTime.now().getMillis();
         this.tests.put(testId, TestStatus.get(lastTestFinished, false));
+        notGreen();
+    }
+
+    public synchronized void notGreen() {
         this.succeededInARow.clear();
         this.lastGreen = null;
     }

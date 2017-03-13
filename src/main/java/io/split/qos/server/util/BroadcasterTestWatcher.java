@@ -72,6 +72,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
         if (started.get(Util.id(description)) != null) {
             length = System.currentTimeMillis() - started.get(Util.id(description));
         }
+        state.notGreen();
         Broadcast broadcast = failCondition.failed(description);
         if (slack.isEnabled()) {
             if (Broadcast.FIRST.equals(broadcast)) {
