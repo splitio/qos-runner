@@ -60,6 +60,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
         Broadcast broadcast = failCondition.success(description);
         if (slack.isEnabled()) {
             if (Broadcast.RECOVERY.equals(broadcast)) {
+                state.notGreen();
                 slack.recovery(description, serverName, length, titleLink);
             }
             slack.success(description, serverName, length, titleLink);
@@ -72,7 +73,6 @@ public class BroadcasterTestWatcher extends TestWatcher {
         if (started.get(Util.id(description)) != null) {
             length = System.currentTimeMillis() - started.get(Util.id(description));
         }
-        state.notGreen();
         Broadcast broadcast = failCondition.failed(description);
         if (slack.isEnabled()) {
             if (Broadcast.FIRST.equals(broadcast)) {
