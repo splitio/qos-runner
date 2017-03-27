@@ -1,6 +1,7 @@
 package io.split.qos.server.integrations.slack.commands;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
  * Lists all the missing tests.
  */
 public class SlackMissingCommand implements SlackCommandExecutor {
+    private static final int CHUNK_SIZE = 50;
+
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
@@ -38,7 +41,6 @@ public class SlackMissingCommand implements SlackCommandExecutor {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] MISSING TESTS", serverName.toUpperCase());
 
         List<QOSServerState.TestDTO> missing = state.missingTests();
         List<String> missingTests = missing
@@ -46,27 +48,39 @@ public class SlackMissingCommand implements SlackCommandExecutor {
                 .map(value -> String.format("%s", value.name()))
                 .collect(Collectors.toList());
 
-        String text = String.format("Total Missing Tests %s / %s", missing.size(), state.tests().size());
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor(missing.isEmpty() ? colors.getSuccess() : colors.getFailed());
+        List<SlackAttachment> toBeAdded = Lists.newArrayList();
+        missingTests
+                .stream()
+                .forEach(test -> {
+                    SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
+                    testAttachment
+                            .setColor(colors.getWarning());
+                    toBeAdded.add(testAttachment);
+                });
+        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
 
-        SlackPreparedMessage.Builder sent = new SlackPreparedMessage
-                .Builder()
-                .addAttachment(slackAttachment);
+        int iteration = 0;
+        for(int index = 0; index < partitions.size(); index++) {
+            String title = String.format("[%s] MISSING TESTS", serverName.toUpperCase());
+            String text = String.format("Total Missing Tests %s / %s, tests %s - %s",
+                    missing.size(),
+                    state.tests().size(),
+                    1 + CHUNK_SIZE * iteration,
+                    CHUNK_SIZE * iteration + partitions.get(index).size());
 
-        if (!missingTests.isEmpty()) {
-            missingTests
-                    .stream()
-                    .forEach(missingTest -> {
-                        SlackAttachment missingAttachment = new SlackAttachment("", "", missingTest, null);
-                        missingAttachment
-                                .setColor(colors.getWarning());
-                        sent.addAttachment(missingAttachment);
-                    });
+            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
+            slackAttachment
+                    .setColor(colors.getInfo());
+
+            SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
+                    .Builder()
+                    .addAttachment(slackAttachment)
+                    .addAttachments(partitions.get(index));
+            session.sendMessage(
+                    messagePosted.getChannel(),
+                    partitionSend.build());
+            iteration++;
         }
-        session
-                .sendMessage(messagePosted.getChannel(), sent.build());
 
         return true;
     }

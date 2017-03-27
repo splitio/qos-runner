@@ -1,6 +1,7 @@
 package io.split.qos.server.integrations.slack.commands;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
  * Lists all the failed tests, ordered by time.
  */
 public class SlackFailedCommand implements SlackCommandExecutor {
+    private static final int CHUNK_SIZE = 50;
+
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
@@ -38,7 +41,6 @@ public class SlackFailedCommand implements SlackCommandExecutor {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] FAILED TESTS", serverName.toUpperCase());
 
         List<QOSServerState.TestDTO> failed = state.failedTests();
         List<String> failedTests = failed
@@ -48,28 +50,39 @@ public class SlackFailedCommand implements SlackCommandExecutor {
                         dateFormatter.formatDate(value.status().when())))
                 .collect(Collectors.toList());
 
-        String text = String.format("Total Failed Tests %s / %s", failed.size(), state.tests().size());
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor(failed.isEmpty() ? colors.getSuccess() : colors.getFailed());
+        List<SlackAttachment> toBeAdded = Lists.newArrayList();
+        failedTests
+                .stream()
+                .forEach(test -> {
+                    SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
+                    testAttachment
+                            .setColor(colors.getFailed());
+                    toBeAdded.add(testAttachment);
+                });
+        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
 
-        SlackPreparedMessage.Builder sent = new SlackPreparedMessage
-                .Builder()
-                .addAttachment(slackAttachment);
+        int iteration = 0;
+        for(int index = 0; index < partitions.size(); index++) {
+            String title = String.format("[%s] FAILED TESTS", serverName.toUpperCase());
+            String text = String.format("Total Failed Tests %s / %s, tests %s - %s",
+                    failed.size(),
+                    state.tests().size(),
+                    1 + CHUNK_SIZE * iteration,
+                    CHUNK_SIZE * iteration + partitions.get(index).size());
 
-        if (!failed.isEmpty()) {
-            failedTests
-                    .stream()
-                    .forEach(failedTest -> {
-                        SlackAttachment failedAttachment = new SlackAttachment("", "", failedTest, null);
-                        failedAttachment
-                                .setColor(colors.getWarning());
-                        sent.addAttachment(failedAttachment);
-                    });
+            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
+            slackAttachment
+                    .setColor(colors.getInfo());
+
+            SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
+                    .Builder()
+                    .addAttachment(slackAttachment)
+                    .addAttachments(partitions.get(index));
+            session.sendMessage(
+                    messagePosted.getChannel(),
+                    partitionSend.build());
+            iteration++;
         }
-        session
-                .sendMessage(messagePosted.getChannel(), sent.build());
-
         return true;
     }
 
