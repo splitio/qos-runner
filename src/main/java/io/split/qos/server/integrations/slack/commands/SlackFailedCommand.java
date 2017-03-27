@@ -43,6 +43,19 @@ public class SlackFailedCommand implements SlackCommandExecutor {
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
 
         List<QOSServerState.TestDTO> failed = state.failedTests();
+        if (failed.isEmpty()) {
+            String title = String.format("[%s] FAILED TESTS", serverName.toUpperCase());
+            String text = "No failed tests";
+            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
+            slackAttachment
+                    .setColor(colors.getSuccess());
+            session
+                    .sendMessage(
+                            messagePosted.getChannel(),
+                            "",
+                            slackAttachment);
+            return true;
+        }
         List<String> failedTests = failed
                 .stream()
                 .map(value -> String.format("%s | %s",

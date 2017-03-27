@@ -43,6 +43,19 @@ public class SlackMissingCommand implements SlackCommandExecutor {
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
 
         List<QOSServerState.TestDTO> missing = state.missingTests();
+        if (missing.isEmpty()) {
+            String title = String.format("[%s] MISSING TESTS", serverName.toUpperCase());
+            String text = "No missing tests";
+            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
+            slackAttachment
+                    .setColor(colors.getSuccess());
+            session
+                    .sendMessage(
+                            messagePosted.getChannel(),
+                            "",
+                            slackAttachment);
+            return true;
+        }
         List<String> missingTests = missing
                 .stream()
                 .map(value -> String.format("%s", value.name()))
