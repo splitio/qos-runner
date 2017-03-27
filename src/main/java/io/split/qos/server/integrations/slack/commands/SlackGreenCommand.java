@@ -45,7 +45,7 @@ public class SlackGreenCommand implements SlackCommandExecutor {
         if (lastGreen == null) {
             String title = String.format("[%s] NOT GREEN", serverName.toUpperCase());
             SlackAttachment slackAttachment = new SlackAttachment(title, "", "", null);
-            List<QOSServerState.TestFailed> failed = state.failedTests();
+            List<QOSServerState.TestDTO> failed = state.failedTests();
             if (failed.isEmpty()) {
                 slackAttachment.setTitle(String.format("[%s] WAITING CYCLE", serverName.toUpperCase()));
                 slackAttachment.setText("No test failing, waiting cycle of all successful tests.");
@@ -54,7 +54,7 @@ public class SlackGreenCommand implements SlackCommandExecutor {
                 slackAttachment.setColor(colors.getFailed());
                 List<String> failedNames = failed
                         .stream()
-                        .map(QOSServerState.TestFailed::name)
+                        .map(QOSServerState.TestDTO::name)
                         .collect(Collectors.toList());
                 if (failedNames.size() >= 5) {
                     slackAttachment.setText(String.format("%s tests failing.", failedNames.size()));

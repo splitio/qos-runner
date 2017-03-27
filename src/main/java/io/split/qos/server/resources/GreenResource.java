@@ -39,7 +39,7 @@ public class GreenResource {
                 List<String> failedNames = state
                         .failedTests()
                         .stream()
-                        .map(QOSServerState.TestFailed::name)
+                        .map(QOSServerState.TestDTO::name)
                         .collect(Collectors.toList());
                 return Response.ok(GreenDTO.failed(failedNames)).build();
             }

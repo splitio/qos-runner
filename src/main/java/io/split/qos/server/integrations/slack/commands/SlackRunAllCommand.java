@@ -42,6 +42,9 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
+        if (state.isPaused()) {
+            behaviour.resume(messagePosted.getSender().getUserName());
+        }
         List<Method> tests = behaviour.runAllNow();
         List<SlackAttachment> toBeAdded = Lists.newArrayList();
         tests

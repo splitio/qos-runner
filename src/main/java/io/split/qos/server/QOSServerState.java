@@ -124,13 +124,22 @@ public class QOSServerState {
         return tests;
     }
 
-    public List<TestFailed> failedTests() {
+    public List<TestDTO> failedTests() {
         return tests
                 .entrySet()
                 .stream()
                 .filter(entry -> (entry.getValue().succeeded() != null && !entry.getValue().succeeded()))
                 .sorted((o1, o2) -> o1.getValue().when().compareTo(o2.getValue().when()))
-                .map(entry -> new TestFailed(entry.getKey(), entry.getValue()))
+                .map(entry -> new TestDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    public List<TestDTO> missingTests() {
+        return tests
+                .entrySet()
+                .stream()
+                .filter(entry -> (entry.getValue().succeeded() == null))
+                .map(entry -> new TestDTO(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -162,11 +171,11 @@ public class QOSServerState {
         return lastGreen;
     }
 
-    public static class TestFailed {
+    public static class TestDTO {
         private final String name;
         private final TestStatus status;
 
-        private TestFailed(String name, TestStatus status) {
+        private TestDTO(String name, TestStatus status) {
             this.name = name;
             this.status = status;
         }

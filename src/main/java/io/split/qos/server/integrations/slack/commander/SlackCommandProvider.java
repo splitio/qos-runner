@@ -15,6 +15,7 @@ public interface SlackCommandProvider {
     SlackGreenCommand green();
     SlackCommandsCommand commands();
     SlackFailedCommand failed();
+    SlackMissingCommand missing();
     SlackRunAllCommand runAll();
     SlackRunTestCommand runTest();
     SlackConfigCommand config();

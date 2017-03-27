@@ -48,6 +48,11 @@ public class SlackCommanderProviderForTest implements SlackCommandProvider {
     }
 
     @Override
+    public SlackMissingCommand missing() {
+        return null;
+    }
+
+    @Override
     public SlackRunAllCommand runAll() {
         return null;
     }

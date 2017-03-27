@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Lists all the failed tests, ordered by time.
+ * Lists all the missing tests.
  */
-public class SlackFailedCommand implements SlackCommandExecutor {
+public class SlackMissingCommand implements SlackCommandExecutor {
     private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
     private final SlackColors colors;
 
     @Inject
-    public SlackFailedCommand(
+    public SlackMissingCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
             SlackColors slackColors,
@@ -38,33 +38,31 @@ public class SlackFailedCommand implements SlackCommandExecutor {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        String title = String.format("[%s] FAILED TESTS", serverName.toUpperCase());
+        String title = String.format("[%s] MISSING TESTS", serverName.toUpperCase());
 
-        List<QOSServerState.TestDTO> failed = state.failedTests();
-        List<String> failedTests = failed
+        List<QOSServerState.TestDTO> missing = state.missingTests();
+        List<String> missingTests = missing
                 .stream()
-                .map(value -> String.format("%s | %s",
-                        value.name(),
-                        dateFormatter.formatDate(value.status().when())))
+                .map(value -> String.format("%s", value.name()))
                 .collect(Collectors.toList());
 
-        String text = String.format("Total Failed Tests %s / %s", failed.size(), state.tests().size());
+        String text = String.format("Total Missing Tests %s / %s", missing.size(), state.tests().size());
         SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
         slackAttachment
-                .setColor(failed.isEmpty() ? colors.getSuccess() : colors.getFailed());
+                .setColor(missing.isEmpty() ? colors.getSuccess() : colors.getFailed());
 
         SlackPreparedMessage.Builder sent = new SlackPreparedMessage
                 .Builder()
                 .addAttachment(slackAttachment);
 
-        if (!failed.isEmpty()) {
-            failedTests
+        if (!missingTests.isEmpty()) {
+            missingTests
                     .stream()
-                    .forEach(failedTest -> {
-                        SlackAttachment failedAttachment = new SlackAttachment("", "", failedTest, null);
-                        failedAttachment
+                    .forEach(missingTest -> {
+                        SlackAttachment missingAttachment = new SlackAttachment("", "", missingTest, null);
+                        missingAttachment
                                 .setColor(colors.getWarning());
-                        sent.addAttachment(failedAttachment);
+                        sent.addAttachment(missingAttachment);
                     });
         }
         session
@@ -75,7 +73,7 @@ public class SlackFailedCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "failed [server-name]: Displays a lists of the failed tests";
+        return "missing [server-name]: Displays a lists of the tests that have not run yet";
     }
 }
 
