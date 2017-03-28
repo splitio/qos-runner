@@ -51,10 +51,10 @@ public class QOSTestsTracker {
                 .stream()
                 .filter(tracked -> {
                     if (fuzzyClass.isPresent() &&
-                            (!tracked.method().getDeclaringClass().getName().contains(fuzzyClass.get()))) {
+                            (!tracked.method().getDeclaringClass().getName().toLowerCase().contains(fuzzyClass.get().toLowerCase()))) {
                         return false;
                     }
-                    return tracked.method().getName().contains(fuzzyName);
+                    return tracked.method().getName().toLowerCase().contains(fuzzyName.toLowerCase());
                 })
                 .collect(Collectors.toList());
     }
