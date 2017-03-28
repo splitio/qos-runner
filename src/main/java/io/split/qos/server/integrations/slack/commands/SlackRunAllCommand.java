@@ -83,6 +83,6 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "runall [server-name]: Runs all the tests of the qos server immediately";
+        return "[server-name (optional)] runall: Runs all the tests of the qos server immediately";
     }
 }

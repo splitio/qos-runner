@@ -50,6 +50,6 @@ public class SlackPauseCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "pause [server-name]: Pauses the tests running for the server. Current tests will keep running";
+        return "[server-name (optional)] pause: Pauses the tests running for the server. Current tests will keep running";
     }
 }

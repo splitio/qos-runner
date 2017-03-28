@@ -96,6 +96,6 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "run [server-name] [class name (optional)] [test name]: Runs the specified test immediately";
+        return "[server-name (optional)] run [class name (optional)] [test name]: Runs the specified test immediately";
     }
 }

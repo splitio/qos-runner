@@ -80,6 +80,6 @@ public class SlackInfoCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "info [server-name]: Displays Server Info, like status, time since status change, last test ran";
+        return "[server-name (optional)] info: Displays Server Info, like status, time since status change, last test ran";
     }
 }

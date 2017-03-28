@@ -50,6 +50,6 @@ public class SlackResumeCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "resume [server-name]: Resumes the tests of the server";
+        return "[server-name (optional)] resume: Resumes the tests of the server";
     }
 }

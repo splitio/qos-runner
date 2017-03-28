@@ -141,6 +141,6 @@ public class SlackTestCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "test [server-name] [class name (optional)] [test name]: Finds the tests that matches the parameters";
+        return "[server-name (optional)] test [class name (optional)] [test name]: Finds the tests that matches the parameters";
     }
 }

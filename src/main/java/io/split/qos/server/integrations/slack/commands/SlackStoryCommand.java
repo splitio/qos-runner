@@ -182,7 +182,7 @@ public class SlackStoryCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "story [server-name] [class name (optional)] [test name (optional)]: Gets the story for the test. " +
+        return "[server-name (optional)]  story [class name (optional)] [test name (optional)]: Gets the story for the test. " +
                 "With no arguments will return last failed story";
     }
 }

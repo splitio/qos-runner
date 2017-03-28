@@ -106,6 +106,6 @@ public class SlackTestsCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "tests [server-name]: Displays a lists of the tests that the server runs";
+        return "[server-name (optional)] tests: Displays a lists of the tests that the server runs";
     }
 }

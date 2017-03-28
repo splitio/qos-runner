@@ -101,7 +101,7 @@ public class SlackFailedCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "failed [server-name]: Displays a lists of the failed tests";
+        return "[server-name (optional)] failed: Displays a lists of the failed tests";
     }
 }
 

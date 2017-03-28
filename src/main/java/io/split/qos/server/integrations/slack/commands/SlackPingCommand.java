@@ -45,7 +45,7 @@ public class SlackPingCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "ping [server-name]: Server replies with a pong";
+        return "[server-name (optional)] ping: Server replies with a pong";
     }
 
 }

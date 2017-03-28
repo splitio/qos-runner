@@ -100,7 +100,7 @@ public class SlackMissingCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "missing [server-name]: Displays a lists of the tests that have not run yet";
+        return "[server-name (optional)] missing: Displays a lists of the tests that have not run yet";
     }
 }
 

@@ -58,6 +58,6 @@ public class SlackConfigCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "config [server-name]: Displays a lists of the configured properties";
+        return "[server-name (optional)] config: Displays a lists of the configured properties";
     }
 }

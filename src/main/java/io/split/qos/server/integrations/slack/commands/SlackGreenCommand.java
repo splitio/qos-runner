@@ -83,6 +83,6 @@ public class SlackGreenCommand implements SlackCommandExecutor {
 
     @Override
     public String help() {
-        return "green [server-name]: Displays the last time when all the tests passed";
+        return "[server-name (optional)] green: Displays the last time when all the tests passed";
     }
 }
