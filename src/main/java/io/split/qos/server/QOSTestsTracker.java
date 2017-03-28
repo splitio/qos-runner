@@ -6,13 +6,14 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.junit.JUnitRunner;
+import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.util.Util;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +44,19 @@ public class QOSTestsTracker {
     public synchronized List<Tracked> getAll() {
         return Lists.newArrayList(tracked
                 .values());
+    }
+
+    public synchronized List<Tracked> getTests(Optional<String> fuzzyClass, String fuzzyName) {
+        return getAll()
+                .stream()
+                .filter(tracked -> {
+                    if (fuzzyClass.isPresent() &&
+                            (!tracked.method().getDeclaringClass().getName().contains(fuzzyClass.get()))) {
+                        return false;
+                    }
+                    return tracked.method().getName().contains(fuzzyName);
+                })
+                .collect(Collectors.toList());
     }
 
     public static class Tracked {

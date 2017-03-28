@@ -46,13 +46,6 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
             slackEmpty(messagePosted, session);
             return false;
         }
-        if (arguments.get(0).equalsIgnoreCase(serverName)) {
-            arguments.remove(0);
-        }
-        if (arguments.isEmpty()) {
-            slackEmpty(messagePosted, session);
-            return false;
-        }
         Optional<Method> methodExecuted;
         if (arguments.size() == 1) {
             methodExecuted = behaviour.runTestNow(Optional.empty(), arguments.get(0));
