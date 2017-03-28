@@ -1,5 +1,6 @@
 package io.split.qos.server;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -122,6 +123,18 @@ public class QOSServerState {
 
     public Map<String, TestStatus> tests() {
         return tests;
+    }
+
+    public TestStatus test(Method method) {
+        return test(Util.id(Preconditions.checkNotNull(method)));
+    }
+
+    public TestStatus test(Description description) {
+        return test(Util.id(Preconditions.checkNotNull(description)));
+    }
+
+    private TestStatus test(String id) {
+        return tests.get(Preconditions.checkNotNull(id));
     }
 
     public List<TestDTO> failedTests() {

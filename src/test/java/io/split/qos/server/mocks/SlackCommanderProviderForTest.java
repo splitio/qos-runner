@@ -73,6 +73,11 @@ public class SlackCommanderProviderForTest implements SlackCommandProvider {
     }
 
     @Override
+    public SlackTestCommand test() {
+        return null;
+    }
+
+    @Override
     public SlackStoryCommand story() {
         return null;
     }

@@ -21,6 +21,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     private final Provider<SlackConfigCommand> configProvider;
     private final Provider<SlackPingCommand> pingProvider;
     private final Provider<SlackStoryCommand> storyProvider;
+    private final Provider<SlackTestCommand> testProvider;
 
     @Inject
     public SlackCommanderProviderImpl(
@@ -36,6 +37,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
             Provider<SlackRunTestCommand> runTestCommandProvider,
             Provider<SlackConfigCommand> configCommandProvider,
             Provider<SlackPingCommand> pingCommandProvider,
+            Provider<SlackTestCommand> testCommandProvider,
             Provider<SlackStoryCommand> storyCommandProvider) {
         this.infoProvider = Preconditions.checkNotNull(infoCommandProvider);
         this.pauseProvider = Preconditions.checkNotNull(pauseCommandProvider);
@@ -49,6 +51,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
         this.configProvider = Preconditions.checkNotNull(configCommandProvider);
         this.pingProvider = Preconditions.checkNotNull(pingCommandProvider);
         this.storyProvider = Preconditions.checkNotNull(storyCommandProvider);
+        this.testProvider = Preconditions.checkNotNull(testCommandProvider);
         this.missingProvider = Preconditions.checkNotNull(missingCommandProvider);
     }
 
@@ -105,6 +108,11 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     @Override
     public SlackPingCommand ping() {
         return pingProvider.get();
+    }
+
+    @Override
+    public SlackTestCommand test() {
+        return testProvider.get();
     }
 
     @Override

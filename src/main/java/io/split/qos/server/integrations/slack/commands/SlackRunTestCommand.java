@@ -41,15 +41,8 @@ public class SlackRunTestCommand implements SlackCommandExecutor {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         SlackCommand slackCommand = slackCommandGetter.get(messagePosted).get();
-        List<String> arguments = slackCommand.arguments();
+        List<String> arguments = slackCommand.arguments2();
         if (arguments == null || arguments.isEmpty()) {
-            slackEmpty(messagePosted, session);
-            return false;
-        }
-        if (arguments.get(0).equalsIgnoreCase(serverName)) {
-            arguments.remove(0);
-        }
-        if (arguments.isEmpty()) {
             slackEmpty(messagePosted, session);
             return false;
         }

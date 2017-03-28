@@ -310,15 +310,8 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyName));
         Preconditions.checkNotNull(fuzzyClass);
         Optional<QOSTestsTracker.Tracked> present = tracker
-                .getAll()
+                .getTests(fuzzyClass, fuzzyName)
                 .stream()
-                .filter(tracked -> {
-                    if (fuzzyClass.isPresent() &&
-                            (!tracked.method().getDeclaringClass().getName().contains(fuzzyClass.get()))) {
-                        return false;
-                    }
-                    return (fuzzyName.contains(tracked.method().getName()));
-                })
                 .findAny();
         if (!present.isPresent()) {
             return Optional.empty();

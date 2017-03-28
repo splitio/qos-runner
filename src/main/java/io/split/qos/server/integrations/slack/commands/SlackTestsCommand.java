@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Runs one test of the server
+ * Shows all the tests of the QOS.
  */
 @Singleton
 public class SlackTestsCommand implements SlackCommandExecutor {
