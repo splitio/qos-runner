@@ -56,7 +56,7 @@ public class SlackTestCommand implements SlackCommandExecutor {
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         SlackCommand slackCommand = slackCommandGetter.get(messagePosted).get();
 
-        List<String> arguments = slackCommand.arguments2();
+        List<String> arguments = slackCommand.arguments();
         if (arguments == null || arguments.isEmpty()) {
             slackError(messagePosted, session);
             return false;

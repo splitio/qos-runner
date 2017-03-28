@@ -34,7 +34,7 @@ public class SlackCommand {
         return command;
     }
 
-    public List<String> arguments2() {
+    public List<String> arguments() {
         return arguments;
     }
 }
