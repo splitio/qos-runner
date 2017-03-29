@@ -65,11 +65,6 @@ public class SlackCommandListenerImpl implements SlackCommandListener {
                 LOG.warn(String.format("Wrong arguments for command %s, arguments %s", command.command(), command.arguments()));
             }
         } else {
-            messageSender
-                    .sendWarning(command.command(),
-                            "Command not found: " + command.command(),
-                            message.getChannel(),
-                            session);
             LOG.warn("Could not find command for " + command);
 
         }
