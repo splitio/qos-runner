@@ -5,12 +5,14 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
-import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerBehaviour;
 import io.split.qos.server.QOSServerState;
+import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
+import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.qos.server.util.SlackAttachmentPartitioner;
 import io.split.testrunner.util.SlackColors;
 import io.split.testrunner.util.Util;
 
@@ -27,15 +29,21 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
     private static final int CHUNK_SIZE = 50;
     private final SlackColors colors;
     private final QOSServerState state;
+    private final SlackCommandGetter commandGetter;
+    private final SlackAttachmentPartitioner partitioner;
 
     @Inject
     public SlackRunAllCommand(
             SlackColors slackColors,
             QOSServerBehaviour behaviour,
             QOSServerState state,
+            SlackCommandGetter slackCommandGetter,
+            SlackAttachmentPartitioner slackAttachmentPartitioner,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.colors = Preconditions.checkNotNull(slackColors);
         this.state = Preconditions.checkNotNull(state);
+        this.commandGetter = Preconditions.checkNotNull(slackCommandGetter);
+        this.partitioner = Preconditions.checkNotNull(slackAttachmentPartitioner);
         this.serverName = Preconditions.checkNotNull(serverName);
         this.behaviour = Preconditions.checkNotNull(behaviour);
     }
@@ -56,28 +64,8 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
                             .setColor(colors.getWarning());
                     toBeAdded.add(testAttachment);
                 });
-        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
-        int iteration = 0;
-        for(int index = 0; index < partitions.size(); index++) {
-            String title = String.format("[%s] TESTS", serverName.toUpperCase());
-            String text = String.format("Total Tests to Run %s, tests %s - %s",
-                    tests.size(),
-                    1 + CHUNK_SIZE * iteration,
-                    CHUNK_SIZE * iteration + partitions.get(index).size());
-
-            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-            slackAttachment
-                    .setColor(colors.getInfo());
-
-            SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
-                    .Builder()
-                    .addAttachment(slackAttachment)
-                    .addAttachments(partitions.get(index));
-            session.sendMessage(
-                    messagePosted.getChannel(),
-                    partitionSend.build());
-            iteration++;
-        }
+        SlackCommand slackCommand = commandGetter.get(messagePosted).get();
+        partitioner.send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 

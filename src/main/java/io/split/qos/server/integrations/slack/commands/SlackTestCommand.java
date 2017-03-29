@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
-import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
@@ -14,12 +13,12 @@ import io.split.qos.server.QOSTestsTracker;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
+import io.split.qos.server.util.SlackAttachmentPartitioner;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
 import io.split.testrunner.util.Util;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Shows the tests that matches the input.
@@ -31,16 +30,17 @@ public class SlackTestCommand implements SlackCommandExecutor {
     private final String serverName;
     private final DateFormatter dateFormatter;
     private final QOSTestsTracker tracker;
-    private static final int CHUNK_SIZE = 50;
     private final SlackColors colors;
     private final SlackCommandGetter slackCommandGetter;
     private final QOSServerState state;
+    private final SlackAttachmentPartitioner partitioner;
 
     @Inject
     public SlackTestCommand(
             SlackColors slackColors,
             SlackCommandGetter slackCommandGetter,
             DateFormatter dateFormatter,
+            SlackAttachmentPartitioner slackAttachmentPartitioner,
             QOSTestsTracker  tracker,
             QOSServerState state,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
@@ -50,6 +50,7 @@ public class SlackTestCommand implements SlackCommandExecutor {
         this.colors = Preconditions.checkNotNull(slackColors);
         this.tracker = Preconditions.checkNotNull(tracker);
         this.state = Preconditions.checkNotNull(state);
+        this.partitioner = Preconditions.checkNotNull(slackAttachmentPartitioner);
     }
 
     @Override
@@ -63,9 +64,9 @@ public class SlackTestCommand implements SlackCommandExecutor {
         }
         List<QOSTestsTracker.Tracked> tests = null;
         if (arguments.size() == 1) {
-            tests = tracker.getTests(Optional.empty(), arguments.get(0));
+            tests = tracker.getTests(arguments.get(0));
         } else {
-            tests = tracker.getTests(Optional.of(arguments.get(0)), arguments.get(1));
+            tests = tracker.getTests(arguments.get(0), arguments.get(1));
         }
         if (tests.isEmpty()) {
             slackEmpty(messagePosted, arguments, session);
@@ -89,27 +90,7 @@ public class SlackTestCommand implements SlackCommandExecutor {
                     }
                     toBeAdded.add(testAttachment);
                 });
-        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
-        int iteration = 0;
-        for(int index = 0; index < partitions.size(); index++) {
-            String title = String.format("[%s] TEST", serverName.toUpperCase());
-            String text = String.format("Total Tests %s, tests %s - %s",
-                    tests.size(),
-                    1 + CHUNK_SIZE * iteration,
-                    CHUNK_SIZE * iteration + partitions.get(index).size());
-
-            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-            slackAttachment.setColor(colors.getInfo());
-
-            SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
-                    .Builder()
-                    .addAttachment(slackAttachment)
-                    .addAttachments(partitions.get(index));
-            session.sendMessage(
-                    messagePosted.getChannel(),
-                    partitionSend.build());
-            iteration++;
-        }
+        partitioner.send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 

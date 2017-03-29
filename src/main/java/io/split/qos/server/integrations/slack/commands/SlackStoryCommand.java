@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
-import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
@@ -13,6 +12,7 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGet
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.stories.QOSStories;
 import io.split.qos.server.stories.Story;
+import io.split.qos.server.util.SlackAttachmentPartitioner;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
 
@@ -29,6 +29,7 @@ public class SlackStoryCommand implements SlackCommandExecutor {
     private final String serverName;
     private final SlackCommandGetter slackCommandGetter;
     private final DateFormatter dateFormater;
+    private final SlackAttachmentPartitioner partitioner;
 
     @Inject
     public SlackStoryCommand(
@@ -36,12 +37,14 @@ public class SlackStoryCommand implements SlackCommandExecutor {
             QOSStories stories,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
             SlackCommandGetter slackCommandGetter,
+            SlackAttachmentPartitioner slackAttachmentPartitioner,
             DateFormatter dateFormatter) {
         this.slackColors = Preconditions.checkNotNull(slackColors);
         this.stories = Preconditions.checkNotNull(stories);
         this.serverName = Preconditions.checkNotNull(serverName);
         this.slackCommandGetter = Preconditions.checkNotNull(slackCommandGetter);
         this.dateFormater = Preconditions.checkNotNull(dateFormatter);
+        this.partitioner = Preconditions.checkNotNull(slackAttachmentPartitioner);
     }
 
 
@@ -135,25 +138,8 @@ public class SlackStoryCommand implements SlackCommandExecutor {
             toBeAdded.add(slackAttachment);
         }
 
-        List<List<SlackAttachment>> partitions = Lists.partition(toBeAdded, CHUNK_SIZE);
-        int iteration = 0;
-        for(int index = 0; index < partitions.size(); index++) {
-            /** Story Header **/
-            String storyTitle = String.format(TITLE, serverName.toUpperCase());
-            String desc = String.format("Part %s of %s", iteration + 1, partitions.size());
-            SlackAttachment titleAttachment = new SlackAttachment(storyTitle, "", desc, null);
-            titleAttachment
-                    .setColor(slackColors.getInfo());
-
-            SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
-                    .Builder()
-                    .addAttachment(titleAttachment)
-                    .addAttachments(partitions.get(index));
-            session.sendMessage(
-                    messagePosted.getChannel(),
-                    partitionSend.build());
-            iteration++;
-        }
+        SlackCommand slackCommand = slackCommandGetter.get(messagePosted).get();
+        partitioner.send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
     }
 
     private void slackEmpty(SlackMessagePosted messagePosted, SlackSession session, List<String> arguments) {

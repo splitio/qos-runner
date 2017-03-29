@@ -27,20 +27,16 @@ public class QOSTestsTrackerTests extends BaseCaseForTest {
 
         QOSTestsTracker tracker = injector().getInstance(QOSTestsTracker.class);
         Assert.assertTrue(tracker.getAll().isEmpty());
-        Assert.assertTrue(tracker.getNotRunning().isEmpty());
 
         tracker.track(emptyMethod, mockedRunner, mockedListener);
         tracker.track(emptyMethod2, mockedRunner2, mockedListener);
         Assert.assertEquals(2, tracker.getAll().size());
-        Assert.assertTrue(tracker.getNotRunning().isEmpty());
 
         Mockito.when(mockedRunner.isRunning()).thenReturn(false);
         Assert.assertEquals(2, tracker.getAll().size());
-        Assert.assertEquals(1, tracker.getNotRunning().size());
 
         Mockito.when(mockedRunner2.isRunning()).thenReturn(false);
         Assert.assertEquals(2, tracker.getAll().size());
-        Assert.assertEquals(2, tracker.getNotRunning().size());
     }
 
     @Test

@@ -266,9 +266,31 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     }
 
     public List<Method> runAllNow() {
-        List<Method> rerunning = Lists.newArrayList();
-        List<QOSTestsTracker.Tracked> notRunning = tracker
-                .getNotRunning()
+        List<QOSTestsTracker.Tracked> toRun = tracker
+                .getAll();
+        return runTests(toRun);
+    }
+
+    public List<Method> runTestsNow(Optional<String> fuzzyClass, String fuzzyClassOrName) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyClassOrName));
+        Preconditions.checkNotNull(fuzzyClass);
+        List<QOSTestsTracker.Tracked> toRun = null;
+        if (fuzzyClass.isPresent()) {
+            toRun = tracker
+                    .getTests(fuzzyClass.get(), fuzzyClassOrName);
+        } else {
+            toRun = tracker
+                    .getTests(fuzzyClassOrName);
+        }
+        return runTests(toRun);
+    }
+
+    private List<Method> runTests(List<QOSTestsTracker.Tracked> toRun) {
+        Preconditions.checkNotNull(toRun);
+        if (toRun.isEmpty()) {
+            return Lists.newArrayList();
+        }
+        List<QOSTestsTracker.Tracked> orderedByTime = toRun
                 .stream()
                 .sorted((firstTracked, secondTracked) -> {
                     String firstId = Util.id(firstTracked.method());
@@ -284,53 +306,25 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                     return firstStatus.when().compareTo(secondStatus.when());
                 })
                 .collect(Collectors.toList());
-        if (notRunning.isEmpty()) {
-            return rerunning;
-        }
-        int step = (spreadTests) ? delayBetweenInSeconds / notRunning.size() : 1;
+        List<Method> running = Lists.newArrayList();
+        int step = (spreadTests) ? delayBetweenInSeconds / orderedByTime.size() : 1;
         int schedule = step;
-        for(QOSTestsTracker.Tracked track : notRunning) {
-            track.future().cancel(true);
-            rerunning.add(track.method());
-            LOG.info(String.format("%s canceled, rerunning now",
-                    Util.id(track.method())));
-            JUnitRunner runner = testRunnerFactory.create(track.method(), Optional.empty());
-            ListenableFuture<TestResult> future = executor.schedule(
-                    runner,
-                    0,
-                    TimeUnit.SECONDS);
-            tracker.track(track.method(), runner, future);
-            Futures.addCallback(future, createCallback(track.method(), schedule, delayBetweenInSecondsWhenFail, delayBetweenInSeconds));
-            schedule += step;
-        }
-        return rerunning;
-    }
-
-    public Optional<Method> runTestNow(Optional<String> fuzzyClass, String fuzzyName) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyName));
-        Preconditions.checkNotNull(fuzzyClass);
-        Optional<QOSTestsTracker.Tracked> present = tracker
-                .getTests(fuzzyClass, fuzzyName)
-                .stream()
-                .findAny();
-        if (!present.isPresent()) {
-            return Optional.empty();
-        } else {
-            QOSTestsTracker.Tracked tracked = present.get();
-            if (tracked.runner().isRunning()) {
-                // It is already running
-                return Optional.of(tracked.method());
+        for(QOSTestsTracker.Tracked track : orderedByTime) {
+            if (!track.runner().isRunning()) {
+                track.future().cancel(true);
+                LOG.info(String.format("%s canceled, rerunning now",
+                        Util.id(track.method())));
+                JUnitRunner runner = testRunnerFactory.create(track.method(), Optional.empty());
+                ListenableFuture<TestResult> future = executor.schedule(
+                        runner,
+                        0,
+                        TimeUnit.SECONDS);
+                tracker.track(track.method(), runner, future);
+                Futures.addCallback(future, createCallback(track.method(), schedule, delayBetweenInSecondsWhenFail, delayBetweenInSeconds));
+                schedule += step;
             }
-            LOG.info(String.format("Running now %s",
-                    Util.id(tracked.method())));
-            JUnitRunner runner = testRunnerFactory.create(tracked.method(), Optional.empty());
-            ListenableFuture<TestResult> future = executor.schedule(
-                    runner,
-                    0,
-                    TimeUnit.SECONDS);
-            tracker.track(tracked.method(), runner, future);
-            Futures.addCallback(future, createCallback(tracked.method(), delayBetweenInSeconds, delayBetweenInSecondsWhenFail, delayBetweenInSeconds));
-            return Optional.of(tracked.method());
+            running.add(track.method());
         }
+        return running;
     }
 }

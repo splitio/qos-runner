@@ -13,7 +13,6 @@ import io.split.testrunner.util.Util;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -33,28 +32,30 @@ public class QOSTestsTracker {
         this.tracked.put(Util.id(method), new Tracked(method, runner, future));
     }
 
-    public synchronized List<Tracked> getNotRunning() {
-        return tracked
-                .values()
-                .stream()
-                .filter(track -> !track.runner.isRunning())
-                .collect(Collectors.toList());
-    }
-
     public synchronized List<Tracked> getAll() {
         return Lists.newArrayList(tracked
                 .values());
     }
 
-    public synchronized List<Tracked> getTests(Optional<String> fuzzyClass, String fuzzyName) {
+    public synchronized List<Tracked> getTests(String fuzzyClassOrName) {
+        Preconditions.checkNotNull(fuzzyClassOrName);
         return getAll()
                 .stream()
                 .filter(tracked -> {
-                    if (fuzzyClass.isPresent() &&
-                            (!tracked.method().getDeclaringClass().getName().toLowerCase().contains(fuzzyClass.get().toLowerCase()))) {
-                        return false;
-                    }
-                    return tracked.method().getName().toLowerCase().contains(fuzzyName.toLowerCase());
+                    return (tracked.method().getDeclaringClass().getName().toLowerCase().contains(fuzzyClassOrName.toLowerCase())
+                            || tracked.method().getName().toLowerCase().contains(fuzzyClassOrName.toLowerCase()));
+                })
+                .collect(Collectors.toList());
+    }
+
+    public synchronized List<Tracked> getTests(String fuzzyClass, String fuzzyName) {
+        Preconditions.checkNotNull(fuzzyClass);
+        Preconditions.checkNotNull(fuzzyName);
+        return getAll()
+                .stream()
+                .filter(tracked -> {
+                        return (tracked.method().getDeclaringClass().getName().toLowerCase().contains(fuzzyClass.toLowerCase())
+                                && tracked.method().getName().toLowerCase().contains(fuzzyName.toLowerCase()));
                 })
                 .collect(Collectors.toList());
     }
