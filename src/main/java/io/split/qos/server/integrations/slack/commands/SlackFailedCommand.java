@@ -11,7 +11,7 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
-import io.split.qos.server.util.SlackAttachmentPartitioner;
+import io.split.qos.server.util.SlackMessageSender;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
 
@@ -21,46 +21,31 @@ import java.util.stream.Collectors;
 /**
  * Lists all the failed tests, ordered by time.
  */
-public class SlackFailedCommand implements SlackCommandExecutor {
-    private static final int CHUNK_SIZE = 50;
+public class SlackFailedCommand extends SlackAbstractCommand {
 
-    private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
-    private final SlackColors colors;
-    private final SlackAttachmentPartitioner partitioner;
-    private final SlackCommandGetter slackCommandGetter;
 
     @Inject
     public SlackFailedCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
             SlackColors slackColors,
-            SlackAttachmentPartitioner slackAttachmentPartitioner,
+            SlackMessageSender slackMessageSender,
             SlackCommandGetter slackCommandGetter,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
-        this.serverName = Preconditions.checkNotNull(serverName);
+        super(slackColors, serverName, slackMessageSender, slackCommandGetter);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.state = state;
-        this.colors = slackColors;
-        this.slackCommandGetter = Preconditions.checkNotNull(slackCommandGetter);
-        this.partitioner = Preconditions.checkNotNull(slackAttachmentPartitioner);
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         List<QOSServerState.TestDTO> failed = state.failedTests();
+        SlackCommand slackCommand = command(messagePosted);
         if (failed.isEmpty()) {
-            String title = String.format("[%s] FAILED TESTS", serverName.toUpperCase());
-            String text = "No failed tests";
-            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-            slackAttachment
-                    .setColor(colors.getSuccess());
-            session
-                    .sendMessage(
-                            messagePosted.getChannel(),
-                            "",
-                            slackAttachment);
+            messageSender()
+                    .sendSuccess(slackCommand.command(), "No failed tests", messagePosted.getChannel(), session);
             return true;
         }
         List<String> failedTests = failed
@@ -76,17 +61,22 @@ public class SlackFailedCommand implements SlackCommandExecutor {
                 .forEach(test -> {
                     SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
                     testAttachment
-                            .setColor(colors.getFailed());
+                            .setColor(colors().getFailed());
                     toBeAdded.add(testAttachment);
                 });
-        SlackCommand slackCommand = slackCommandGetter.get(messagePosted).get();
-        partitioner.send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 
     @Override
     public String help() {
         return "[server-name (optional)] failed: Displays a lists of the failed tests";
+    }
+
+    @Override
+    public boolean acceptsArguments(List<String> arguments) {
+        Preconditions.checkNotNull(arguments);
+        return arguments.size() == 0;
     }
 }
 

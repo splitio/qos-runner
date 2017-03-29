@@ -11,7 +11,6 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     private final Provider<SlackInfoCommand> infoProvider;
     private final Provider<SlackPauseCommand> pauseProvider;
     private final Provider<SlackResumeCommand> resumeProvider;
-    private final Provider<SlackTestsCommand> testsProvider;
     private final Provider<SlackGreenCommand> greenProvider;
     private final Provider<SlackCommandsCommand> commandsProvider;
     private final Provider<SlackFailedCommand> failedProvider;
@@ -21,14 +20,13 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     private final Provider<SlackConfigCommand> configProvider;
     private final Provider<SlackPingCommand> pingProvider;
     private final Provider<SlackStoryCommand> storyProvider;
-    private final Provider<SlackTestCommand> testProvider;
+    private final Provider<SlackTestsCommand> testsProvider;
 
     @Inject
     public SlackCommanderProviderImpl(
             Provider<SlackInfoCommand> infoCommandProvider,
             Provider<SlackPauseCommand> pauseCommandProvider,
             Provider<SlackResumeCommand> resumeCommandProvider,
-            Provider<SlackTestsCommand> testsCommandProvider,
             Provider<SlackGreenCommand> greenCommandProvider,
             Provider<SlackCommandsCommand> commandsCommandProvider,
             Provider<SlackFailedCommand> failedCommandProvider,
@@ -37,12 +35,11 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
             Provider<SlackRunTestCommand> runTestCommandProvider,
             Provider<SlackConfigCommand> configCommandProvider,
             Provider<SlackPingCommand> pingCommandProvider,
-            Provider<SlackTestCommand> testCommandProvider,
+            Provider<SlackTestsCommand> testsCommandProvider,
             Provider<SlackStoryCommand> storyCommandProvider) {
         this.infoProvider = Preconditions.checkNotNull(infoCommandProvider);
         this.pauseProvider = Preconditions.checkNotNull(pauseCommandProvider);
         this.resumeProvider = Preconditions.checkNotNull(resumeCommandProvider);
-        this.testsProvider = Preconditions.checkNotNull(testsCommandProvider);
         this.greenProvider = Preconditions.checkNotNull(greenCommandProvider);
         this.commandsProvider = Preconditions.checkNotNull(commandsCommandProvider);
         this.failedProvider = Preconditions.checkNotNull(failedCommandProvider);
@@ -51,7 +48,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
         this.configProvider = Preconditions.checkNotNull(configCommandProvider);
         this.pingProvider = Preconditions.checkNotNull(pingCommandProvider);
         this.storyProvider = Preconditions.checkNotNull(storyCommandProvider);
-        this.testProvider = Preconditions.checkNotNull(testCommandProvider);
+        this.testsProvider = Preconditions.checkNotNull(testsCommandProvider);
         this.missingProvider = Preconditions.checkNotNull(missingCommandProvider);
     }
 
@@ -68,11 +65,6 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     @Override
     public SlackResumeCommand resume() {
         return resumeProvider.get();
-    }
-
-    @Override
-    public SlackTestsCommand tests() {
-        return testsProvider.get();
     }
 
     @Override
@@ -111,8 +103,8 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     }
 
     @Override
-    public SlackTestCommand test() {
-        return testProvider.get();
+    public SlackTestsCommand tests() {
+        return testsProvider.get();
     }
 
     @Override

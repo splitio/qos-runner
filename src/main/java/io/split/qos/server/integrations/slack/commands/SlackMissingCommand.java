@@ -11,7 +11,7 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
-import io.split.qos.server.util.SlackAttachmentPartitioner;
+import io.split.qos.server.util.SlackMessageSender;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
 
@@ -21,47 +21,34 @@ import java.util.stream.Collectors;
 /**
  * Lists all the missing tests.
  */
-public class SlackMissingCommand implements SlackCommandExecutor {
-    private static final int CHUNK_SIZE = 50;
+public class SlackMissingCommand extends SlackAbstractCommand {
 
-    private final String serverName;
     private final QOSServerState state;
     private final DateFormatter dateFormatter;
-    private final SlackColors colors;
-    private final SlackCommandGetter commandGetter;
-    private final SlackAttachmentPartitioner partitioner;
 
     @Inject
     public SlackMissingCommand(
             QOSServerState state,
             DateFormatter dateFormatter,
             SlackCommandGetter slackCommandGetter,
-            SlackAttachmentPartitioner slackAttachmentPartitioner,
+            SlackMessageSender slackMessageSender,
             SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
-        this.serverName = Preconditions.checkNotNull(serverName);
+        super(slackColors, serverName, slackMessageSender, slackCommandGetter);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
         this.state = state;
-        this.commandGetter = Preconditions.checkNotNull(slackCommandGetter);
-        this.partitioner = Preconditions.checkNotNull(slackAttachmentPartitioner);
-        this.colors = slackColors;
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-
+        SlackCommand slackCommand = command(messagePosted);
         List<QOSServerState.TestDTO> missing = state.missingTests();
         if (missing.isEmpty()) {
-            String title = String.format("[%s] MISSING TESTS", serverName.toUpperCase());
-            String text = "No missing tests";
-            SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-            slackAttachment
-                    .setColor(colors.getSuccess());
-            session
-                    .sendMessage(
+            messageSender()
+                    .sendSuccess(slackCommand.command(),
+                            "No missing tests",
                             messagePosted.getChannel(),
-                            "",
-                            slackAttachment);
+                            session);
             return true;
         }
         List<String> missingTests = missing
@@ -75,17 +62,22 @@ public class SlackMissingCommand implements SlackCommandExecutor {
                 .forEach(test -> {
                     SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
                     testAttachment
-                            .setColor(colors.getWarning());
+                            .setColor(colors().getWarning());
                     toBeAdded.add(testAttachment);
                 });
-        SlackCommand slackCommand = commandGetter.get(messagePosted).get();
-        partitioner.send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 
     @Override
     public String help() {
         return "[server-name (optional)] missing [server-name]: Displays a lists of the tests that have not run yet";
+    }
+
+    @Override
+    public boolean acceptsArguments(List<String> arguments) {
+        Preconditions.checkNotNull(arguments);
+        return arguments.size() == 0;
     }
 }
 

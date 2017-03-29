@@ -3,6 +3,7 @@ package io.split.qos.server.integrations.slack.commands;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 
+import java.util.List;
 import java.util.function.BiPredicate;
 
 /**
@@ -13,4 +14,6 @@ public interface SlackCommandExecutor extends BiPredicate<SlackMessagePosted, Sl
      * @return Some handy information on how to use the command.
      */
     String help();
+
+    boolean acceptsArguments(List<String> arguments);
 }

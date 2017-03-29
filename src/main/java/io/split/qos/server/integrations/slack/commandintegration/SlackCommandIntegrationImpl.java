@@ -57,7 +57,7 @@ public class SlackCommandIntegrationImpl extends AbstractSlackIntegration implem
                 slackCommandGetter.get(event)
                         .ifPresent(command -> {
                             if (!command.server().isPresent() || command.server().get().equalsIgnoreCase(serverName)) {
-                                slackCommandListener.execute(command.command(), event, session);
+                                slackCommandListener.execute(command, event, session);
                             }
                         });
             }

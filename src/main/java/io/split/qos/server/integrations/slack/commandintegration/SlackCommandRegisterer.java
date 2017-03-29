@@ -24,7 +24,6 @@ public class SlackCommandRegisterer {
         listener.register("info", provider.info());
         listener.register("pause", provider.pause());
         listener.register("resume", provider.resume());
-        listener.register("tests", provider.tests());
         listener.register("green", provider.green());
         listener.register("commands", provider.commands());
         listener.register("failed", provider.failed());
@@ -33,7 +32,7 @@ public class SlackCommandRegisterer {
         listener.register("run", provider.runTest());
         listener.register("config", provider.config());
         listener.register("ping", provider.ping());
-        listener.register("test", provider.test());
+        listener.register("tests", provider.tests());
         listener.register("story", provider.story());
     }
 }

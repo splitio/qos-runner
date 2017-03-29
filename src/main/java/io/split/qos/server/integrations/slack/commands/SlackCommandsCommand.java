@@ -58,4 +58,10 @@ public class SlackCommandsCommand implements SlackCommandExecutor {
     public String help() {
         return "commands [server-name]: Displays the list of commands the server accepts";
     }
+
+    @Override
+    public boolean acceptsArguments(List<String> arguments) {
+        Preconditions.checkNotNull(arguments);
+        return arguments.size() == 0;
+    }
 }

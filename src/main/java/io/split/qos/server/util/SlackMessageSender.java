@@ -15,13 +15,13 @@ import io.split.testrunner.util.SlackColors;
 import java.util.List;
 
 @Singleton
-public class SlackAttachmentPartitioner {
+public class SlackMessageSender {
     private static final int CHUNK_SIZE = 50;
     private final String serverName;
     private final SlackColors colors;
 
     @Inject
-    public SlackAttachmentPartitioner(
+    public SlackMessageSender(
             SlackColors slackColors,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
@@ -55,5 +55,37 @@ public class SlackAttachmentPartitioner {
                     partitionSend.build());
             iteration++;
         }
+    }
+
+    public void sendInfo(String title, String text, SlackChannel channel, SlackSession session) {
+        send(title, text, colors.getInfo(), channel, session);
+    }
+
+    public void sendSuccess(String title, String text, SlackChannel channel, SlackSession session) {
+        send(title, text, colors.getSuccess(), channel, session);
+    }
+
+    public void sendWarning(String title, String text, SlackChannel channel, SlackSession session) {
+        send(title, text, colors.getWarning(), channel, session);
+    }
+
+    public void sendFailed(String title, String text, SlackChannel channel, SlackSession session) {
+        send(title, text, colors.getFailed(), channel, session);
+    }
+
+    private void send(String title, String text, String color, SlackChannel channel, SlackSession session) {
+        Preconditions.checkNotNull(title);
+        Preconditions.checkNotNull(color);
+        Preconditions.checkNotNull(channel);
+        Preconditions.checkNotNull(session);
+        String titleWithServerName = String.format("[%s] %s" , serverName.toUpperCase(), title.toUpperCase());
+        SlackAttachment slackAttachment = new SlackAttachment(titleWithServerName, "", text, null);
+        slackAttachment
+                .setColor(color);
+        session
+                .sendMessage(
+                        channel,
+                        "",
+                        slackAttachment);
     }
 }

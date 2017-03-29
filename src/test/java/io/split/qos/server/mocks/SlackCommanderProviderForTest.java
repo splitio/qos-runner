@@ -28,11 +28,6 @@ public class SlackCommanderProviderForTest implements SlackCommandProvider {
     }
 
     @Override
-    public SlackTestsCommand tests() {
-        return null;
-    }
-
-    @Override
     public SlackGreenCommand green() {
         return null;
     }
@@ -73,7 +68,7 @@ public class SlackCommanderProviderForTest implements SlackCommandProvider {
     }
 
     @Override
-    public SlackTestCommand test() {
+    public SlackTestsCommand tests() {
         return null;
     }
 

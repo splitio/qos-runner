@@ -11,7 +11,6 @@ public interface SlackCommandProvider {
     SlackInfoCommand info();
     SlackPauseCommand pause();
     SlackResumeCommand resume();
-    SlackTestsCommand tests();
     SlackGreenCommand green();
     SlackCommandsCommand commands();
     SlackFailedCommand failed();
@@ -20,6 +19,6 @@ public interface SlackCommandProvider {
     SlackRunTestCommand runTest();
     SlackConfigCommand config();
     SlackPingCommand ping();
-    SlackTestCommand test();
+    SlackTestsCommand tests();
     SlackStoryCommand story();
 }

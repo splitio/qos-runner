@@ -9,91 +9,104 @@ import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
+import io.split.qos.server.QOSTestsTracker;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
-import io.split.qos.server.util.SlackAttachmentPartitioner;
+import io.split.qos.server.util.SlackMessageSender;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
+import io.split.testrunner.util.Util;
 
 import java.util.List;
-import java.util.Map;
 
 /**
- * Shows all the tests of the QOS.
+ * Shows the tests that matches the input.
  */
 @Singleton
-public class SlackTestsCommand implements SlackCommandExecutor {
-    private final String serverName;
-    private final QOSServerState state;
+public class SlackTestsCommand extends SlackAbstractCommand {
     private final DateFormatter dateFormatter;
-
-    private static final int CHUNK_SIZE = 50;
-    private final SlackColors colors;
-    private final SlackCommandGetter commandGetter;
-    private final SlackAttachmentPartitioner partitioner;
+    private final QOSTestsTracker tracker;
+    private final QOSServerState state;
 
     @Inject
     public SlackTestsCommand(
             SlackColors slackColors,
             SlackCommandGetter slackCommandGetter,
-            SlackAttachmentPartitioner slackAttachmentPartitioner,
-            QOSServerState state,
             DateFormatter dateFormatter,
+            SlackMessageSender slackMessageSender,
+            QOSTestsTracker  tracker,
+            QOSServerState state,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
-        this.serverName = Preconditions.checkNotNull(serverName);
+        super(slackColors, serverName, slackMessageSender, slackCommandGetter);
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
-        this.state = state;
-        this.partitioner = Preconditions.checkNotNull(slackAttachmentPartitioner);
-        this.commandGetter = Preconditions.checkNotNull(slackCommandGetter);
-        this.colors = slackColors;
+        this.tracker = Preconditions.checkNotNull(tracker);
+        this.state = Preconditions.checkNotNull(state);
     }
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        Map<String, QOSServerState.TestStatus> tests = state.tests();
+        SlackCommand slackCommand = command(messagePosted);
+        List<String> arguments = slackCommand.arguments();
+        List<QOSTestsTracker.Tracked> tests = null;
+        if (arguments.size() == 0) {
+            tests = tracker.getAll();
+        } else if (arguments.size() == 1) {
+            tests = tracker.getTests(arguments.get(0));
+        } else {
+            tests = tracker.getTests(arguments.get(0), arguments.get(1));
+        }
+
         List<SlackAttachment> toBeAdded = Lists.newArrayList();
-        tests.entrySet()
+        tests
                 .stream()
+                .map(tracked -> tracked.method())
                 .sorted((o1, o2) -> {
-                    if (o1.getValue().hasFinished() &&  !o1.getValue().succeeded()) {
+                    QOSServerState.TestStatus statusO1 = state.test(o1);
+                    QOSServerState.TestStatus statusO2 = state.test(o2);
+                    if (statusO1.hasFinished() &&  !statusO1.succeeded()) {
                         return 1;
                     }
-                    if (o2.getValue().hasFinished() &&  !o2.getValue().succeeded()) {
+                    if (statusO2.hasFinished() &&  !statusO2.succeeded()) {
                         return -1;
                     }
-                    if (!o1.getValue().hasFinished() && !o2.getValue().hasFinished()) {
+                    if (!statusO1.hasFinished() && !statusO2.hasFinished()) {
                         return 0;
                     }
-                    if (!o1.getValue().hasFinished()) {
+                    if (!statusO1.hasFinished()) {
                         return -1;
                     }
-                    if (!o2.getValue().hasFinished()) {
+                    if (!statusO2.hasFinished()) {
                         return 1;
                     }
-                    return o1.getValue().succeeded().compareTo(o2.getValue().succeeded());
+                    return statusO1.succeeded().compareTo(statusO2.succeeded());
                 })
                 .forEach(value -> {
-                    String test = String.format("%s | %s",
-                            value.getKey(),
-                            dateFormatter.formatDate(value.getValue().when()));
-                    SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
-                    if (value.getValue().succeeded() == null) {
-                        testAttachment.setColor(colors.getWarning());
-                    } else if (value.getValue().succeeded()) {
-                        testAttachment.setColor(colors.getSuccess());
+                    String id = Util.id(value);
+                    SlackAttachment testAttachment = new SlackAttachment("", "", id, null);
+                    QOSServerState.TestStatus status = state.test(value);
+                    if (status.succeeded() == null) {
+                        testAttachment.setColor(colors().getWarning());
+                    } else if (status.succeeded()) {
+                        testAttachment.setColor(colors().getSuccess());
                     } else {
-                        testAttachment.setColor(colors.getFailed());
+                        testAttachment.setColor(colors().getFailed());
                     }
                     toBeAdded.add(testAttachment);
                 });
-        SlackCommand slackCommand = commandGetter.get(messagePosted).get();
-        partitioner.send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 
     @Override
     public String help() {
-        return "[server-name (optional)] tests: Displays a lists of the tests that the server runs";
+        return "[server-name (optional)] tests [class name (optional)] [test name (optional)]: " +
+                "Finds the tests that matches the parameters. No parameters gets all tests.";
+    }
+
+    @Override
+    public boolean acceptsArguments(List<String> arguments) {
+        Preconditions.checkNotNull(arguments);
+        return arguments.size() < 3;
     }
 }

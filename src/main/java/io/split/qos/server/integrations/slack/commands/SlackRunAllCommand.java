@@ -12,7 +12,7 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
-import io.split.qos.server.util.SlackAttachmentPartitioner;
+import io.split.qos.server.util.SlackMessageSender;
 import io.split.testrunner.util.SlackColors;
 import io.split.testrunner.util.Util;
 
@@ -22,15 +22,9 @@ import java.util.List;
 /**
  * Runs all the tests of the QOS.
  */
-public class SlackRunAllCommand implements SlackCommandExecutor {
-    private final String serverName;
+public class SlackRunAllCommand extends SlackAbstractCommand {
     private final QOSServerBehaviour behaviour;
-
-    private static final int CHUNK_SIZE = 50;
-    private final SlackColors colors;
     private final QOSServerState state;
-    private final SlackCommandGetter commandGetter;
-    private final SlackAttachmentPartitioner partitioner;
 
     @Inject
     public SlackRunAllCommand(
@@ -38,13 +32,10 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
             QOSServerBehaviour behaviour,
             QOSServerState state,
             SlackCommandGetter slackCommandGetter,
-            SlackAttachmentPartitioner slackAttachmentPartitioner,
+            SlackMessageSender slackMessageSender,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
-        this.colors = Preconditions.checkNotNull(slackColors);
+        super(slackColors, serverName, slackMessageSender, slackCommandGetter);
         this.state = Preconditions.checkNotNull(state);
-        this.commandGetter = Preconditions.checkNotNull(slackCommandGetter);
-        this.partitioner = Preconditions.checkNotNull(slackAttachmentPartitioner);
-        this.serverName = Preconditions.checkNotNull(serverName);
         this.behaviour = Preconditions.checkNotNull(behaviour);
     }
 
@@ -61,16 +52,22 @@ public class SlackRunAllCommand implements SlackCommandExecutor {
                 .forEach(test -> {
                     SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
                     testAttachment
-                            .setColor(colors.getWarning());
+                            .setColor(colors().getWarning());
                     toBeAdded.add(testAttachment);
                 });
-        SlackCommand slackCommand = commandGetter.get(messagePosted).get();
-        partitioner.send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        SlackCommand slackCommand = command(messagePosted);
+        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 
     @Override
     public String help() {
         return "[server-name (optional)] runall: Runs all the tests of the qos server immediately";
+    }
+
+    @Override
+    public boolean acceptsArguments(List<String> arguments) {
+        Preconditions.checkNotNull(arguments);
+        return arguments.size() == 0;
     }
 }

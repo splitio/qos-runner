@@ -2,6 +2,7 @@ package io.split.qos.server.integrations.slack.listener;
 
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
+import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commands.SlackCommandExecutor;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public interface SlackCommandListener {
      * @param message the message where the command was sent.
      * @param session the Slack Session.
      */
-    void execute(String command, SlackMessagePosted message, SlackSession session);
+    void execute(SlackCommand command, SlackMessagePosted message, SlackSession session);
 
     /**
      * @return all the registered commands.
