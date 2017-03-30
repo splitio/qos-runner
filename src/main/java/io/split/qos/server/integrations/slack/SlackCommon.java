@@ -95,7 +95,7 @@ public class SlackCommon {
     }
 
     public String botId() {
-        if (slackSession != null) {
+        if (slackSession != null && slackSession.sessionPersona() != null) {
             return slackSession.sessionPersona().getId();
         } else {
             return "";

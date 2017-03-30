@@ -37,6 +37,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
     private QOSRegister register;
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("https.protocols", "TLSv1.1");
         new QOSServerApplication().run(args);
     }
 
@@ -67,7 +68,10 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
                 new QOSServerModule(configuration.getServerName())
         );
 
+        LOG.info("Initializing Guice");
+        long begin = System.currentTimeMillis();
         injector = Guice.createInjector(modules);
+        LOG.info(String.format("Guice initialized in %s milliseconds", System.currentTimeMillis() - begin));
         environment.jersey().register(new HealthResource());
         environment.jersey().register(new GreenResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new ConfigResource(injector.getInstance(Key.get(Properties.class, Names.named(QOSPropertiesModule.CONFIGURATION)))));

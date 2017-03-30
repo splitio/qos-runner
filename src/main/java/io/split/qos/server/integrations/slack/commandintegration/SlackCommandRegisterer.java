@@ -32,6 +32,7 @@ public class SlackCommandRegisterer {
         listener.register("run", provider.runTest());
         listener.register("config", provider.config());
         listener.register("ping", provider.ping());
+        listener.register("count", provider.count());
         listener.register("tests", provider.tests());
         listener.register("story", provider.story());
     }

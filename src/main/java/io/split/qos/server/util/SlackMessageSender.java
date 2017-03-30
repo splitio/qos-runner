@@ -28,7 +28,38 @@ public class SlackMessageSender {
         this.colors = Preconditions.checkNotNull(slackColors);
     }
 
-    public void send(String command, SlackSession session,
+
+    public void send(String command,
+                     SlackSession session,
+                     SlackChannel slackChannel,
+                     List<SlackAttachment> attachments) {
+        send(command, "", session, slackChannel, attachments);
+    }
+
+    public void send(String command,
+                     String description,
+                     SlackSession session,
+                     SlackChannel slackChannel,
+                     List<SlackAttachment> attachments) {
+        Preconditions.checkNotNull(attachments);
+        Preconditions.checkNotNull(command);
+        Preconditions.checkNotNull(description);
+        Preconditions.checkNotNull(session);
+        Preconditions.checkNotNull(slackChannel);
+        String title = String.format("[%s] %s", serverName.toUpperCase(), command.toUpperCase());
+        SlackAttachment slackAttachment = new SlackAttachment(title, "", description, null);
+        slackAttachment.setColor(colors.getInfo());
+
+        SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
+                .Builder()
+                .addAttachment(slackAttachment)
+                .addAttachments(attachments);
+        session.sendMessage(
+                slackChannel,
+                partitionSend.build());
+    }
+
+    public void sendPartition(String command, SlackSession session,
                      SlackChannel slackChannel, List<SlackAttachment> attachments) {
         Preconditions.checkNotNull(attachments);
         Preconditions.checkNotNull(command);

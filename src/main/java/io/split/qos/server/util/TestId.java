@@ -3,8 +3,13 @@ package io.split.qos.server.util;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import io.split.testrunner.util.Util;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.runner.Description;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,5 +77,16 @@ public class TestId {
 
     public String testName() {
         return testName;
+    }
+
+    private static final String SLACK_HTTPS_AUTH_URL = "https://slack.com/api/rtm.start?token=";
+
+    public static void main(String [] args) throws IOException {
+        String authToken = "xoxb-162119649299-2aAyDbgiP7QUXa585K4lskpn";
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(SLACK_HTTPS_AUTH_URL + authToken);
+        HttpResponse response;
+        response = httpClient.execute(request);
+        System.out.print(response.getStatusLine().getStatusCode());
     }
 }

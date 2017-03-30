@@ -24,7 +24,7 @@ public class Util {
         }
         return builder.append(subpackages[subpackages.length - 1]).toString();
     }
-    
+
     /**
      * Gets a random number between min and max.
      *

@@ -143,7 +143,7 @@ public class SlackStoryCommand extends SlackAbstractCommand {
                     .setColor(color);
             toBeAdded.add(slackAttachment);
         }
-        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
     }
 
     @Override

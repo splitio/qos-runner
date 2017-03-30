@@ -77,4 +77,9 @@ public class SlackCommanderProviderForTest implements SlackCommandProvider {
         return null;
     }
 
+    @Override
+    public SlackCountCommand count() {
+        return null;
+    }
+
 }

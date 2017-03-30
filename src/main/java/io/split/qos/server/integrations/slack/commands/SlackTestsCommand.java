@@ -92,7 +92,7 @@ public class SlackTestsCommand extends SlackAbstractCommand {
                     }
                     toBeAdded.add(testAttachment);
                 });
-        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 

@@ -56,7 +56,7 @@ public class SlackRunAllCommand extends SlackAbstractCommand {
                     toBeAdded.add(testAttachment);
                 });
         SlackCommand slackCommand = command(messagePosted);
-        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 

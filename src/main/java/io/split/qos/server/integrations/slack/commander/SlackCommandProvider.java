@@ -21,4 +21,5 @@ public interface SlackCommandProvider {
     SlackPingCommand ping();
     SlackTestsCommand tests();
     SlackStoryCommand story();
+    SlackCountCommand count();
 }

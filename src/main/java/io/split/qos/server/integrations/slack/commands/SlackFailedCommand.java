@@ -67,7 +67,7 @@ public class SlackFailedCommand extends SlackAbstractCommand {
                             .setColor(colors().getFailed());
                     toBeAdded.add(testAttachment);
                 });
-        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 

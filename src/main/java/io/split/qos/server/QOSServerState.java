@@ -155,6 +155,10 @@ public class QOSServerState {
         return Maps.filterValues(tests, input -> input.succeeded() == null);
     }
 
+    public Map<TestId, TestStatus> succeededTests() {
+        return Maps.filterValues(tests, input -> input.succeeded() != null && input.succeeded());
+    }
+
     public boolean isActive() {
         return Status.ACTIVE.equals(status());
     }

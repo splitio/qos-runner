@@ -68,7 +68,7 @@ public class SlackMissingCommand extends SlackAbstractCommand {
                             .setColor(colors().getWarning());
                     toBeAdded.add(testAttachment);
                 });
-        messageSender().send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 
