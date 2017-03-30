@@ -82,4 +82,9 @@ public class SlackCommanderProviderForTest implements SlackCommandProvider {
         return null;
     }
 
+    @Override
+    public SlackSucceededCommand succeeded() {
+        return null;
+    }
+
 }

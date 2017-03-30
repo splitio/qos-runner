@@ -28,6 +28,7 @@ public class SlackCommandRegisterer {
         listener.register("commands", provider.commands());
         listener.register("failed", provider.failed());
         listener.register("missing", provider.missing());
+        listener.register("succeeded", provider.succeeded());
         listener.register("runall", provider.runAll());
         listener.register("run", provider.runTest());
         listener.register("config", provider.config());

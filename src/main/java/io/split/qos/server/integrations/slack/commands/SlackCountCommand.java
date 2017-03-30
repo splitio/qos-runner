@@ -72,7 +72,7 @@ public class SlackCountCommand extends SlackAbstractCommand {
 
     @Override
     public String help() {
-        return "[server-name (optional)] info: Displays Server Info, like status, time since status change, last test ran";
+        return "[server-name (optional)] count: Displays a count of the succeeded, failed and missing tests";
     }
 
     @Override

@@ -22,6 +22,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     private final Provider<SlackCountCommand> countProvider;
     private final Provider<SlackStoryCommand> storyProvider;
     private final Provider<SlackTestsCommand> testsProvider;
+    private final Provider<SlackSucceededCommand> succeededProvider;
 
     @Inject
     public SlackCommanderProviderImpl(
@@ -32,6 +33,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
             Provider<SlackCommandsCommand> commandsCommandProvider,
             Provider<SlackFailedCommand> failedCommandProvider,
             Provider<SlackMissingCommand> missingCommandProvider,
+            Provider<SlackSucceededCommand> succeededCommandProvider,
             Provider<SlackRunAllCommand> runAllCommandProvider,
             Provider<SlackRunTestCommand> runTestCommandProvider,
             Provider<SlackCountCommand> countCommandProvider,
@@ -52,6 +54,7 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
         this.storyProvider = Preconditions.checkNotNull(storyCommandProvider);
         this.testsProvider = Preconditions.checkNotNull(testsCommandProvider);
         this.missingProvider = Preconditions.checkNotNull(missingCommandProvider);
+        this.succeededProvider = Preconditions.checkNotNull(succeededCommandProvider);
         this.countProvider = Preconditions.checkNotNull(countCommandProvider);
     }
 
@@ -118,6 +121,11 @@ public class SlackCommanderProviderImpl implements SlackCommandProvider {
     @Override
     public SlackCountCommand count() {
         return countProvider.get();
+    }
+
+    @Override
+    public SlackSucceededCommand succeeded() {
+        return succeededProvider.get();
     }
 
     @Override
