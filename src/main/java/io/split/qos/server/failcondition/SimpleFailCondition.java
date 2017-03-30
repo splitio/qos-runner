@@ -9,8 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.split.qos.server.modules.QOSPropertiesModule;
-import io.split.testrunner.util.Util;
-import org.junit.runner.Description;
+import io.split.qos.server.util.TestId;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -27,9 +26,9 @@ public class SimpleFailCondition implements FailCondition {
     //Each Tests starts its own injector, so each test brings up its own Broadcaster.
     //Could inject this in QOSCommonModule instead so there is only one Broadcaster, haven't tried
     //For now these has to be static.
-    private static final Multiset<String> FAILURES = ConcurrentHashMultiset.create();
-    private static final Map<String, Long> FIRST_FAILURE_TIME = Maps.newConcurrentMap();
-    private static final Map<String, Integer> FAILURE_MULTIPLIER = Maps.newConcurrentMap();
+    private static final Multiset<TestId> FAILURES = ConcurrentHashMultiset.create();
+    private static final Map<TestId, Long> FIRST_FAILURE_TIME = Maps.newConcurrentMap();
+    private static final Map<TestId, Integer> FAILURE_MULTIPLIER = Maps.newConcurrentMap();
 
     private final int consecutiveFailures;
     private final Integer reBroadcastFailureInMinutes;
@@ -44,28 +43,30 @@ public class SimpleFailCondition implements FailCondition {
     }
 
     @Override
-    public Broadcast failed(Description description) {
-        FAILURES.add(Util.id(description));
-        if (FAILURES.count(Util.id(description)) == consecutiveFailures) {
-            FIRST_FAILURE_TIME.put(Util.id(description), System.currentTimeMillis());
+    public Broadcast failed(TestId testId) {
+        Preconditions.checkNotNull(testId);
+        FAILURES.add(testId);
+        if (FAILURES.count(testId) == consecutiveFailures) {
+            FIRST_FAILURE_TIME.put(testId, System.currentTimeMillis());
             return Broadcast.FIRST;
         }
-        Long when = FIRST_FAILURE_TIME.get(Util.id(description));
-        int mulitiplier = FAILURE_MULTIPLIER.getOrDefault(Util.id(description), 1);
+        Long when = FIRST_FAILURE_TIME.get(testId);
+        int mulitiplier = FAILURE_MULTIPLIER.getOrDefault(testId, 1);
         if (when != null && (when + mulitiplier * TimeUnit.MINUTES.toMillis(reBroadcastFailureInMinutes)) < System.currentTimeMillis()) {
             mulitiplier++;
-            FAILURE_MULTIPLIER.put(Util.id(description), mulitiplier);
+            FAILURE_MULTIPLIER.put(testId, mulitiplier);
             return Broadcast.REBROADCAST;
         }
         return Broadcast.NO;
     }
 
     @Override
-    public Broadcast success(Description description) {
-        int count = FAILURES.count(Util.id(description));
-        FIRST_FAILURE_TIME.remove(Util.id(description));
-        FAILURE_MULTIPLIER.put(Util.id(description), 1);
-        FAILURES.removeAll(Lists.newArrayList(Util.id(description)));
+    public Broadcast success(TestId testId) {
+        Preconditions.checkNotNull(testId);
+        int count = FAILURES.count(testId);
+        FIRST_FAILURE_TIME.remove(testId);
+        FAILURE_MULTIPLIER.put(testId, 1);
+        FAILURES.removeAll(Lists.newArrayList(testId));
         if (count >= consecutiveFailures) {
             return Broadcast.RECOVERY;
         } else {
@@ -74,7 +75,7 @@ public class SimpleFailCondition implements FailCondition {
     }
 
     @Override
-    public Long firstFailure(Description description) {
-        return FIRST_FAILURE_TIME.get(Util.id(description));
+    public Long firstFailure(TestId testId) {
+        return FIRST_FAILURE_TIME.get(testId);
     }
 }

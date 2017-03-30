@@ -6,8 +6,8 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.stories.annotations.Title;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.TestsFinder;
-import io.split.testrunner.util.Util;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -74,7 +74,7 @@ public class StoriesRule implements TestRule {
                     .ifPresent(title -> story.title(title));
             getDescription(method)
                     .ifPresent(desc -> story.description(desc));
-            story.testId(Util.id(description));
+            story.testId(TestId.fromDescription(description));
         }
     }
 

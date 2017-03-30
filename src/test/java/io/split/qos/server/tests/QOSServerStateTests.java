@@ -2,6 +2,7 @@ package io.split.qos.server.tests;
 
 import io.split.qos.server.BaseCaseForTest;
 import io.split.qos.server.QOSServerState;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.Util;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,13 +47,13 @@ public class QOSServerStateTests extends BaseCaseForTest {
         Assert.assertEquals(1, state.tests().size());
         state.testSucceeded(mock);
 
-        QOSServerState.TestStatus status = state.tests().get(Util.id(mock));
+        QOSServerState.TestStatus status = state.tests().get(TestId.fromDescription(mock));
         Assert.assertTrue(status.succeeded());
         Assert.assertTrue(status.when() > now);
         Assert.assertTrue(state.lastGreen() > now);
 
         state.testFailed(mock);
-        status = state.tests().get(Util.id(mock));
+        status = state.tests().get(TestId.fromDescription(mock));
         Assert.assertFalse(status.succeeded());
         Assert.assertNull(state.lastGreen());
 

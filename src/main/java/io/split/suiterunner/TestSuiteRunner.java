@@ -22,6 +22,7 @@ import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.junit.modules.TestRunnerModule;
 import io.split.testrunner.util.GuiceInitializator;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.TestsFinder;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -166,7 +167,7 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
                             .stream()
                             .forEach(failure -> {
                                 LOG.info("---------------------------------------------------------");
-                                LOG.info(Util.id(failure.getDescription()));
+                                LOG.info(TestId.fromDescription(failure.getDescription()).toString());
                                 LOG.info(failure.getTestHeader());
                                 LOG.info(failure.getMessage());
                                 LOG.info(failure.getTrace());

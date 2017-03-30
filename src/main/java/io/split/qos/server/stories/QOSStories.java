@@ -1,11 +1,10 @@
 package io.split.qos.server.stories;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.split.testrunner.util.Util;
+import io.split.qos.server.util.TestId;
 import org.junit.runner.Description;
 
 import java.util.Map;
@@ -14,35 +13,31 @@ import java.util.Optional;
 @Singleton
 public class QOSStories {
 
-    private final Map<String, Story> stories;
+    private final Map<TestId, Story> stories;
     private Optional<Story> latestFailed;
 
     @Inject
     public QOSStories() {
-        this.stories= Maps.newConcurrentMap();
+        this.stories = Maps.newConcurrentMap();
         this.latestFailed = Optional.empty();
     }
 
     public Optional<Story> getStory(Optional<String> fuzzyClass, String fuzzyMethod) {
-        Optional<Map.Entry<String, Story>> any = stories
+        Optional<Map.Entry<TestId, Story>> any = stories
                 .entrySet()
                 .stream()
                 .filter(entry -> {
                     if (entry == null
-                            || Strings.isNullOrEmpty(entry.getKey())
+                            || entry.getKey() == null
                             || entry.getValue() == null) {
                         return false;
                     }
-                    String testId = entry.getKey();
-                    if (!testId.contains(fuzzyMethod)) {
-                        return false;
-                    }
+                    TestId testId = entry.getKey();
                     if (fuzzyClass.isPresent()) {
-                        if (!testId.contains(fuzzyClass.get())) {
-                            return false;
-                        }
+                        return testId.contains(fuzzyClass.get(), fuzzyMethod);
+                    } else {
+                        return testId.contains(fuzzyMethod);
                     }
-                    return true;
                 })
                 .findAny();
         if (any.isPresent()) {
@@ -58,7 +53,7 @@ public class QOSStories {
     public void addStory(Description description, Story story) {
         Preconditions.checkNotNull(description);
         Preconditions.checkNotNull(story);
-        stories.put(Util.id(description), story);
+        stories.put(TestId.fromDescription(description), story);
         if (!story.isSucceeded()) {
             latestFailed = Optional.of(story);
         }

@@ -32,14 +32,14 @@ public class GreenResource {
         if (state.lastGreen() != null) {
             return Response.ok(GreenDTO.green(state.lastGreen())).build();
         } else {
-
             if (state.failedTests().isEmpty()) {
                 return Response.ok(GreenDTO.waiting()).build();
             } else {
                 List<String> failedNames = state
                         .failedTests()
+                        .keySet()
                         .stream()
-                        .map(QOSServerState.TestDTO::name)
+                        .map(testId -> testId.toString())
                         .collect(Collectors.toList());
                 return Response.ok(GreenDTO.failed(failedNames)).build();
             }

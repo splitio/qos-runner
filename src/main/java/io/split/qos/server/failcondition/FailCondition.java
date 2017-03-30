@@ -1,6 +1,6 @@
 package io.split.qos.server.failcondition;
 
-import org.junit.runner.Description;
+import io.split.qos.server.util.TestId;
 
 /**
  * Defines whether failures/successes should be broadcasted.
@@ -15,22 +15,19 @@ public interface FailCondition {
     /**
      *  Given a failed test, defines whether the failure should be brodcasted.
      *
-     * @param description the junit description of the failed test.
      * @return whether to broadcast the failure
      */
-    Broadcast failed(Description description);
+    Broadcast failed(TestId testId);
 
     /**
      * Given a succeeded test, defines whether it should broadcast or not the success.
      *
-     * @param description the junit description of the succeeded test.
      * @return whether to broadcast the success.
      */
-    Broadcast success(Description description);
+    Broadcast success(TestId testId);
 
     /**
-     * @param description the junit description of the test.
      * @return when was the first failure found.
      */
-    Long firstFailure(Description description);
+    Long firstFailure(TestId testId);
 }

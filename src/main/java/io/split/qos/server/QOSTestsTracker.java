@@ -1,19 +1,17 @@
 package io.split.qos.server;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.TestResult;
-import io.split.testrunner.util.Util;
+import io.split.qos.server.util.TestId;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Keeps track of the tests that are running.
@@ -21,7 +19,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class QOSTestsTracker {
 
-    private final Map<String, Tracked> tracked;
+    private final Map<TestId, Tracked> tracked;
 
     @Inject
     public QOSTestsTracker() {
@@ -29,35 +27,22 @@ public class QOSTestsTracker {
     }
 
     public synchronized void track(Method method, JUnitRunner runner, ListenableFuture<TestResult> future) {
-        this.tracked.put(Util.id(method), new Tracked(method, runner, future));
+        this.tracked.put(TestId.fromMethod(method), new Tracked(method, runner, future));
     }
 
-    public synchronized List<Tracked> getAll() {
-        return Lists.newArrayList(tracked
-                .values());
+    public synchronized Map<TestId, Tracked> tests() {
+        return tracked;
     }
 
-    public synchronized List<Tracked> getTests(String fuzzyClassOrName) {
-        Preconditions.checkNotNull(fuzzyClassOrName);
-        return getAll()
-                .stream()
-                .filter(tracked -> {
-                    return (tracked.method().getDeclaringClass().getName().toLowerCase().contains(fuzzyClassOrName.toLowerCase())
-                            || tracked.method().getName().toLowerCase().contains(fuzzyClassOrName.toLowerCase()));
-                })
-                .collect(Collectors.toList());
+    public Map<TestId, Tracked> tests(String fuzzyClassOrName) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyClassOrName));
+        return Maps.filterKeys(tracked, input -> input.contains(fuzzyClassOrName));
     }
 
-    public synchronized List<Tracked> getTests(String fuzzyClass, String fuzzyName) {
-        Preconditions.checkNotNull(fuzzyClass);
-        Preconditions.checkNotNull(fuzzyName);
-        return getAll()
-                .stream()
-                .filter(tracked -> {
-                        return (tracked.method().getDeclaringClass().getName().toLowerCase().contains(fuzzyClass.toLowerCase())
-                                && tracked.method().getName().toLowerCase().contains(fuzzyName.toLowerCase()));
-                })
-                .collect(Collectors.toList());
+    public Map<TestId, Tracked> tests(String fuzzyClass, String fuzzyName) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyClass));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyName));
+        return Maps.filterKeys(tracked, input -> input.contains(fuzzyClass, fuzzyName));
     }
 
     public static class Tracked {

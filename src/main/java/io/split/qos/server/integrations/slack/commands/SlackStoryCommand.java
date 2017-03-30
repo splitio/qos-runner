@@ -81,7 +81,7 @@ public class SlackStoryCommand extends SlackAbstractCommand {
         String color = story.isSucceeded() ? colors().getSuccess() : colors().getFailed();
         /** Story Test Id**/
         if (story.testId().isPresent()) {
-            SlackAttachment slackAttachment = new SlackAttachment("Test: ", "", story.testId().get(), null);
+            SlackAttachment slackAttachment = new SlackAttachment("Test: ", "", story.testId().get().toString(), null);
             slackAttachment
                     .setColor(color);
             toBeAdded.add(slackAttachment);

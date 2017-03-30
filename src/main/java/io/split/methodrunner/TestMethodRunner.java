@@ -22,6 +22,7 @@ import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.junit.TestResult;
 import io.split.testrunner.junit.modules.TestRunnerModule;
 import io.split.testrunner.util.GuiceInitializator;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -92,16 +93,16 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
      */
     @Override
     public List<TestResult> call() throws InterruptedException {
-        String testName = Util.id(method);
+        TestId testId = TestId.fromMethod(method);
         long start = System.currentTimeMillis();
-        LOG.info(String.format("STARTING TestMethodRunner %s, running it %s times %s in parallel", testName, quantity, parallel));
+        LOG.info(String.format("STARTING TestMethodRunner %s, running it %s times %s in parallel", testId.testName(), quantity, parallel));
         for (int index = 0; index < this.quantity; index++) {
             Util.pause(Util.getRandom(500, 2000));
             ListenableFuture<TestResult> future = executor.submit(testRunnerFactory.create(method, Optional.of(String.valueOf(index))));
             Futures.addCallback(future, createCallback(method));
         }
         executor.awaitTermination(timeoutInMinutes, TimeUnit.MINUTES);
-        LOG.info(String.format("FINISHED TestMethodRunner %s in %s", testName,Util.TO_PRETTY_FORMAT.apply(System.currentTimeMillis() - start)));
+        LOG.info(String.format("FINISHED TestMethodRunner %s in %s", testId.testName(), Util.TO_PRETTY_FORMAT.apply(System.currentTimeMillis() - start)));
         return ImmutableList.copyOf(results);
     }
 
@@ -167,7 +168,7 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
                             .stream()
                             .forEach(failure -> {
                                 LOG.info("---------------------------------------------------------");
-                                LOG.info(Util.id(failure.getDescription()));
+                                LOG.info(TestId.fromDescription(failure.getDescription()).toString());
                                 LOG.info(failure.getTestHeader());
                                 LOG.info(failure.getMessage());
                                 LOG.info(failure.getTrace());

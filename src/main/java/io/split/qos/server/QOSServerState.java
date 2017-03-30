@@ -1,18 +1,17 @@
 package io.split.qos.server;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.split.testrunner.util.Util;
+import io.split.qos.server.util.TestId;
 import org.joda.time.DateTime;
 import org.junit.runner.Description;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Maintains the state of the server that is shared accross the app.
@@ -48,9 +47,9 @@ public class QOSServerState {
 
     private Long pausedSince;
 
-    private Map<String, Long> succeededInARow;
+    private Map<TestId, Long> succeededInARow;
 
-    private Map<String, TestStatus> tests;
+    private Map<TestId, TestStatus> tests;
 
     private String who;
 
@@ -80,14 +79,14 @@ public class QOSServerState {
     }
 
     public void registerTest(Description description) {
-        this.tests.put(Util.id(description), TestStatus.get(null, null));
+        this.tests.put(TestId.fromDescription(description), TestStatus.get(null, null));
     }
 
     public void registerTest(Method method) {
-        this.tests.put(Util.id(method), TestStatus.get(null, null));
+        this.tests.put(TestId.fromMethod(method), TestStatus.get(null, null));
     }
 
-    public void testSucceeded(String testId) {
+    public void testSucceeded(TestId testId) {
         this.lastTestFinished = DateTime.now().getMillis();
         this.tests.put(testId, TestStatus.get(lastTestFinished, true));
         this.succeededInARow.put(testId, lastTestFinished);
@@ -97,14 +96,14 @@ public class QOSServerState {
     }
 
     public void testSucceeded(Description description) {
-        testSucceeded(Util.id(description));;
+        testSucceeded(TestId.fromDescription(description));;
     }
 
     public void testFailed(Description description) {
-        testFailed(Util.id(description));
+        testFailed(TestId.fromDescription(description));
     }
 
-    public void testFailed(String testId) {
+    public void testFailed(TestId testId) {
         this.lastTestFinished = DateTime.now().getMillis();
         this.tests.put(testId, TestStatus.get(lastTestFinished, false));
         this.succeededInARow.clear();
@@ -121,39 +120,39 @@ public class QOSServerState {
         return status;
     }
 
-    public Map<String, TestStatus> tests() {
+    public Map<TestId, TestStatus> tests() {
         return tests;
     }
 
+    public Map<TestId, TestStatus> tests(String fuzzyClassOrName) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyClassOrName));
+        return Maps.filterKeys(tests, input -> input.contains(fuzzyClassOrName));
+    }
+
+    public Map<TestId, TestStatus> tests(String fuzzyClass, String fuzzyName) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyClass));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyName));
+        return Maps.filterKeys(tests, input -> input.contains(fuzzyClass, fuzzyName));
+    }
+
     public TestStatus test(Method method) {
-        return test(Util.id(Preconditions.checkNotNull(method)));
+        return test(TestId.fromMethod(Preconditions.checkNotNull(method)));
     }
 
     public TestStatus test(Description description) {
-        return test(Util.id(Preconditions.checkNotNull(description)));
+        return test(TestId.fromDescription(Preconditions.checkNotNull(description)));
     }
 
-    private TestStatus test(String id) {
+    private TestStatus test(TestId id) {
         return tests.get(Preconditions.checkNotNull(id));
     }
 
-    public List<TestDTO> failedTests() {
-        return tests
-                .entrySet()
-                .stream()
-                .filter(entry -> (entry.getValue().succeeded() != null && !entry.getValue().succeeded()))
-                .sorted((o1, o2) -> o1.getValue().when().compareTo(o2.getValue().when()))
-                .map(entry -> new TestDTO(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+    public Map<TestId, TestStatus> failedTests() {
+        return Maps.filterValues(tests, input -> input.succeeded() != null && !input.succeeded());
     }
 
-    public List<TestDTO> missingTests() {
-        return tests
-                .entrySet()
-                .stream()
-                .filter(entry -> (entry.getValue().succeeded() == null))
-                .map(entry -> new TestDTO(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+    public Map<TestId, TestStatus> missingTests() {
+        return Maps.filterValues(tests, input -> input.succeeded() == null);
     }
 
     public boolean isActive() {
@@ -182,22 +181,6 @@ public class QOSServerState {
 
     public Long lastGreen() {
         return lastGreen;
-    }
-
-    public static class TestDTO {
-        private final String name;
-        private final TestStatus status;
-
-        private TestDTO(String name, TestStatus status) {
-            this.name = name;
-            this.status = status;
-        }
-
-        public String name() { return name; }
-
-        public TestStatus status() {
-            return status;
-        }
     }
 
     public static class TestStatus {

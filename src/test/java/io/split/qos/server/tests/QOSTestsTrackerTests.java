@@ -26,21 +26,21 @@ public class QOSTestsTrackerTests extends BaseCaseForTest {
         ListenableFuture mockedListener = Mockito.mock(ListenableFuture.class);
 
         QOSTestsTracker tracker = injector().getInstance(QOSTestsTracker.class);
-        Assert.assertTrue(tracker.getAll().isEmpty());
+        Assert.assertTrue(tracker.tests().isEmpty());
 
         tracker.track(emptyMethod, mockedRunner, mockedListener);
         tracker.track(emptyMethod2, mockedRunner2, mockedListener);
-        Assert.assertEquals(2, tracker.getAll().size());
+        Assert.assertEquals(2, tracker.tests().size());
 
         Mockito.when(mockedRunner.isRunning()).thenReturn(false);
-        Assert.assertEquals(2, tracker.getAll().size());
+        Assert.assertEquals(2, tracker.tests().size());
 
         Mockito.when(mockedRunner2.isRunning()).thenReturn(false);
-        Assert.assertEquals(2, tracker.getAll().size());
+        Assert.assertEquals(2, tracker.tests().size());
     }
 
     @Test
-    public void addingOverTheSameMehtodKeepsTheCountToOne() throws NoSuchMethodException {
+    public void addingOverTheSameMethodKeepsTheCountToOne() throws NoSuchMethodException {
         Method emptyMethod = this.getClass().getMethod("methodForTesting");
 
         JUnitRunner mockedRunner = Mockito.mock(JUnitRunner.class);
@@ -56,7 +56,7 @@ public class QOSTestsTrackerTests extends BaseCaseForTest {
         tracker.track(emptyMethod, mockedRunner, mockedListener);
         tracker.track(emptyMethod, mockedRunner2, mockedListener);
         tracker.track(emptyMethod, mockedRunner, mockedListener);
-        Assert.assertEquals(1, tracker.getAll().size());
+        Assert.assertEquals(1, tracker.tests().size());
     }
 
     public void methodForTesting() { }

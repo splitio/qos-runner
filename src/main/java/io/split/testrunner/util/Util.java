@@ -2,9 +2,7 @@ package io.split.testrunner.util;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import org.junit.runner.Description;
 
-import java.lang.reflect.Method;
 import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -26,15 +24,7 @@ public class Util {
         }
         return builder.append(subpackages[subpackages.length - 1]).toString();
     }
-
-    public static String id(Description description) {
-        return String.format("%s#%s", Util.shortenClass(description.getTestClass()), description.getMethodName());
-    }
-
-    public static String id(Method method) {
-        return String.format("%s#%s", Util.shortenClass(method.getDeclaringClass()), method.getName());
-    }
-
+    
     /**
      * Gets a random number between min and max.
      *

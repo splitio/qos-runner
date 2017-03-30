@@ -13,8 +13,10 @@ import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
+import io.split.qos.server.util.TestId;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +47,7 @@ public class SlackGreenCommand extends SlackAbstractCommand {
         SlackCommand slackCommand = command(messagePosted);
         Long lastGreen = state.lastGreen();
         if (lastGreen == null) {
-            List<QOSServerState.TestDTO> failed = state.failedTests();
+            Map<TestId, QOSServerState.TestStatus> failed = state.failedTests();
             if (failed.isEmpty()) {
                 messageSender()
                         .sendWarning(slackCommand.command() + " - WAITING CYCLE",
@@ -54,8 +56,9 @@ public class SlackGreenCommand extends SlackAbstractCommand {
                                 session);
             } else {
                 List<String> failedNames = failed
+                        .keySet()
                         .stream()
-                        .map(QOSServerState.TestDTO::name)
+                        .map(TestId::toString)
                         .collect(Collectors.toList());
                 if (failedNames.size() >= 5) {
                     messageSender()

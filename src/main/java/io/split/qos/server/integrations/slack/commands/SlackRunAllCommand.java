@@ -14,7 +14,7 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGet
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
 import io.split.testrunner.util.SlackColors;
-import io.split.testrunner.util.Util;
+import io.split.qos.server.util.TestId;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -48,9 +48,9 @@ public class SlackRunAllCommand extends SlackAbstractCommand {
         List<SlackAttachment> toBeAdded = Lists.newArrayList();
         tests
                 .stream()
-                .map(Util::id)
+                .map(method -> TestId.fromMethod(method))
                 .forEach(test -> {
-                    SlackAttachment testAttachment = new SlackAttachment("", "", test, null);
+                    SlackAttachment testAttachment = new SlackAttachment("", "", test.toString(), null);
                     testAttachment
                             .setColor(colors().getWarning());
                     toBeAdded.add(testAttachment);

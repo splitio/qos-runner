@@ -22,8 +22,8 @@ import io.split.qos.server.pausable.PausableScheduledThreadPoolExecutor;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.junit.TestResult;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.TestsFinder;
-import io.split.testrunner.util.Util;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -266,26 +268,25 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     }
 
     public List<Method> runAllNow() {
-        List<QOSTestsTracker.Tracked> toRun = tracker
-                .getAll();
-        return runTests(toRun);
+        Map<TestId, QOSTestsTracker.Tracked> tests = tracker.tests();
+        return runTests(tests.values());
     }
 
     public List<Method> runTestsNow(Optional<String> fuzzyClass, String fuzzyClassOrName) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(fuzzyClassOrName));
         Preconditions.checkNotNull(fuzzyClass);
-        List<QOSTestsTracker.Tracked> toRun = null;
+        Map<TestId, QOSTestsTracker.Tracked> toRun = null;
         if (fuzzyClass.isPresent()) {
             toRun = tracker
-                    .getTests(fuzzyClass.get(), fuzzyClassOrName);
+                    .tests(fuzzyClass.get(), fuzzyClassOrName);
         } else {
             toRun = tracker
-                    .getTests(fuzzyClassOrName);
+                    .tests(fuzzyClassOrName);
         }
-        return runTests(toRun);
+        return runTests(toRun.values());
     }
 
-    private List<Method> runTests(List<QOSTestsTracker.Tracked> toRun) {
+    private List<Method> runTests(Collection<QOSTestsTracker.Tracked> toRun) {
         Preconditions.checkNotNull(toRun);
         if (toRun.isEmpty()) {
             return Lists.newArrayList();
@@ -293,8 +294,8 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
         List<QOSTestsTracker.Tracked> orderedByTime = toRun
                 .stream()
                 .sorted((firstTracked, secondTracked) -> {
-                    String firstId = Util.id(firstTracked.method());
-                    String secondId = Util.id(secondTracked.method());
+                    TestId firstId = TestId.fromMethod(firstTracked.method());
+                    TestId secondId = TestId.fromMethod(secondTracked.method());
                     QOSServerState.TestStatus firstStatus = state.tests().get(firstId);
                     QOSServerState.TestStatus secondStatus = state.tests().get(secondId);
                     if (firstStatus == null || firstStatus.when() == null) {
@@ -313,7 +314,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             if (!track.runner().isRunning()) {
                 track.future().cancel(true);
                 LOG.info(String.format("%s canceled, rerunning now",
-                        Util.id(track.method())));
+                        TestId.fromMethod(track.method())));
                 JUnitRunner runner = testRunnerFactory.create(track.method(), Optional.empty());
                 ListenableFuture<TestResult> future = executor.schedule(
                         runner,

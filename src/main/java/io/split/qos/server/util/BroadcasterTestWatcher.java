@@ -10,7 +10,6 @@ import io.split.qos.server.failcondition.Broadcast;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.integrations.IntegrationTestFactory;
 import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
-import io.split.testrunner.util.Util;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
 
     private final SlackBroadcaster slack;
     public static String serverName = "NOT INITIALIZED";
-    private static final Map<String, Long> started = Maps.newConcurrentMap();
+    private static final Map<TestId, Long> started = Maps.newConcurrentMap();
     private final FailCondition failCondition;
     private final QOSServerState state;
     //Hack to set the title link at runtime
@@ -54,10 +53,10 @@ public class BroadcasterTestWatcher extends TestWatcher {
     protected void succeeded(Description description) {
         Long length = null;
         state.testSucceeded(description);
-        if (started.get(Util.id(description)) != null) {
-            length = System.currentTimeMillis() - started.get(Util.id(description));
+        if (started.get(TestId.fromDescription(description)) != null) {
+            length = System.currentTimeMillis() - started.get(TestId.fromDescription(description));
         }
-        Broadcast broadcast = failCondition.success(description);
+        Broadcast broadcast = failCondition.success(TestId.fromDescription(description));
         if (slack.isEnabled()) {
             if (Broadcast.RECOVERY.equals(broadcast)) {
                 slack.recovery(description, serverName, length, titleLink);
@@ -69,24 +68,24 @@ public class BroadcasterTestWatcher extends TestWatcher {
     @Override
     protected void failed(Throwable e, Description description) {
         Long length = null;
-        if (started.get(Util.id(description)) != null) {
-            length = System.currentTimeMillis() - started.get(Util.id(description));
+        if (started.get(TestId.fromDescription(description)) != null) {
+            length = System.currentTimeMillis() - started.get(TestId.fromDescription(description));
         }
-        Broadcast broadcast = failCondition.failed(description);
+        Broadcast broadcast = failCondition.failed(TestId.fromDescription(description));
         if (slack.isEnabled()) {
             if (Broadcast.FIRST.equals(broadcast)) {
                 state.testFailed(description);
                 slack.firstFailure(description, e, serverName, length, titleLink);
             }
             if (Broadcast.REBROADCAST.equals(broadcast)) {
-                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(description), length, titleLink);
+                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(TestId.fromDescription(description)), length, titleLink);
             }
         }
     }
 
     @Override
     protected void starting(Description description) {
-        started.put(Util.id(description), System.currentTimeMillis());
+        started.put(TestId.fromDescription(description), System.currentTimeMillis());
         if (slack.isEnabled()) {
             slack.initialize();
         }

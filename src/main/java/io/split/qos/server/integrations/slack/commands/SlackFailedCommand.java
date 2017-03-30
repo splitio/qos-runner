@@ -14,8 +14,10 @@ import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
+import io.split.qos.server.util.TestId;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +43,7 @@ public class SlackFailedCommand extends SlackAbstractCommand {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
-        List<QOSServerState.TestDTO> failed = state.failedTests();
+        Map<TestId, QOSServerState.TestStatus> failed = state.failedTests();
         SlackCommand slackCommand = command(messagePosted);
         if (failed.isEmpty()) {
             messageSender()
@@ -49,10 +51,11 @@ public class SlackFailedCommand extends SlackAbstractCommand {
             return true;
         }
         List<String> failedTests = failed
+                .entrySet()
                 .stream()
                 .map(value -> String.format("%s | %s",
-                        value.name(),
-                        dateFormatter.formatDate(value.status().when())))
+                        value.getKey(),
+                        dateFormatter.formatDate(value.getValue().when())))
                 .collect(Collectors.toList());
 
         List<SlackAttachment> toBeAdded = Lists.newArrayList();

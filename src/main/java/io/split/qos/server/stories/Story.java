@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.split.qos.server.util.TestId;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class Story {
     private Optional<Long> finished;
     private Optional<String> title;
     private Optional<String> description;
-    private Optional<String> testId;
+    private Optional<TestId> testId;
     private boolean succeeded;
 
     @Inject
@@ -93,11 +94,11 @@ public class Story {
         this.succeeded = succeeded;
     }
 
-    public void testId(String testId) {
+    public void testId(TestId testId) {
         this.testId = Optional.of(Preconditions.checkNotNull(testId));
     }
 
-    public Optional<String> testId() {
+    public Optional<TestId> testId() {
         return testId;
     }
 
