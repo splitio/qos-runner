@@ -66,7 +66,7 @@ public class SlackCountCommand extends SlackAbstractCommand {
 
         toSend.add(missingAttachment);
         messageSender()
-            .send(slackCommand.command(), session, messagePosted.getChannel(), toSend);
+            .send(slackCommand.command(), "Total Tests: " + (failed.size() + missing.size() + succeeded.size()),session, messagePosted.getChannel(), toSend);
         return true;
     }
 
