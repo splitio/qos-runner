@@ -25,6 +25,7 @@ import java.util.List;
 public class SlackRunAllCommand extends SlackAbstractCommand {
     private final QOSServerBehaviour behaviour;
     private final QOSServerState state;
+    private static final String SHOW_ARGUMENT = "show";
 
     @Inject
     public SlackRunAllCommand(
@@ -41,33 +42,42 @@ public class SlackRunAllCommand extends SlackAbstractCommand {
 
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
+        SlackCommand slackCommand = command(messagePosted);
         if (state.isPaused()) {
             behaviour.resume(messagePosted.getSender().getUserName());
         }
         List<Method> tests = behaviour.runAllNow();
-        List<SlackAttachment> toBeAdded = Lists.newArrayList();
-        tests
-                .stream()
-                .map(method -> TestId.fromMethod(method))
-                .forEach(test -> {
-                    SlackAttachment testAttachment = new SlackAttachment("", "", test.toString(), null);
-                    testAttachment
-                            .setColor(colors().getWarning());
-                    toBeAdded.add(testAttachment);
-                });
-        SlackCommand slackCommand = command(messagePosted);
-        messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        System.out.println("HERE " + slackCommand.arguments());
+        if (slackCommand.arguments().isEmpty()) {
+            System.out.println("TIME TO SHOW " + slackCommand.arguments());
+            messageSender()
+                    .send(slackCommand.command(), "Total tests to run: " + tests.size(), session, messagePosted.getChannel());
+        } else {
+            System.out.println("NO SHOW " + slackCommand.arguments());
+            List<SlackAttachment> toBeAdded = Lists.newArrayList();
+            tests
+                    .stream()
+                    .map(method -> TestId.fromMethod(method))
+                    .forEach(test -> {
+                        SlackAttachment testAttachment = new SlackAttachment("", "", test.toString(), null);
+                        testAttachment
+                                .setColor(colors().getWarning());
+                        toBeAdded.add(testAttachment);
+                    });
+            messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
+        }
         return true;
     }
 
     @Override
     public String help() {
-        return "[server-name (optional)] runall: Runs all the tests of the qos server immediately";
+        return "[server-name (optional)] runall [show (optional)] : Runs all the tests of the qos server immediately. " +
+                "If show is present, show the tests that are going to be run.";
     }
 
     @Override
     public boolean acceptsArguments(List<String> arguments) {
         Preconditions.checkNotNull(arguments);
-        return arguments.size() == 0;
+        return arguments.size() == 0 || (arguments.size() == 1 && arguments.get(0).equalsIgnoreCase(SHOW_ARGUMENT));
     }
 }

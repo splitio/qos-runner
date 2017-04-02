@@ -39,6 +39,13 @@ public class SlackMessageSender {
     public void send(String command,
                      String description,
                      SlackSession session,
+                     SlackChannel slackChannel) {
+        send(command, description, session, slackChannel, Lists.newArrayList());
+    }
+
+    public void send(String command,
+                     String description,
+                     SlackSession session,
                      SlackChannel slackChannel,
                      List<SlackAttachment> attachments) {
         Preconditions.checkNotNull(attachments);
@@ -52,8 +59,12 @@ public class SlackMessageSender {
 
         SlackPreparedMessage.Builder partitionSend = new SlackPreparedMessage
                 .Builder()
-                .addAttachment(slackAttachment)
-                .addAttachments(attachments);
+                .addAttachment(slackAttachment);
+
+        if (!attachments.isEmpty()) {
+            partitionSend.addAttachments(attachments);
+        }
+
         session.sendMessage(
                 slackChannel,
                 partitionSend.build());
