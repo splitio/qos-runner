@@ -2,6 +2,7 @@ package io.split.qos.server.resources;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
+import io.split.qos.dtos.GreenDTO;
 import io.split.qos.server.QOSServerState;
 
 import javax.inject.Inject;

@@ -52,6 +52,7 @@ public class SlackCommandIntegrationImpl extends AbstractSlackIntegration implem
     public void startBotListener() {
         register.register();
 
+
         SlackMessagePostedListener slackMessagePostedListener = (event, session) -> {
             if (isBot(event)) {
                 slackCommandGetter.get(event)

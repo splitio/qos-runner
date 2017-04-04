@@ -13,6 +13,8 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
+
+    compile 'io.split:qosdtos:1.1'
  
     //QOS Dropwizard
     compile 'javax.inject:javax.inject:1'

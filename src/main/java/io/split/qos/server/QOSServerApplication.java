@@ -37,7 +37,6 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
     private QOSRegister register;
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("https.protocols", "TLSv1.1");
         new QOSServerApplication().run(args);
     }
 
@@ -76,8 +75,10 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         environment.jersey().register(new GreenResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new ConfigResource(injector.getInstance(Key.get(Properties.class, Names.named(QOSPropertiesModule.CONFIGURATION)))));
 
-        QOSServerConfiguration.Register register = configuration.getRegister();
+        QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
+        behaviour.call();
 
+        QOSServerConfiguration.Register register = configuration.getRegister();
         if (register != null) {
             this.register = injector.getInstance(QOSRegister.class);
             if (Strings.isNullOrEmpty(register.getQosDashboardURL())) {
@@ -89,8 +90,6 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
             this.register.register(register.getQosDashboardURL(), register.getQosRunnerURL());
         }
 
-        QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
-        behaviour.call();
 
         // Not so nice way to shut down the Slack Connection.
         // Could not figure it ouw a cleaner way.
