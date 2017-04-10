@@ -20,6 +20,7 @@ public class TestId implements Comparable<TestId>{
     private final Optional<Method> method;
     private final String testName;
     private final String shortenedClass;
+    private final Class<?> clazz;
 
     public static TestId fromDescription(Description description) {
         return new TestId(description);
@@ -32,14 +33,16 @@ public class TestId implements Comparable<TestId>{
     private TestId(Description description) {
         this.description = Optional.of(Preconditions.checkNotNull(description));
         this.method = Optional.empty();
-        this.shortenedClass = Util.shortenClass(description.getTestClass());
+        this.clazz = description.getTestClass();
+        this.shortenedClass = Util.shortenClass(clazz);
         this.testName = description.getMethodName();
     }
 
     private TestId(Method method) {
         this.description = Optional.empty();
         this.method = Optional.of(Preconditions.checkNotNull(method));
-        this.shortenedClass = Util.shortenClass(method.getDeclaringClass());
+        this.clazz = method.getDeclaringClass();
+        this.shortenedClass = Util.shortenClass(clazz);
         this.testName = method.getName();
     }
 
@@ -102,7 +105,8 @@ public class TestId implements Comparable<TestId>{
         if (o == null) {
             return -1;
         }
-        int compare = this.shortenedClass().compareTo(o.shortenedClass());
+
+        int compare = this.clazz.getName().compareTo(o.clazz.getName());
         if (compare != 0) {
             return compare;
         } else {

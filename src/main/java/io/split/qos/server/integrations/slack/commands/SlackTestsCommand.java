@@ -13,9 +13,9 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
-import io.split.qos.server.util.TestId;
 
 import java.util.List;
 import java.util.Map;
@@ -62,21 +62,21 @@ public class SlackTestsCommand extends SlackAbstractCommand {
                 .sorted((o1, o2) -> {
                     QOSServerState.TestStatus statusO1 = o1.getValue();
                     QOSServerState.TestStatus statusO2 = o2.getValue();
-                    if (statusO1.hasFinished() &&  !statusO1.succeeded()) {
+                    // First finished, second did not, so second always goes up.
+                    if ((statusO1.hasFinished()) && (!statusO2.hasFinished())) {
                         return 1;
                     }
-                    if (statusO2.hasFinished() &&  !statusO2.succeeded()) {
+                    // Second finished, first did not, so first always goes up.
+                    if ((!statusO1.hasFinished()) && (statusO2.hasFinished())) {
                         return -1;
                     }
-                    if (!statusO1.hasFinished() && !statusO2.hasFinished()) {
-                        return 0;
+                    // None finished, order by name
+                    if ((!statusO1.hasFinished() && !statusO2.hasFinished())) {
+                        return o1.getKey().compareTo(o2.getKey());
                     }
-                    if (!statusO1.hasFinished()) {
-                        return -1;
-                    }
-                    if (!statusO2.hasFinished()) {
-                        return 1;
-                    }
+                    // Both finished.
+                    // First order by failure (failed first)
+                    // If same status order by name.
                     int comparison = statusO1.succeeded().compareTo(statusO2.succeeded());
                     if (comparison != 0) {
                         return comparison;
