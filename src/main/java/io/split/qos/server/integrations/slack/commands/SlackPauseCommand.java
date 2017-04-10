@@ -48,8 +48,13 @@ public class SlackPauseCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] pause: Pauses the tests running for the server. Current tests will keep running";
+    public String description() {
+        return "Pauses the tests running for the server. Current tests will keep running";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] pause";
     }
 
     @Override

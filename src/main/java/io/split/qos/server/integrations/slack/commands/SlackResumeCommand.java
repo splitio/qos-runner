@@ -46,8 +46,13 @@ public class SlackResumeCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] resume: Resumes the tests of the server";
+    public String description() {
+        return "Resumes the tests of the server";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] resume";
     }
 
     @Override

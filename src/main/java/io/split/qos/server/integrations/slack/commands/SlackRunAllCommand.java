@@ -70,9 +70,13 @@ public class SlackRunAllCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] runall [show (optional)] : Runs all the tests of the qos server immediately. " +
-                "If show is present, show the tests that are going to be run.";
+    public String description() {
+        return "Runs all the tests of the qos server immediately. If show is present, show the tests that are going to be run.";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] runall [show (optional)]";
     }
 
     @Override

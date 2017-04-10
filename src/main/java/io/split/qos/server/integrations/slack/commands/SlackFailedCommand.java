@@ -72,8 +72,13 @@ public class SlackFailedCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] failed: Displays a lists of the failed tests";
+    public String description() {
+        return "Displays a lists of the failed tests";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] failed";
     }
 
     @Override

@@ -48,6 +48,9 @@ public class SlackInfoCommand extends SlackAbstractCommand {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         SlackCommand slackCommand = command(messagePosted);
+        messageSender()
+                .send(slackCommand.command(), session, messagePosted.getChannel(), null);
+
         if (state.isActive()) {
             String text = String.format("Description: %s \n\nStatus: %s [since %s]\nLast test finished: %s\nSuites: %s\nResumed by: %s",
                     description,
@@ -81,9 +84,15 @@ public class SlackInfoCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] info: Displays Server Info, like status, time since status change, last test ran";
+    public String description() {
+        return "Displays Server Info, like status, time since status change, last test ran";
     }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] info";
+    }
+
 
     @Override
     public boolean acceptsArguments(List<String> arguments) {

@@ -79,8 +79,13 @@ public class SlackRunTestCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] run [class name (optional)] [test name]: Runs the specified test immediately";
+    public String description() {
+        return "Runs the specified test immediately";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] run [class name (optional)] [test name]";
     }
 
     @Override

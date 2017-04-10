@@ -11,9 +11,14 @@ import java.util.function.BiPredicate;
  */
 public interface SlackCommandExecutor extends BiPredicate<SlackMessagePosted, SlackSession> {
     /**
-     * @return Some handy information on how to use the command.
+     * Description of the command
      */
-    String help();
+    String description();
+
+    /**
+     * Arguments that the command accepts.
+     */
+    String arguments();
 
     boolean acceptsArguments(List<String> arguments);
 }

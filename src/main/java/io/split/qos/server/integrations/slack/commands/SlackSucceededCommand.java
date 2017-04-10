@@ -72,8 +72,13 @@ public class SlackSucceededCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] succeeded: Displays a lists of the succeeded tests";
+    public String description() {
+        return "Displays a lists of the succeeded tests";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] succeeded";
     }
 
     @Override

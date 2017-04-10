@@ -40,8 +40,13 @@ public class SlackPingCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] ping: Server replies with a pong";
+    public String description() {
+        return "Server replies with a pong";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] ping";
     }
 
     @Override

@@ -73,8 +73,13 @@ public class SlackMissingCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] missing [server-name]: Displays a lists of the tests that have not run yet";
+    public String description() {
+        return "Displays a lists of the tests that have not run yet";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] missing";
     }
 
     @Override

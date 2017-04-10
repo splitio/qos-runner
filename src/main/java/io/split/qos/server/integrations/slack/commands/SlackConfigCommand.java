@@ -3,6 +3,7 @@ package io.split.qos.server.integrations.slack.commands;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
@@ -38,19 +39,28 @@ public class SlackConfigCommand extends SlackAbstractCommand {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         SlackCommand command = command(messagePosted);
-        List<String> confs = configuration
+        List<SlackAttachment> confs = configuration
                 .entrySet()
                 .stream()
-                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                .map(entry -> {
+                    SlackAttachment result = new SlackAttachment(entry.getKey().toString(), "", entry.getValue().toString(), null);
+                    result.setColor(colors().getInfo());
+                    return result;
+                })
                 .collect(Collectors.toList());
         messageSender()
-                .sendInfo(command.command(), String.join("\n", confs), messagePosted.getChannel(), session);
+                .sendPartition(command.command(), session, messagePosted.getChannel(), confs);
         return true;
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] config: Displays a lists of the configured properties";
+    public String description() {
+        return "Displays a lists of the configured properties";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] config";
     }
 
     @Override

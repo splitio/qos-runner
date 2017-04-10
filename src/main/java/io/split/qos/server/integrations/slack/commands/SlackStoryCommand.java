@@ -147,9 +147,13 @@ public class SlackStoryCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)]  story [class name (optional)] [test name (optional)]: Gets the story for the test. " +
-                "With no arguments will return last failed story";
+    public String description() {
+        return "Gets the story for the test. With no arguments will return last failed story";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] story [class name (optional)] [test name (optional)]";
     }
 
     @Override

@@ -71,8 +71,13 @@ public class SlackCountCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] count: Displays a count of the succeeded, failed and missing tests";
+    public String description() {
+        return "Displays a count of the succeeded, failed and missing tests";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] count";
     }
 
     @Override

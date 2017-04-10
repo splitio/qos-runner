@@ -97,9 +97,13 @@ public class SlackTestsCommand extends SlackAbstractCommand {
     }
 
     @Override
-    public String help() {
-        return "[server-name (optional)] tests [class name (optional)] [test name (optional)]: " +
-                "Finds the tests that matches the parameters. No parameters gets all tests.";
+    public String description() {
+        return "Finds the tests that matches the parameters. No parameters gets all tests.";
+    }
+
+    @Override
+    public String arguments() {
+        return "[server-name (optional)] tests [class name (optional)] [test name (optional)]: ";
     }
 
     @Override
