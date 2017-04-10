@@ -106,7 +106,7 @@ public class TestId implements Comparable<TestId>{
             return -1;
         }
 
-        int compare = this.clazz.getName().compareTo(o.clazz.getName());
+        int compare = this.clazz.getSimpleName().compareTo(o.clazz.getSimpleName());
         if (compare != 0) {
             return compare;
         } else {

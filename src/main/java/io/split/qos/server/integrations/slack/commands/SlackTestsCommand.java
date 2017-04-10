@@ -1,7 +1,6 @@
 package io.split.qos.server.integrations.slack.commands;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -19,6 +18,7 @@ import io.split.testrunner.util.SlackColors;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Shows the tests that matches the input.
@@ -55,8 +55,7 @@ public class SlackTestsCommand extends SlackAbstractCommand {
             tests = state.tests(arguments.get(0), arguments.get(1));
         }
 
-        List<SlackAttachment> toBeAdded = Lists.newArrayList();
-        tests
+        List<SlackAttachment> toBeAdded = tests
                 .entrySet()
                 .stream()
                 .sorted((o1, o2) -> {
@@ -84,7 +83,7 @@ public class SlackTestsCommand extends SlackAbstractCommand {
                         return o1.getKey().compareTo(o2.getKey());
                     }
                 })
-                .forEach(value -> {
+                .map(value -> {
                     TestId id = value.getKey();
                     SlackAttachment testAttachment = new SlackAttachment("", "", id.toString(), null);
                     QOSServerState.TestStatus status = value.getValue();
@@ -95,8 +94,9 @@ public class SlackTestsCommand extends SlackAbstractCommand {
                     } else {
                         testAttachment.setColor(colors().getFailed());
                     }
-                    toBeAdded.add(testAttachment);
-                });
+                    return testAttachment;
+                })
+                .collect(Collectors.toList());
         messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
