@@ -77,7 +77,12 @@ public class SlackTestsCommand extends SlackAbstractCommand {
                     if (!statusO2.hasFinished()) {
                         return 1;
                     }
-                    return statusO1.succeeded().compareTo(statusO2.succeeded());
+                    int comparison = statusO1.succeeded().compareTo(statusO2.succeeded());
+                    if (comparison != 0) {
+                        return comparison;
+                    } else {
+                        return o1.getKey().compareTo(o2.getKey());
+                    }
                 })
                 .forEach(value -> {
                     TestId id = value.getKey();

@@ -13,8 +13,8 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
-import io.split.testrunner.util.SlackColors;
 import io.split.qos.server.util.TestId;
+import io.split.testrunner.util.SlackColors;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -47,17 +47,15 @@ public class SlackRunAllCommand extends SlackAbstractCommand {
             behaviour.resume(messagePosted.getSender().getUserName());
         }
         List<Method> tests = behaviour.runAllNow();
-        System.out.println("HERE " + slackCommand.arguments());
         if (slackCommand.arguments().isEmpty()) {
-            System.out.println("TIME TO SHOW " + slackCommand.arguments());
             messageSender()
                     .send(slackCommand.command(), "Total tests to run: " + tests.size(), session, messagePosted.getChannel());
         } else {
-            System.out.println("NO SHOW " + slackCommand.arguments());
             List<SlackAttachment> toBeAdded = Lists.newArrayList();
             tests
                     .stream()
                     .map(method -> TestId.fromMethod(method))
+                    .sorted(TestId::compareTo)
                     .forEach(test -> {
                         SlackAttachment testAttachment = new SlackAttachment("", "", test.toString(), null);
                         testAttachment

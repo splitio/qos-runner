@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
 
-public class TestId {
+public class TestId implements Comparable<TestId>{
 
     private final Optional<Description> description;
     private final Optional<Method> method;
@@ -79,6 +79,10 @@ public class TestId {
         return testName;
     }
 
+    public String shortenedClass() {
+        return shortenedClass;
+    }
+
     private static final String SLACK_HTTPS_AUTH_URL = "https://slack.com/api/rtm.start?token=";
 
     public static void main(String [] args) throws IOException {
@@ -88,5 +92,21 @@ public class TestId {
         HttpResponse response;
         response = httpClient.execute(request);
         System.out.print(response.getStatusLine().getStatusCode());
+    }
+
+    @Override
+    public int compareTo(TestId o) {
+        if (this.equals(o)) {
+            return 0;
+        }
+        if (o == null) {
+            return -1;
+        }
+        int compare = this.shortenedClass().compareTo(o.shortenedClass());
+        if (compare != 0) {
+            return compare;
+        } else {
+            return this.testName().compareTo(o.testName());
+        }
     }
 }

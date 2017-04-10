@@ -47,6 +47,15 @@ public class SlackConfigCommand extends SlackAbstractCommand {
                     result.setColor(colors().getInfo());
                     return result;
                 })
+                .sorted((o1, o2) -> {
+                    if (o1 == null) {
+                        return -1;
+                    }
+                    if (o2 == null) {
+                        return 1;
+                    }
+                    return o1.getTitle().compareTo(o2.getTitle());
+                })
                 .collect(Collectors.toList());
         messageSender()
                 .sendPartition(command.command(), session, messagePosted.getChannel(), confs);

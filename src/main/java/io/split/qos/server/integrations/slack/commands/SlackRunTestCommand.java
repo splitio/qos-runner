@@ -1,7 +1,6 @@
 package io.split.qos.server.integrations.slack.commands;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
@@ -13,12 +12,13 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
-import io.split.testrunner.util.SlackColors;
 import io.split.qos.server.util.TestId;
+import io.split.testrunner.util.SlackColors;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SlackRunTestCommand extends SlackAbstractCommand {
 
@@ -56,13 +56,13 @@ public class SlackRunTestCommand extends SlackAbstractCommand {
                             messagePosted.getChannel(),
                             session);
         } else {
-            List<SlackAttachment> toBeAdded = Lists.newArrayList();
-            methodsExecuted
+            List<SlackAttachment> toBeAdded = methodsExecuted
                     .stream()
-                    .forEach(value -> {
-                        TestId id = TestId.fromMethod(value);
+                    .sorted((o1, o2) -> TestId.fromMethod(o1).compareTo(TestId.fromMethod(o2)))
+                    .map(method -> {
+                        TestId id = TestId.fromMethod(method);
                         SlackAttachment testAttachment = new SlackAttachment("", "", id.toString(), null);
-                        QOSServerState.TestStatus status = state.test(value);
+                        QOSServerState.TestStatus status = state.test(method);
                         if (status.succeeded() == null) {
                             testAttachment.setColor(colors().getWarning());
                         } else if (status.succeeded()) {
@@ -70,8 +70,9 @@ public class SlackRunTestCommand extends SlackAbstractCommand {
                         } else {
                             testAttachment.setColor(colors().getFailed());
                         }
-                        toBeAdded.add(testAttachment);
-                    });
+                        return testAttachment;
+                    })
+                    .collect(Collectors.toList());
             messageSender().sendPartition(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
             return true;
         }

@@ -12,9 +12,9 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
-import io.split.qos.server.util.TestId;
 
 import java.util.List;
 import java.util.Map;
@@ -56,6 +56,7 @@ public class SlackMissingCommand extends SlackAbstractCommand {
         List<String> missingTests = missing
                 .keySet()
                 .stream()
+                .sorted(TestId::compareTo)
                 .map(value -> value.toString())
                 .collect(Collectors.toList());
 

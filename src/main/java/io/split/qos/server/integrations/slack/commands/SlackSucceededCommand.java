@@ -53,6 +53,7 @@ public class SlackSucceededCommand extends SlackAbstractCommand {
         List<String> succeededTests = succeeded
                 .entrySet()
                 .stream()
+                .sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
                 .map(value -> String.format("%s | %s",
                         value.getKey(),
                         dateFormatter.formatDate(value.getValue().when())))

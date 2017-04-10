@@ -12,9 +12,9 @@ import io.split.qos.server.integrations.slack.commandintegration.SlackCommand;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandGetter;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.util.SlackMessageSender;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.DateFormatter;
 import io.split.testrunner.util.SlackColors;
-import io.split.qos.server.util.TestId;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +53,7 @@ public class SlackFailedCommand extends SlackAbstractCommand {
         List<String> failedTests = failed
                 .entrySet()
                 .stream()
+                .sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
                 .map(value -> String.format("%s | %s",
                         value.getKey(),
                         dateFormatter.formatDate(value.getValue().when())))
