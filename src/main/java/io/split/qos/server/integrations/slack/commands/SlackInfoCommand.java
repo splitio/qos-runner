@@ -1,9 +1,12 @@
 package io.split.qos.server.integrations.slack.commands;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import io.split.qos.server.QOSServerState;
@@ -48,38 +51,44 @@ public class SlackInfoCommand extends SlackAbstractCommand {
     @Override
     public boolean test(SlackMessagePosted messagePosted, SlackSession session) {
         SlackCommand slackCommand = command(messagePosted);
-        messageSender()
-                .send(slackCommand.command(), session, messagePosted.getChannel(), null);
+        String color = state.isActive() ? colors().getSuccess() : colors().getWarning();
+
+        List<SlackAttachment> toBeAdded = Lists.newArrayList();
+        if (!Strings.isNullOrEmpty(description)) {
+            SlackAttachment descriptionAttachment = new SlackAttachment("Description", "", description, null);
+            descriptionAttachment.setColor(color);
+            toBeAdded.add(descriptionAttachment);
+        }
+        if (state.isActive()) {
+            String text = String.format("%s (since %s)", state.status(), dateFormatter.formatDate(state.activeSince()));
+            SlackAttachment statusAttachment = new SlackAttachment("Status", "", text, null);
+            statusAttachment.setColor(color);
+            toBeAdded.add(statusAttachment);
+        } else {
+            String text = String.format("%s (since %s)", state.status(), dateFormatter.formatDate(state.pausedSince()));
+            SlackAttachment statusAttachment = new SlackAttachment("Status", "", text, null);
+            statusAttachment.setColor(color);
+            toBeAdded.add(statusAttachment);
+        }
+        SlackAttachment suitesAttachment = new SlackAttachment("Suites", "", suites, null);
+        suitesAttachment.setColor(color);
+        toBeAdded.add(suitesAttachment);
+        SlackAttachment lastTestFinishedAttachment = new SlackAttachment("Last test finished", "",
+                dateFormatter.formatDate(state.lastTestFinished()), null);
+        lastTestFinishedAttachment .setColor(color);
+        toBeAdded.add(lastTestFinishedAttachment);
 
         if (state.isActive()) {
-            String text = String.format("Description: %s \n\nStatus: %s [since %s]\nLast test finished: %s\nSuites: %s\nResumed by: %s",
-                    description,
-                    state.status(),
-                    dateFormatter.formatDate(state.activeSince()),
-                    dateFormatter.formatDate(state.lastTestFinished()),
-                    suites,
-                    state.who());
-            messageSender()
-                    .sendInfo(slackCommand.command(),
-                            text,
-                            messagePosted.getChannel(),
-                            session);
+            SlackAttachment resumedByAttachment = new SlackAttachment("Resumed by", "", state.who(), null);
+            resumedByAttachment.setColor(color);
+            toBeAdded.add(resumedByAttachment);
+        } else {
+            SlackAttachment resumedByAttachment = new SlackAttachment("Paused by", "", state.who(), null);
+            resumedByAttachment.setColor(color);
+            toBeAdded.add(resumedByAttachment);
         }
-        if (state.isPaused()) {
-            String text = String.format("Description: %s \n\nStatus: %s [since %s]\nLast test finished: %s\nSuites: %s\nPaused by: %s",
-                    description,
-                    state.status(),
-                    dateFormatter.formatDate(state.pausedSince()),
-                    dateFormatter.formatDate(state.lastTestFinished()),
-                    suites,
-                    state.who());
-            messageSender()
-                    .sendWarning(slackCommand.command(),
-                            text,
-                            messagePosted.getChannel(),
-                            session);
-        }
-
+        messageSender()
+                .send(slackCommand.command(), session, messagePosted.getChannel(), toBeAdded);
         return true;
     }
 
