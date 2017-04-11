@@ -64,6 +64,10 @@ dependencies {
     compile ('com.ullink.slack:simpleslackapi:0.6.0') {
         exclude group: 'org.slf4j', module: 'slf4j-api'
         exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+        exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
+        exclude group: 'org.slf4j', module: 'jul-to-slf4j'
+        exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
     }
 
     compile 'com.google.inject:guice:4.0'
