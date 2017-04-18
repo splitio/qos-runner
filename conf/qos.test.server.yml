@@ -3,8 +3,7 @@ serverName: qos-server
 config: conf/qos.test.properties
 
 register:
-  qosDashboardURL: http://localhost:9000/api
-  qosRunnerURL: http://www.google.com
+  dashboardURL: http://localhost:9000/api
 
 server:
   type: simple

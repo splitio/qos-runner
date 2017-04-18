@@ -1,5 +1,6 @@
 package io.split.qos.server;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Guice;
@@ -8,6 +9,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import io.dropwizard.Application;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Environment;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
@@ -16,13 +18,19 @@ import io.split.qos.server.resources.ConfigResource;
 import io.split.qos.server.resources.GreenResource;
 import io.split.qos.server.resources.HealthResource;
 import io.split.testrunner.util.GuiceInitializator;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -34,7 +42,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
 
     public static Injector injector;
     private String name;
-    private QOSRegister register;
+    public QOSRegister register;
 
     public static void main(String[] args) throws Exception {
         new QOSServerApplication().run(args);
@@ -81,14 +89,12 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         QOSServerConfiguration.Register register = configuration.getRegister();
         if (register != null) {
             this.register = injector.getInstance(QOSRegister.class);
-            if (Strings.isNullOrEmpty(register.getQosDashboardURL())) {
+            if (Strings.isNullOrEmpty(register.getDashboardURL())) {
                 throw new IllegalArgumentException("Register was set in yaml, but not property qosDashboardURL");
             }
-            if (Strings.isNullOrEmpty(register.getQosRunnerURL())) {
-                throw new IllegalArgumentException("Register was set in yaml, but not property qosRunnerURL");
-            }
-            this.register.register(register.getQosDashboardURL(), register.getQosRunnerURL());
+            environment.lifecycle().addServerLifecycleListener(new ServiceLyfeListener(this, register.getDashboardURL()));
         }
+
 
 
         // Not so nice way to shut down the Slack Connection.
@@ -104,5 +110,51 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
                 }
             }
         });
+    }
+
+    private static class ServiceLyfeListener implements ServerLifecycleListener {
+
+        private final QOSServerApplication serverApplication;
+        private final String dashboardURL;
+
+        private ServiceLyfeListener(QOSServerApplication serverApplication, String dashboardURL) {
+            this.serverApplication = Preconditions.checkNotNull(serverApplication);
+            this.dashboardURL = Preconditions.checkNotNull(dashboardURL);
+        }
+        @Override
+        public void serverStarted(Server server) {
+            serverApplication.register.register(dashboardURL, getRunnerURL(server));
+        }
+    }
+
+    private static String getRunnerURL(Server server) {
+        Connector connector = null;
+        if (server.getConnectors().length == 1) {
+            connector = server.getConnectors()[0];
+        } else {
+            Optional<Connector> application = Arrays.stream(server.getConnectors())
+                    .filter(theConnector -> theConnector.getName().equals("application"))
+                    .findAny();
+            if (!application.isPresent()) {
+                throw new IllegalStateException("Could not find application connector on server " + server);
+            }
+            connector = application.get();
+        }
+        if (connector instanceof ServerConnector) {
+            ServerConnector serverConnector = (ServerConnector) connector;
+            int port = serverConnector.getPort();
+            return String.format("http://%s:%s", getHost(), port);
+        } else {
+            throw new IllegalStateException("Only accepts Server Connectors");
+        }
+    }
+
+    private static String getHost() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            throw new IllegalStateException(e);
+        }
+
     }
 }

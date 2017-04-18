@@ -29,19 +29,11 @@ public class QOSServerConfiguration extends Configuration {
 
     public static class Register {
         @NotEmpty
-        private String qosDashboardURL;
-
-        @NotEmpty
-        private String qosRunnerURL;
+        private String dashboardURL;
 
         @JsonProperty
-        public String getQosDashboardURL() {
-            return this.qosDashboardURL;
-        }
-
-        @JsonProperty
-        public String getQosRunnerURL() {
-            return qosRunnerURL;
+        public String getDashboardURL() {
+            return this.dashboardURL;
         }
     }
     //Comma separated list of configs.
