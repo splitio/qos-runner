@@ -17,22 +17,6 @@ import java.util.Properties;
  * Module for loading properties from the properties file.
  */
 public class QOSPropertiesModule extends AbstractModule {
-    // ------------------
-    // COMMON PROPERTIES
-    // ------------------
-
-    // Whether slack is enabled
-    // Default false.
-    public static final String SLACK_INTEGRATION = "SLACK_INTEGRATION";
-    // The bot auth token
-    // Default empty.
-    public static final String SLACK_BOT_TOKEN = "SLACK_BOT_TOKEN";
-    // Name of the channel to write verbose broadcasts.
-    // Default empty.
-    public static final String SLACK_VERBOSE_CHANNEL = "SLACK_VERBOSE_CHANNEL";
-    // Name of the channerl to write digest broadcasts.
-    // Default empty.
-    public static final String SLACK_DIGEST_CHANNEL = "SLACK_DIGEST_CHANNEL";
 
     // ------------------
     // SERVER PROPERTIES
@@ -90,12 +74,6 @@ public class QOSPropertiesModule extends AbstractModule {
     private static final Map<String, String> defaultProperties = Maps.newHashMap();
 
     static {
-        // Common
-        defaultProperties.put(SLACK_INTEGRATION, "true");
-        defaultProperties.put(SLACK_BOT_TOKEN, "");
-        defaultProperties.put(SLACK_VERBOSE_CHANNEL, "");
-        defaultProperties.put(SLACK_DIGEST_CHANNEL, "");
-
         // Server
         defaultProperties.put(PARALLEL_TESTS, "10");
         defaultProperties.put(SHUTDOWN_WAIT_IN_MINUTES, "10");

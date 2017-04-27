@@ -24,11 +24,6 @@ public class SlackCommandIntegrationForTest implements SlackCommandIntegration {
     }
 
     @Override
-    public boolean isEnabled() {
-        return false;
-    }
-
-    @Override
     public void close() throws Exception {
 
     }

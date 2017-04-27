@@ -116,36 +116,28 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     @Override
     public Void call() throws Exception {
         LOG.info(String.format("STARTING QOS Server for suites %s, running %s tests in parallel", suites, parallelTests));
-        if (commandIntegration.isEnabled()) {
-            commandIntegration.initialize();
-            commandIntegration.startBotListener();
-        }
-        if (broadcastIntegration.isEnabled()) {
-            broadcastIntegration.initialize();
-        }
+        commandIntegration.initialize();
+        commandIntegration.startBotListener();
+        broadcastIntegration.initialize();
 
         List<Method> sheduled = scheduleTests();
         if (sheduled.size() == 0) {
             LOG.error("Could not find tests to run on " + suites + " package " + suitesPackage);
-            if (broadcastIntegration.isEnabled()) {
-                String message = String.format("No tests found for %s, suites %s, package %s", serverName, suites, suitesPackage);
-                SlackAttachment slackAttachment = new SlackAttachment("NO TESTS WILL RUN FOR " + serverName, "", message, null);
-                slackAttachment
-                    .setColor("warning");
-
-                broadcastIntegration.broadcastVerbose("", slackAttachment);
-            }
-            return null;
-        }
-        if (broadcastIntegration.isEnabled()) {
-            String message = String.format("QOS Server '%s' is up", serverName);
-            SlackAttachment slackAttachment = new SlackAttachment(
-                    String.format("[%s] UP", serverName.toUpperCase()), "", message, null);
+            String message = String.format("No tests found for %s, suites %s, package %s", serverName, suites, suitesPackage);
+            SlackAttachment slackAttachment = new SlackAttachment("NO TESTS WILL RUN FOR " + serverName, "", message, null);
             slackAttachment
-                    .setColor("good");
+                .setColor("warning");
 
             broadcastIntegration.broadcastVerbose("", slackAttachment);
+            return null;
         }
+        String message = String.format("QOS Server '%s' is up", serverName);
+        SlackAttachment slackAttachment = new SlackAttachment(
+                String.format("[%s] UP", serverName.toUpperCase()), "", message, null);
+        slackAttachment
+                .setColor("good");
+
+        broadcastIntegration.broadcastVerbose("", slackAttachment);
         resume("Initialization");
         return null;
     }

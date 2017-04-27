@@ -5,14 +5,15 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
+import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.integrations.slack.AbstractSlackIntegration;
 import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
-import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 
+import java.io.IOException;
+
 public class SlackCommandIntegrationImpl extends AbstractSlackIntegration implements SlackCommandIntegration {
-    private final boolean enabled;
     private final SlackCommandListener slackCommandListener;
     private final String serverName;
     private final SlackCommandRegisterer register;
@@ -20,29 +21,23 @@ public class SlackCommandIntegrationImpl extends AbstractSlackIntegration implem
 
     @Inject
     public SlackCommandIntegrationImpl(
-            @Named(QOSPropertiesModule.SLACK_INTEGRATION) String slackIntegration,
-            @Named(QOSPropertiesModule.SLACK_BOT_TOKEN) String slackBotToken,
-            @Named(QOSPropertiesModule.SLACK_DIGEST_CHANNEL) String slackDigestChannel,
-            @Named(QOSPropertiesModule.SLACK_VERBOSE_CHANNEL) String slackVerboseChannel,
+            QOSServerConfiguration configuration,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
             SlackCommandListener slackCommandListener,
             SlackCommandRegisterer registerer,
             SlackCommon slackCommon,
             SlackCommandGetter slackCommandGetter) {
-        super(slackBotToken, slackDigestChannel, slackVerboseChannel, slackCommon);
-        this.enabled = Boolean.valueOf(Preconditions.checkNotNull(slackIntegration));
+        super(configuration.getSlack().getBotToken(),
+                configuration.getSlack().getDigestChannel(),
+                configuration.getSlack().getVerboseChannel(),
+                slackCommon);
         this.slackCommandListener = Preconditions.checkNotNull(slackCommandListener);
         this.serverName = Preconditions.checkNotNull(serverName);
         this.register = Preconditions.checkNotNull(registerer);
         this.slackCommandGetter = Preconditions.checkNotNull(slackCommandGetter);
     }
 
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void initialize() {
+    public void initialize() throws IOException {
         initialize(true);
     }
 

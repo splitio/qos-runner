@@ -2,8 +2,12 @@ serverName: qos-server
 
 config: conf/qos.test.properties
 
-register:
-  dashboardURL: http://localhost:9000/api
+slack:
+  botToken: token
+  # Channel were all the verbose communication will go, i.e. every time a test succeeds.
+  verboseChannel: web-e2e-verbose
+  # Channel were all the digest communication will go, i.e when a test fails or recovers.
+  digestChannel: web-e2e-digest
 
 server:
   type: simple
