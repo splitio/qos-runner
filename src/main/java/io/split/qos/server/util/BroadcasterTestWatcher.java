@@ -15,6 +15,7 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -57,12 +58,10 @@ public class BroadcasterTestWatcher extends TestWatcher {
             length = System.currentTimeMillis() - started.get(TestId.fromDescription(description));
         }
         Broadcast broadcast = failCondition.success(TestId.fromDescription(description));
-        if (slack.isEnabled()) {
-            if (Broadcast.RECOVERY.equals(broadcast)) {
-                slack.recovery(description, serverName, length, titleLink);
-            }
-            slack.success(description, serverName, length, titleLink);
+        if (Broadcast.RECOVERY.equals(broadcast)) {
+            slack.recovery(description, serverName, length, titleLink);
         }
+        slack.success(description, serverName, length, titleLink);
     }
 
     @Override
@@ -72,33 +71,31 @@ public class BroadcasterTestWatcher extends TestWatcher {
             length = System.currentTimeMillis() - started.get(TestId.fromDescription(description));
         }
         Broadcast broadcast = failCondition.failed(TestId.fromDescription(description));
-        if (slack.isEnabled()) {
-            if (Broadcast.FIRST.equals(broadcast)) {
-                state.testFailed(description);
-                slack.firstFailure(description, e, serverName, length, titleLink);
-            }
-            if (Broadcast.REBROADCAST.equals(broadcast)) {
-                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(TestId.fromDescription(description)), length, titleLink);
-            }
+        if (Broadcast.FIRST.equals(broadcast)) {
+            state.testFailed(description);
+            slack.firstFailure(description, e, serverName, length, titleLink);
+        }
+        if (Broadcast.REBROADCAST.equals(broadcast)) {
+            slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(TestId.fromDescription(description)), length, titleLink);
         }
     }
 
     @Override
     protected void starting(Description description) {
         started.put(TestId.fromDescription(description), System.currentTimeMillis());
-        if (slack.isEnabled()) {
+        try {
             slack.initialize();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to initialize slack", e);
         }
     }
 
     @Override
     protected void finished(Description description) {
-        if (slack.isEnabled()) {
-            try {
-                slack.close();
-            } catch (Exception e) {
-                LOG.error("Could not shutdown slack integration", e);
-            }
+        try {
+            slack.close();
+        } catch (Exception e) {
+            LOG.error("Could not shutdown slack integration", e);
         }
     }
 }

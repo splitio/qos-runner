@@ -47,11 +47,6 @@ public class SlackBroadcastIntegrationForTest implements SlackBroadcaster {
     }
 
     @Override
-    public boolean isEnabled() {
-        return false;
-    }
-
-    @Override
     public void close() throws Exception {
 
     }

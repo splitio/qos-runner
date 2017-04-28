@@ -4,7 +4,8 @@ import com.google.common.base.Preconditions;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import io.split.qos.server.integrations.Integration;
-import io.split.qos.server.integrations.slack.SlackCommon;
+
+import java.io.IOException;
 
 /**
  * Common behavior of a Slack Integration.
@@ -32,21 +33,19 @@ public abstract class AbstractSlackIntegration implements Integration {
         this.slackVersboseChannel = Preconditions.checkNotNull(slackVerboseChannel);
     }
 
-    protected void initialize(boolean isServer) {
-        if (isEnabled()) {
-            slackCommon.initialize(
-                    token,
-                    slackVersboseChannel,
-                    slackDigestChannel,
-                    isServer
-            );
-            digestEnabled = slackCommon.digestEnabled();
-            verboseEnabled = slackCommon.verboseEnabled();
-            slackSession = slackCommon.slackSession();
-            verboseChannel = slackCommon.verboseChannel();
-            digestChannel = slackCommon.digestChannel();
-            botId = slackCommon.botId();
-        }
+    protected void initialize(boolean isServer) throws IOException {
+        slackCommon.initialize(
+                token,
+                slackVersboseChannel,
+                slackDigestChannel,
+                isServer
+        );
+        digestEnabled = slackCommon.digestEnabled();
+        verboseEnabled = slackCommon.verboseEnabled();
+        slackSession = slackCommon.slackSession();
+        verboseChannel = slackCommon.verboseChannel();
+        digestChannel = slackCommon.digestChannel();
+        botId = slackCommon.botId();
     }
 
     public SlackChannel digestChannel() {
@@ -78,8 +77,6 @@ public abstract class AbstractSlackIntegration implements Integration {
     }
 
     protected void close(boolean isServer) throws Exception {
-        if (isEnabled()) {
-            slackCommon.close(isServer);
-        }
+        slackCommon.close(isServer);
     }
 }
