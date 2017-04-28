@@ -3,7 +3,6 @@ package io.split.qos.server.resources;
 import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
 import io.split.qos.dtos.StateDTO;
-import io.split.qos.dtos.Status;
 import io.split.qos.server.QOSServerState;
 
 import javax.inject.Inject;
@@ -30,7 +29,7 @@ public class StateResource {
 
     @GET
     public Response state() {
-        if (state.status().equals(Status.ACTIVE)) {
+        if (state.status().equals(QOSServerState.Status.ACTIVE)) {
             return Response.ok(StateDTO.active(state.who(), state.activeSince(), state.lastTestFinished())).build();
         } else {
             return Response.ok(StateDTO.paused(state.who(), state.pausedSince(), state.lastTestFinished())).build();
