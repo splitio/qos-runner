@@ -31,7 +31,7 @@ public class SlackCommon {
     public synchronized void initialize(String slackBotToken,
                                   String slackVerboseChannel,
                                   String slackDigestChannel,
-                                  boolean isServer) {
+                                  boolean isServer) throws IOException {
         if (initialized) {
             return;
         }
@@ -65,7 +65,7 @@ public class SlackCommon {
                     }
                 }
             } catch (IOException e) {
-                LOG.warn(String.format("Could not create session with token %s, Slack Integration will not broadcast at all", slackBotToken), e);
+                throw e;
             }
         }
         if (isServer) {

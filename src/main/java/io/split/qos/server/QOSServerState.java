@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.split.qos.dtos.Status;
 import io.split.qos.server.util.TestId;
 import org.joda.time.DateTime;
 import org.junit.runner.Description;
@@ -108,12 +109,6 @@ public class QOSServerState {
         this.tests.put(testId, TestStatus.get(lastTestFinished, false));
         this.succeededInARow.clear();
         this.lastGreen = null;
-    }
-
-    public enum Status {
-        ACTIVE,
-        PAUSED,
-        ;
     }
 
     public Status status() {

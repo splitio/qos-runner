@@ -5,6 +5,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.split.qos.server.QOSServerApplication;
+import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
@@ -91,7 +92,8 @@ public class TestRunner extends BlockJUnit4ClassRunner {
                         QOSServerApplication.injector.getInstance(SlackCommon.class),
                         QOSServerApplication.injector.getInstance(QOSServerState.class),
                         QOSServerApplication.injector.getInstance(QOSStories.class),
-                        QOSServerApplication.injector.getInstance(TestsFinder.class)));
+                        QOSServerApplication.injector.getInstance(TestsFinder.class),
+                        QOSServerApplication.injector.getInstance(QOSServerConfiguration.class)));
             }
         }
         modules.add(getFailCondition(theClass));

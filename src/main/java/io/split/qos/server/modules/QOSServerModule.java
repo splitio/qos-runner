@@ -5,6 +5,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
@@ -23,14 +24,16 @@ import io.split.qos.server.util.BroadcasterTestWatcher;
  * Module for installing Server related Guice injections.
  */
 public class QOSServerModule extends AbstractModule {
-    private final String serverName;
 
     // Server Name
     // Default QOS Server
     public static final String QOS_SERVER_NAME = "QOS_SERVER_NAME";
+    private final QOSServerConfiguration configuration;
+    private final String serverName;
 
-    public QOSServerModule(String serverName) {
-        this.serverName = Preconditions.checkNotNull(serverName);
+    public QOSServerModule(QOSServerConfiguration configuration) {
+        this.configuration = Preconditions.checkNotNull(configuration);
+        this.serverName = configuration.getServerName();
     }
 
     @Override
@@ -44,6 +47,7 @@ public class QOSServerModule extends AbstractModule {
         bind(SlackCommandIntegration.class).to(SlackCommandIntegrationImpl.class);
         bind(SlackBroadcaster.class).to(SlackBroadcastIntegrationImpl.class);
         bind(SlackCommandListener.class).to(SlackCommandListenerImpl.class);
+        bind(QOSServerConfiguration.class).toInstance(configuration);
         bindConstant()
                 .annotatedWith(Names.named(QOS_SERVER_NAME))
                 .to(serverName);

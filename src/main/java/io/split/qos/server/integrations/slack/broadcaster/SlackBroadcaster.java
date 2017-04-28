@@ -4,6 +4,7 @@ import com.ullink.slack.simpleslackapi.SlackAttachment;
 import io.split.qos.server.integrations.Integration;
 import org.junit.runner.Description;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -59,5 +60,5 @@ public interface SlackBroadcaster extends AutoCloseable, Integration {
     /**
      * Initializes the broadcaster.
      */
-    void initialize();
+    void initialize() throws IOException;
 }

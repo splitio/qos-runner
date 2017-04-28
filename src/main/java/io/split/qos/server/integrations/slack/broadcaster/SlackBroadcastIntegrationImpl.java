@@ -6,33 +6,33 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
+import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.integrations.slack.AbstractSlackIntegration;
 import io.split.qos.server.integrations.slack.SlackCommon;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.testrunner.util.DateFormatter;
 import org.junit.runner.Description;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
 @Singleton
 public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration implements SlackBroadcaster {
 
-    private final boolean enabled;
     private final boolean broadcastSuccess;
     private final DateFormatter dateFormatter;
 
     @Inject
     public SlackBroadcastIntegrationImpl(
-            @Named(QOSPropertiesModule.SLACK_INTEGRATION) String slackIntegration,
-            @Named(QOSPropertiesModule.SLACK_BOT_TOKEN) String slackBotToken,
-            @Named(QOSPropertiesModule.SLACK_DIGEST_CHANNEL) String slackDigestChannel,
-            @Named(QOSPropertiesModule.SLACK_VERBOSE_CHANNEL) String slackVerboseChannel,
+            QOSServerConfiguration configuration,
             @Named(QOSPropertiesModule.BROADCAST_SUCCESS) String broadcastSuccess,
             DateFormatter dateFormatter,
             SlackCommon slackCommon) {
-        super(slackBotToken, slackDigestChannel, slackVerboseChannel, slackCommon);
-        this.enabled = Boolean.valueOf(Preconditions.checkNotNull(slackIntegration));
+        super(configuration.getSlack().getBotToken(),
+                configuration.getSlack().getDigestChannel(),
+                configuration.getSlack().getVerboseChannel(),
+                slackCommon);
         this.broadcastSuccess = Boolean.valueOf(Preconditions.checkNotNull(broadcastSuccess));
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
     }
@@ -63,7 +63,7 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
 
     @Override
     public void broadcastVerbose(String message, SlackAttachment attachment) {
-        if (isEnabled() && verboseEnabled()) {
+        if (verboseEnabled()) {
             slackSession()
                     .sendMessage(
                             verboseChannel(),
@@ -74,7 +74,7 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
 
     @Override
     public void broadcastDigest(String message, SlackAttachment attachment) {
-        if (isEnabled() && digestEnabled()) {
+        if (digestEnabled()) {
             slackSession()
                     .sendMessage(
                             digestChannel(),
@@ -89,13 +89,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
     }
 
     @Override
-    public void initialize() {
+    public void initialize() throws IOException {
         initialize(false);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 
     @Override
