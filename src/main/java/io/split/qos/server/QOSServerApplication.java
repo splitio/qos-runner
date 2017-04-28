@@ -17,6 +17,7 @@ import io.split.qos.server.register.QOSRegister;
 import io.split.qos.server.resources.ConfigResource;
 import io.split.qos.server.resources.GreenResource;
 import io.split.qos.server.resources.HealthResource;
+import io.split.qos.server.resources.StateResource;
 import io.split.testrunner.util.GuiceInitializator;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -82,7 +83,8 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         environment.jersey().register(new HealthResource());
         environment.jersey().register(new GreenResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new ConfigResource(injector.getInstance(Key.get(Properties.class, Names.named(QOSPropertiesModule.CONFIGURATION)))));
-
+        environment.jersey().register(new StateResource(injector.getInstance(QOSServerState.class)));
+        
         QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
         behaviour.call();
 

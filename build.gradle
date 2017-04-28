@@ -7,7 +7,7 @@ apply plugin: 'signing'
 
 group = "io.split"
 archivesBaseName = "qosrunner"
-version = "12.2"
+version = "15.0"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -23,7 +23,7 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile 'io.split:qosdtos:1.4'
+    compile 'io.split:qosdtos:1.6'
     compile 'org.slf4j:slf4j-api:1.7.24'
     compile 'org.slf4j:log4j-over-slf4j:1.7.24'
     compile 'org.slf4j:jul-to-slf4j:1.7.24'
