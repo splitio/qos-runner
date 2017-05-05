@@ -14,6 +14,7 @@ import io.dropwizard.setup.Environment;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.register.QOSRegister;
+import io.split.qos.server.resources.BehaviourResource;
 import io.split.qos.server.resources.ConfigResource;
 import io.split.qos.server.resources.GreenResource;
 import io.split.qos.server.resources.HealthResource;
@@ -84,6 +85,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         environment.jersey().register(new GreenResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new ConfigResource(injector.getInstance(Key.get(Properties.class, Names.named(QOSPropertiesModule.CONFIGURATION)))));
         environment.jersey().register(new StateResource(injector.getInstance(QOSServerState.class)));
+        environment.jersey().register(new BehaviourResource(injector.getInstance(QOSServerBehaviour.class)));
 
         QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
         behaviour.call();
