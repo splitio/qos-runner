@@ -1,6 +1,6 @@
 *.class
 
-conf/qos.test.properties
+conf/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

@@ -4,6 +4,7 @@ import io.split.qos.server.stories.annotations.Description;
 import io.split.qos.server.stories.annotations.Title;
 import io.split.qos.server.testcase.QOSTestCase;
 import io.split.testrunner.util.Suites;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -17,6 +18,7 @@ public class SmokeExampleTest extends QOSTestCase {
     @Description("First updates a split, changing the treatments, then kills and restores the split. Always checking that" +
             "the manager split() method returns accordingly")
     public void testOne() {
+        Assert.fail();
         System.out.print("FINISHED ONE");
     }
 

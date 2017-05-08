@@ -36,6 +36,26 @@ public class QOSServerConfiguration extends Configuration {
             return this.dashboardURL;
         }
     }
+
+    public PagerDuty pagerDuty;
+
+    @JsonProperty
+    public PagerDuty getPagerDuty() {
+        return pagerDuty;
+    }
+
+    public static class PagerDuty {
+        @NotEmpty
+        private String serviceKey;
+
+        @JsonProperty
+        public String getServiceKey() {
+            return this.serviceKey;
+
+        }
+    }
+
+
     //Comma separated list of configs.
     @JsonProperty
     public String getConfig() {

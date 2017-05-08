@@ -7,6 +7,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.failcondition.SimpleFailCondition;
+import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
+import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcasterImpl;
 import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
 import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcastIntegrationImpl;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandIntegration;
@@ -44,6 +46,7 @@ public class QOSServerModule extends AbstractModule {
         bind(SlackCommandIntegration.class).to(SlackCommandIntegrationImpl.class);
         bind(SlackBroadcaster.class).to(SlackBroadcastIntegrationImpl.class);
         bind(SlackCommandListener.class).to(SlackCommandListenerImpl.class);
+        bind(PagerDutyBroadcaster.class).to(PagerDutyBroadcasterImpl.class);
         bindConstant()
                 .annotatedWith(Names.named(QOS_SERVER_NAME))
                 .to(serverName);

@@ -9,6 +9,7 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.Broadcast;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.integrations.IntegrationTestFactory;
+import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -30,6 +31,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
     private static final Map<TestId, Long> started = Maps.newConcurrentMap();
     private final FailCondition failCondition;
     private final QOSServerState state;
+    private final PagerDutyBroadcaster pagerDuty;
     //Hack to set the title link at runtime
     private Optional<String> titleLink;
 
@@ -39,6 +41,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
             FailCondition failCondition,
             QOSServerState state) {
         this.slack = Preconditions.checkNotNull(integrationTestFactory).slackBroadcastIntegration();
+        this.pagerDuty = Preconditions.checkNotNull(integrationTestFactory).pagerDutyBroadcaster();
         this.failCondition = Preconditions.checkNotNull(failCondition);
         this.state = Preconditions.checkNotNull(state);
         this.titleLink = Optional.empty();
@@ -68,17 +71,27 @@ public class BroadcasterTestWatcher extends TestWatcher {
     @Override
     protected void failed(Throwable e, Description description) {
         Long length = null;
-        if (started.get(TestId.fromDescription(description)) != null) {
-            length = System.currentTimeMillis() - started.get(TestId.fromDescription(description));
+        TestId testId = TestId.fromDescription(description);
+        if (started.get(testId) != null) {
+            length = System.currentTimeMillis() - started.get(testId);
         }
-        Broadcast broadcast = failCondition.failed(TestId.fromDescription(description));
+        Broadcast broadcast = failCondition.failed(testId);
         if (slack.isEnabled()) {
             if (Broadcast.FIRST.equals(broadcast)) {
                 state.testFailed(description);
                 slack.firstFailure(description, e, serverName, length, titleLink);
             }
             if (Broadcast.REBROADCAST.equals(broadcast)) {
-                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(TestId.fromDescription(description)), length, titleLink);
+                slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
+            }
+        }
+        if (pagerDuty.isEnabled()) {
+            if (Broadcast.FIRST.equals(broadcast)) {
+                try {
+                    pagerDuty.incident(testId.toString(), e.getLocalizedMessage());
+                } catch (Exception failed) {
+                    LOG.error("Failed to trigger pager duty", failed);
+                }
             }
         }
     }

@@ -11,6 +11,7 @@ import com.google.inject.name.Names;
 import io.dropwizard.Application;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Environment;
+import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.register.QOSRegister;
@@ -45,6 +46,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
     public static Injector injector;
     private String name;
     public QOSRegister register;
+    private PagerDutyBroadcaster pagerDuty;
 
     public static void main(String[] args) throws Exception {
         new QOSServerApplication().run(args);
@@ -99,7 +101,14 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
             environment.lifecycle().addServerLifecycleListener(new ServiceLyfeListener(this, register.getDashboardURL()));
         }
 
-
+        QOSServerConfiguration.PagerDuty pagerDuty = configuration.getPagerDuty();
+        if (pagerDuty != null) {
+            this.pagerDuty = injector.getInstance(PagerDutyBroadcaster.class);
+            if (Strings.isNullOrEmpty(pagerDuty.getServiceKey())) {
+                throw new IllegalArgumentException("PagerDuty was set in yaml, but not property serviceKey");
+            }
+            this.pagerDuty.initialize(pagerDuty.getServiceKey(), name);
+        }
 
         // Not so nice way to shut down the Slack Connection.
         // Could not figure it ouw a cleaner way.

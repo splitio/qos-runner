@@ -38,10 +38,12 @@ dependencies {
     compile 'io.dropwizard:dropwizard-forms:1.1.0', withoutLog
     testCompile 'io.dropwizard:dropwizard-testing:1.1.0', withoutLog
 
-
     //Method and Suite
     compile 'com.beust:jcommander:1.48'
-    
+
+    // PagerDuty Integration
+    compile 'com.github.dikhan:pagerduty-client:2.0.2', withoutLog
+
     // Common
     compile 'com.ullink.slack:simpleslackapi:0.6.0', withoutLog
     compile 'com.google.inject:guice:4.0'
