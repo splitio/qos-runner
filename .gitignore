@@ -1,6 +1,6 @@
 *.class
 
-conf/
+conf/*:ew
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
