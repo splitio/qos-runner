@@ -34,7 +34,9 @@ sonar-project.properties
 .DS_Store
 .gradle/
 
-conf/qos.test.properties
+conf/
+!conf/qos.test.server.yml
+!conf/qos.test.properties
 
 gradle/
 build/
