@@ -1,6 +1,7 @@
 package io.split.qos.server.mocks;
 
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
+import io.split.qos.server.util.TestId;
 
 public class PagerDutyBroadcasterForTest implements PagerDutyBroadcaster {
     @Override
@@ -19,7 +20,13 @@ public class PagerDutyBroadcasterForTest implements PagerDutyBroadcaster {
     }
 
     @Override
-    public void incident(String description, String details) throws Exception {
+    public void incident(TestId testId, String details) throws Exception {
 
     }
+
+    @Override
+    public void resolve(TestId testId) throws Exception {
+
+    }
+
 }

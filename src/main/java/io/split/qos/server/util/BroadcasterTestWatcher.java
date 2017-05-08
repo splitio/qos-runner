@@ -56,15 +56,25 @@ public class BroadcasterTestWatcher extends TestWatcher {
     protected void succeeded(Description description) {
         Long length = null;
         state.testSucceeded(description);
-        if (started.get(TestId.fromDescription(description)) != null) {
-            length = System.currentTimeMillis() - started.get(TestId.fromDescription(description));
+        TestId testId = TestId.fromDescription(description);
+        if (started.get(testId) != null) {
+            length = System.currentTimeMillis() - started.get(testId);
         }
-        Broadcast broadcast = failCondition.success(TestId.fromDescription(description));
+        Broadcast broadcast = failCondition.success(testId);
         if (slack.isEnabled()) {
             if (Broadcast.RECOVERY.equals(broadcast)) {
                 slack.recovery(description, serverName, length, titleLink);
             }
             slack.success(description, serverName, length, titleLink);
+        }
+        if (pagerDuty.isEnabled()) {
+            if (Broadcast.RECOVERY.equals(broadcast)) {
+                try {
+                    pagerDuty.resolve(testId);
+                } catch (Exception e) {
+                    LOG.error(String.format("Failed to resolve pager duty for test %s", testId), e);
+                }
+            }
         }
     }
 
@@ -88,9 +98,9 @@ public class BroadcasterTestWatcher extends TestWatcher {
         if (pagerDuty.isEnabled()) {
             if (Broadcast.FIRST.equals(broadcast)) {
                 try {
-                    pagerDuty.incident(testId.toString(), e.getLocalizedMessage());
+                    pagerDuty.incident(testId, e.getLocalizedMessage());
                 } catch (Exception failed) {
-                    LOG.error("Failed to trigger pager duty", failed);
+                    LOG.error(String.format("Failed to trigger pager duty for test %s", testId), failed);
                 }
             }
         }

@@ -13,11 +13,16 @@ import org.junit.Test;
 @Suites("SMOKE_FOR_TEST")
 public class SmokeExampleTest extends QOSTestCase {
 
+    public static int count = 0;
     @Test
     @Title("First Test")
     @Description("First updates a split, changing the treatments, then kills and restores the split. Always checking that" +
             "the manager split() method returns accordingly")
     public void testOne() {
+        count++;
+        if (count < 3) {
+            Assert.fail();
+        }
         System.out.print("FINISHED ONE");
     }
 
