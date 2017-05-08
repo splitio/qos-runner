@@ -14,7 +14,12 @@ public class PagerDutyBroadcasterForTest implements PagerDutyBroadcaster {
     }
 
     @Override
-    public void initialize(String serviceKey) {
+    public void initialize(String serviceKey, String qosServerName) {
+
+    }
+
+    @Override
+    public void incident(String description, String details) throws Exception {
 
     }
 }
