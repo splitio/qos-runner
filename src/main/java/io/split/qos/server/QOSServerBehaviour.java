@@ -269,8 +269,9 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
 
     public List<Method> runAllNow() {
         Map<TestId, QOSTestsTracker.Tracked> tests = tracker.tests();
+        List<Method> methods = runTests(tests.values());
         state.reset();
-        return runTests(tests.values());
+        return methods;
     }
 
     public List<Method> runTestsNow(Optional<String> fuzzyClass, String fuzzyClassOrName) {
