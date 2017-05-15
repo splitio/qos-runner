@@ -42,7 +42,7 @@ public class QOSRegister {
         URL apiURL = generateApiURL(qosRunnerURL);
         RegisterDTO dto = new RegisterDTO(serverName, apiURL.toString(),
                 slackCommon.slackSession().sessionPersona().getUserName());
-        executor.scheduleAtFixedRate(new Register(registerURL, poster, dto), 0, 5, TimeUnit.MINUTES);
+        executor.scheduleAtFixedRate(new Register(registerURL, poster, dto), 0, 1, TimeUnit.MINUTES);
     }
 
     private URL generateURL(String url, Optional<String> endpoint) {
