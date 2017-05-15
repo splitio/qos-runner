@@ -116,6 +116,14 @@ public class QOSServerState {
         ;
     }
 
+    public void reset() {
+        this.lastGreen = null;
+        this.succeededInARow.clear();
+        for(TestId testId : this.tests.keySet()) {
+            this.tests.put(testId, TestStatus.empty());
+        }
+    }
+
     public Status status() {
         return status;
     }
@@ -159,6 +167,7 @@ public class QOSServerState {
         return Maps.filterValues(tests, input -> input.succeeded() != null && input.succeeded());
     }
 
+
     public boolean isActive() {
         return Status.ACTIVE.equals(status());
     }
@@ -198,6 +207,10 @@ public class QOSServerState {
 
         public static TestStatus get(Long when, Boolean succeeded) {
             return new TestStatus(when, succeeded);
+        }
+
+        public static TestStatus empty() {
+            return new TestStatus(null, null);
         }
 
         public Long when() {

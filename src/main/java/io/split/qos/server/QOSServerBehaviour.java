@@ -269,6 +269,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
 
     public List<Method> runAllNow() {
         Map<TestId, QOSTestsTracker.Tracked> tests = tracker.tests();
+        state.reset();
         return runTests(tests.values());
     }
 
