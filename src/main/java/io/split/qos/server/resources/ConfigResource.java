@@ -3,6 +3,7 @@ package io.split.qos.server.resources;
 import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import io.split.qos.dtos.ConfigDTO;
 import io.split.qos.server.modules.QOSPropertiesModule;
 
 import javax.inject.Inject;
@@ -29,6 +30,6 @@ public class ConfigResource {
 
     @GET
     public Response config() {
-        return Response.ok(configuration).build();
+        return Response.ok(ConfigDTO.from(configuration)).build();
     }
 }
