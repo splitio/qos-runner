@@ -49,8 +49,11 @@ public class JUnitRunner implements Callable<TestResult> {
         try {
             LOG.info(String.format("STARTING Test %s", testName));
             Result result = jUnitCore.run(Request.method(test.getDeclaringClass(), test.getName()));
-            LOG.info(String.format("FINSHED Test %s in %s, result %s", testName,
+            LOG.info(String.format("FINISHED Test %s in %s, result %s", testName,
                     Util.TO_PRETTY_FORMAT.apply(System.currentTimeMillis() - start), result.wasSuccessful()? "SUCCEEDED" : "FAILED"));
+            if (!result.wasSuccessful()) {
+                LOG.debug(String.format("Reasons: \n%s", result.getFailures().toString()));
+            }
             return new TestResult(result, outputStream);
         } finally {
             outputStream.close();
