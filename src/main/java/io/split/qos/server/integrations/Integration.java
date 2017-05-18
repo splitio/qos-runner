@@ -1,11 +1,8 @@
 package io.split.qos.server.integrations;
 
 /**
- * Defines an integration.
+ * Created on 5/18/17.
  */
-public interface Integration extends AutoCloseable {
-    /**
-     * @return whether the integration is enabled or not.
-     */
+public interface Integration {
     boolean isEnabled();
 }

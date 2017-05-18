@@ -13,16 +13,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
-import io.split.qos.server.integrations.IntegrationServerFactory;
-import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
+import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadcaster;
 import io.split.qos.server.integrations.slack.commandintegration.SlackCommandIntegration;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.pausable.PausableScheduledThreadPoolExecutor;
+import io.split.qos.server.util.TestId;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
 import io.split.testrunner.junit.TestResult;
-import io.split.qos.server.util.TestId;
 import io.split.testrunner.util.TestsFinder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -59,13 +58,13 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     private final List<String> suites;
     private final String suitesPackage;
     private final JUnitRunnerFactory testRunnerFactory;
-    private final SlackCommandIntegration commandIntegration;
-    private final SlackBroadcaster broadcastIntegration;
     private final String serverName;
     private final QOSTestsTracker tracker;
     private final Integer delayBetweenInSecondsWhenFail;
     private final boolean oneRun;
     private final TestsFinder testFinder;
+    private final SlackCommandIntegration slackCommandIntegration;
+    private final SlackTestResultBroadcaster slackTestResultBroadcaster;
 
     @Inject
     public QOSServerBehaviour(
@@ -79,8 +78,9 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
             @Named(QOSPropertiesModule.SUITES_PACKAGE) String suitesPackage,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
             JUnitRunnerFactory testRunnerFactory,
-            IntegrationServerFactory integrationServerFactory,
             TestsFinder testsFinder,
+            SlackTestResultBroadcaster slackTestResultBroadcaster,
+            SlackCommandIntegration slackCommandIntegration,
             QOSServerState state,
             QOSTestsTracker tracker) {
 
@@ -96,10 +96,10 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
         this.suites = Arrays.asList(Preconditions.checkNotNull(suites).split(","));
         this.suitesPackage = Preconditions.checkNotNull(suitesPackage);
         this.testRunnerFactory = Preconditions.checkNotNull(testRunnerFactory);
-        this.commandIntegration = Preconditions.checkNotNull(integrationServerFactory).slackCommandIntegration();
-        this.broadcastIntegration = Preconditions.checkNotNull(integrationServerFactory).slackBroadcastIntegration();
         this.serverName = Preconditions.checkNotNull(serverName);
         this.pause("Initialization");
+        this.slackCommandIntegration = Preconditions.checkNotNull(slackCommandIntegration);
+        this.slackTestResultBroadcaster = Preconditions.checkNotNull(slackTestResultBroadcaster);
         this.tracker = Preconditions.checkNotNull(tracker);
         this.testFinder = Preconditions.checkNotNull(testsFinder);
     }
@@ -116,35 +116,31 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     @Override
     public Void call() throws Exception {
         LOG.info(String.format("STARTING QOS Server for suites %s, running %s tests in parallel", suites, parallelTests));
-        if (commandIntegration.isEnabled()) {
-            commandIntegration.initialize();
-            commandIntegration.startBotListener();
-        }
-        if (broadcastIntegration.isEnabled()) {
-            broadcastIntegration.initialize();
+        if (slackCommandIntegration.isEnabled()) {
+            slackCommandIntegration.startBotListener();
         }
 
         List<Method> sheduled = scheduleTests();
         if (sheduled.size() == 0) {
             LOG.error("Could not find tests to run on " + suites + " package " + suitesPackage);
-            if (broadcastIntegration.isEnabled()) {
+            if (slackTestResultBroadcaster.isEnabled()) {
                 String message = String.format("No tests found for %s, suites %s, package %s", serverName, suites, suitesPackage);
                 SlackAttachment slackAttachment = new SlackAttachment("NO TESTS WILL RUN FOR " + serverName, "", message, null);
                 slackAttachment
                     .setColor("warning");
 
-                broadcastIntegration.broadcastVerbose("", slackAttachment);
+                slackTestResultBroadcaster.broadcastVerbose("", slackAttachment);
             }
             return null;
         }
-        if (broadcastIntegration.isEnabled()) {
+        if (slackTestResultBroadcaster.isEnabled()) {
             String message = String.format("QOS Server '%s' is up", serverName);
             SlackAttachment slackAttachment = new SlackAttachment(
                     String.format("[%s] UP", serverName.toUpperCase()), "", message, null);
             slackAttachment
                     .setColor("good");
 
-            broadcastIntegration.broadcastVerbose("", slackAttachment);
+            slackTestResultBroadcaster.broadcastVerbose("", slackAttachment);
         }
         resume("Initialization");
         return null;

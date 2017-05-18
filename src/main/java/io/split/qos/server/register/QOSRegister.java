@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.split.qos.dtos.RegisterDTO;
-import io.split.qos.server.integrations.slack.SlackCommon;
+import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSServerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,23 +25,27 @@ public class QOSRegister {
     private final ScheduledExecutorService executor;
     private final HttpPoster poster;
     private final String serverName;
-    private final SlackCommon slackCommon;
+    private final SlackSessionProvider slackSessionProvider;
 
     @Inject
     public QOSRegister(HttpPoster poster,
-                       SlackCommon slackCommon,
+                       SlackSessionProvider slackSessionProvider,
                        @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
         this.executor = Executors.newSingleThreadScheduledExecutor();
         this.poster = Preconditions.checkNotNull(poster);
-        this.slackCommon = Preconditions.checkNotNull(slackCommon);
+        this.slackSessionProvider = Preconditions.checkNotNull(slackSessionProvider);
         this.serverName = Preconditions.checkNotNull(serverName);
     }
 
     public void register(String qosDashboardURL, String qosRunnerURL) {
         URL registerURL = generateRegisterURL(qosDashboardURL);
         URL apiURL = generateApiURL(qosRunnerURL);
-        RegisterDTO dto = new RegisterDTO(serverName, apiURL.toString(),
-                slackCommon.slackSession().sessionPersona().getUserName());
+        RegisterDTO dto = new RegisterDTO(
+                serverName,
+                apiURL.toString(),
+                slackSessionProvider.isEnabled() ?
+                    slackSessionProvider.slackSession().sessionPersona().getUserName() :
+                    "NO_SLACK");
         executor.scheduleAtFixedRate(new Register(registerURL, poster, dto), 0, 1, TimeUnit.MINUTES);
     }
 

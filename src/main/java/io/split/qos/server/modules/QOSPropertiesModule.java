@@ -21,19 +21,6 @@ public class QOSPropertiesModule extends AbstractModule {
     // COMMON PROPERTIES
     // ------------------
 
-    // Whether slack is enabled
-    // Default false.
-    public static final String SLACK_INTEGRATION = "SLACK_INTEGRATION";
-    // The bot auth token
-    // Default empty.
-    public static final String SLACK_BOT_TOKEN = "SLACK_BOT_TOKEN";
-    // Name of the channel to write verbose broadcasts.
-    // Default empty.
-    public static final String SLACK_VERBOSE_CHANNEL = "SLACK_VERBOSE_CHANNEL";
-    // Name of the channerl to write digest broadcasts.
-    // Default empty.
-    public static final String SLACK_DIGEST_CHANNEL = "SLACK_DIGEST_CHANNEL";
-
     // ------------------
     // SERVER PROPERTIES
     // ------------------
@@ -77,10 +64,6 @@ public class QOSPropertiesModule extends AbstractModule {
     // TEST PROPERTIES
     // ------------------
 
-    // Whether to broadcast tests that succeeds.
-    // Default false
-    public static final String BROADCAST_SUCCESS = "BROADCAST_SUCCESS";
-    // How many failures in a row before broadcasting failure.
     // Default 2
     public static final String CONSECUTIVE_FAILURES = "CONSECUTIVE_FAILURES";
     // If a test keeps failing, how often to re broadcast the failure
@@ -90,11 +73,6 @@ public class QOSPropertiesModule extends AbstractModule {
     private static final Map<String, String> defaultProperties = Maps.newHashMap();
 
     static {
-        // Common
-        defaultProperties.put(SLACK_INTEGRATION, "true");
-        defaultProperties.put(SLACK_BOT_TOKEN, "");
-        defaultProperties.put(SLACK_VERBOSE_CHANNEL, "");
-        defaultProperties.put(SLACK_DIGEST_CHANNEL, "");
 
         // Server
         defaultProperties.put(PARALLEL_TESTS, "10");
@@ -110,7 +88,6 @@ public class QOSPropertiesModule extends AbstractModule {
 
         // Test
         defaultProperties.put(CONSECUTIVE_FAILURES, "2");
-        defaultProperties.put(BROADCAST_SUCCESS, "true");
         defaultProperties.put(RE_BROADCAST_FAILURE_IN_MINUTES, "60");
     }
 

@@ -9,9 +9,8 @@ import io.split.qos.server.QOSServerApplication;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.Broadcast;
 import io.split.qos.server.failcondition.FailCondition;
-import io.split.qos.server.integrations.IntegrationTestFactory;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
-import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
+import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadcaster;
 import io.split.testrunner.util.GuiceInitializator;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -52,7 +51,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
     @Override
     protected void succeeded(Description description) {
         if (GuiceInitializator.isQos()) {
-            IntegrationTestFactory integrationTestFactory = QOSServerApplication.injector.getInstance(IntegrationTestFactory.class);
+            SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
             Long length = null;
             state.testSucceeded(description);
             TestId testId = TestId.fromDescription(description);
@@ -60,14 +59,13 @@ public class BroadcasterTestWatcher extends TestWatcher {
                 length = System.currentTimeMillis() - started.get(testId);
             }
             Broadcast broadcast = failCondition.success(testId);
-            SlackBroadcaster slack = integrationTestFactory.slackBroadcastIntegration();
-            if (slack.isEnabled()) {
+            if (resultBroadcaster.isEnabled()) {
                 if (Broadcast.RECOVERY.equals(broadcast)) {
-                    slack.recovery(description, serverName, length, titleLink);
+                    resultBroadcaster.recovery(description, serverName, length, titleLink);
                 }
-                slack.success(description, serverName, length, titleLink);
+                resultBroadcaster.success(description, serverName, length, titleLink);
             }
-            PagerDutyBroadcaster pagerDuty = integrationTestFactory.pagerDutyBroadcaster();
+            PagerDutyBroadcaster pagerDuty = QOSServerApplication.injector.getInstance(PagerDutyBroadcaster.class);
             if (pagerDuty.isEnabled()) {
                 if (Broadcast.RECOVERY.equals(broadcast)) {
                     try {
@@ -83,24 +81,23 @@ public class BroadcasterTestWatcher extends TestWatcher {
     @Override
     protected void failed(Throwable e, Description description) {
         if (GuiceInitializator.isQos()) {
-            IntegrationTestFactory integrationTestFactory = QOSServerApplication.injector.getInstance(IntegrationTestFactory.class);
             Long length = null;
             TestId testId = TestId.fromDescription(description);
             if (started.get(testId) != null) {
                 length = System.currentTimeMillis() - started.get(testId);
             }
             Broadcast broadcast = failCondition.failed(testId);
-            SlackBroadcaster slack = integrationTestFactory.slackBroadcastIntegration();
-            if (slack.isEnabled()) {
+            SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
+            if (resultBroadcaster.isEnabled()) {
                 if (Broadcast.FIRST.equals(broadcast)) {
                     state.testFailed(description);
-                    slack.firstFailure(description, e, serverName, length, titleLink);
+                    resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 }
                 if (Broadcast.REBROADCAST.equals(broadcast)) {
-                    slack.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
+                    resultBroadcaster.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
                 }
             }
-            PagerDutyBroadcaster pagerDuty = integrationTestFactory.pagerDutyBroadcaster();
+            PagerDutyBroadcaster pagerDuty = QOSServerApplication.injector.getInstance(PagerDutyBroadcaster.class);
             if (pagerDuty.isEnabled()) {
                 if (Broadcast.FIRST.equals(broadcast)) {
                     try {
@@ -116,27 +113,21 @@ public class BroadcasterTestWatcher extends TestWatcher {
     @Override
     protected void starting(Description description) {
         if (GuiceInitializator.isQos()) {
-            IntegrationTestFactory integrationTestFactory = QOSServerApplication.injector.getInstance(IntegrationTestFactory.class);
             started.put(TestId.fromDescription(description), System.currentTimeMillis());
-            SlackBroadcaster slack = integrationTestFactory.slackBroadcastIntegration();
-            if (slack.isEnabled()) {
-                slack.initialize();
-            }
         }
     }
 
     @Override
     protected void finished(Description description) {
         if (GuiceInitializator.isQos()) {
-            IntegrationTestFactory integrationTestFactory = QOSServerApplication.injector.getInstance(IntegrationTestFactory.class);
-            SlackBroadcaster slack = integrationTestFactory.slackBroadcastIntegration();
-            if (slack.isEnabled()) {
-                try {
-                    slack.close();
-                } catch (Exception e) {
-                    LOG.error("Could not shutdown slack integration", e);
-                }
-            }
+//            SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
+//            if (resultBroadcaster.isEnabled()) {
+//                try {
+//                    resultBroadcaster.close();
+//                } catch (Exception e) {
+//                    LOG.error("Could not shutdown slack integration", e);
+//                }
+//            }
         }
     }
 }

@@ -3,12 +3,9 @@ package io.split.qos.server.integrations.slack.broadcaster;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
-import io.split.qos.server.integrations.slack.AbstractSlackIntegration;
-import io.split.qos.server.integrations.slack.SlackCommon;
-import io.split.qos.server.modules.QOSPropertiesModule;
+import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.testrunner.util.DateFormatter;
 import org.junit.runner.Description;
 
@@ -16,94 +13,63 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Singleton
-public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration implements SlackBroadcaster {
+public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster {
 
-    private final boolean enabled;
-    private final boolean broadcastSuccess;
     private final DateFormatter dateFormatter;
+    private final SlackSessionProvider slackSessionProvider;
 
     @Inject
-    public SlackBroadcastIntegrationImpl(
-            @Named(QOSPropertiesModule.SLACK_INTEGRATION) String slackIntegration,
-            @Named(QOSPropertiesModule.SLACK_BOT_TOKEN) String slackBotToken,
-            @Named(QOSPropertiesModule.SLACK_DIGEST_CHANNEL) String slackDigestChannel,
-            @Named(QOSPropertiesModule.SLACK_VERBOSE_CHANNEL) String slackVerboseChannel,
-            @Named(QOSPropertiesModule.BROADCAST_SUCCESS) String broadcastSuccess,
-            DateFormatter dateFormatter,
-            SlackCommon slackCommon) {
-        super(slackBotToken, slackDigestChannel, slackVerboseChannel, slackCommon);
-        this.enabled = Boolean.valueOf(Preconditions.checkNotNull(slackIntegration));
-        this.broadcastSuccess = Boolean.valueOf(Preconditions.checkNotNull(broadcastSuccess));
+    public SlackTestResultBroacasterImpl(DateFormatter dateFormatter,
+                                         SlackSessionProvider slackSessionProvider) {
         this.dateFormatter = Preconditions.checkNotNull(dateFormatter);
+        this.slackSessionProvider = Preconditions.checkNotNull(slackSessionProvider);
     }
 
     @Override
     public void firstFailure(Description description, Throwable error, String serverName, Long duration,
                              Optional<String> titleLink) {
-        if (digestEnabled()) {
-            broadcastFailure(description, error, digestChannel(), serverName, duration, titleLink);
-        }
+        broadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, duration, titleLink);
     }
 
     @Override
     public void recovery(Description description, String serverName, Long duration, Optional<String> titleLink) {
-        if (digestEnabled()) {
-            broadcastRecovery(description, serverName, duration, titleLink);
-        }
+        broadcastRecovery(description, serverName, duration, titleLink);
     }
 
     @Override
     public void success(Description description, String serverName, Long duration, Optional<String> titleLink) {
-        if (verboseEnabled()) {
-            if (broadcastSuccess || !this.isInitializedByServer()) {
-                broadcastSuccess(description, serverName, duration, titleLink);
-            }
-        }
+        broadcastSuccess(description, serverName, duration, titleLink);
     }
 
     @Override
     public void broadcastVerbose(String message, SlackAttachment attachment) {
-        if (isEnabled() && verboseEnabled()) {
-            slackSession()
+        slackSessionProvider.slackSession()
                     .sendMessage(
-                            verboseChannel(),
+                            slackSessionProvider.verboseChannel(),
                             message,
                             attachment);
-        }
     }
 
     @Override
     public void broadcastDigest(String message, SlackAttachment attachment) {
-        if (isEnabled() && digestEnabled()) {
-            slackSession()
+        slackSessionProvider
+                .slackSession()
                     .sendMessage(
-                            digestChannel(),
+                            slackSessionProvider.digestChannel(),
                             message,
                             attachment);
-        }
     }
 
-    @Override
-    public void close() throws Exception {
-        close(false);
-    }
-
-    @Override
-    public void initialize() {
-        initialize(false);
-    }
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return slackSessionProvider.isEnabled();
     }
 
     @Override
     public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure,
                                    Long duration, Optional<String> titleLink) {
-        if (digestEnabled()) {
-            reBroadcastFailure(description, error, digestChannel(), serverName, whenFirstFailure, duration, titleLink);
-        }
+        reBroadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, whenFirstFailure, duration, titleLink);
     }
 
     private void reBroadcastFailure(Description description,
@@ -126,7 +92,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                 .setColor("danger");
         titleLink.ifPresent(link -> slackAttachment.setTitleLink(link));
 
-        slackSession()
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(channel,
                         "",
                         slackAttachment);
@@ -136,7 +103,9 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         SlackAttachment reason = new SlackAttachment(title, "", text, null);
         reason
                 .setColor("warning");
-        slackSession()
+
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(channel,
                         "",
                         reason);
@@ -149,7 +118,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                         .append(stackTraceElement.toString())
                         .append("\n"));
         exception.append("```");
-        slackSession()
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(channel,
                         exception.toString());
 
@@ -168,9 +138,10 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                 .setColor("good");
         titleLink.ifPresent(link -> slackAttachment.setTitleLink(link));
 
-        slackSession()
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(
-                        digestChannel(),
+                        slackSessionProvider.digestChannel(),
                         "",
                         slackAttachment);
 
@@ -180,9 +151,10 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                                   String serverName,
                                   Long duration,
                                   Optional<String> titleLink) {
-        slackSession()
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(
-                        verboseChannel(),
+                        slackSessionProvider.verboseChannel(),
                         "",
                         createHeaderAttachment(description, true, serverName, duration, titleLink));
     }
@@ -193,7 +165,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                                   String serverName,
                                   Long duration,
                                   Optional<String> titleLink) {
-        slackSession()
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(channel,
                         "",
                         createHeaderAttachment(description, false, serverName, duration, titleLink));
@@ -203,7 +176,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
         SlackAttachment reason = new SlackAttachment(title, "", text, null);
         reason
                 .setColor("warning");
-        slackSession()
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(channel,
                         "",
                         reason);
@@ -216,7 +190,8 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                         .append(stackTraceElement.toString())
                         .append("\n"));
         exception.append("```");
-        slackSession()
+        slackSessionProvider
+                .slackSession()
                 .sendMessage(channel,
                         exception.toString());
     }
@@ -237,6 +212,4 @@ public class SlackBroadcastIntegrationImpl extends AbstractSlackIntegration impl
                 .ifPresent(link -> slackAttachment.setTitleLink(link));
         return slackAttachment;
     }
-
-
 }

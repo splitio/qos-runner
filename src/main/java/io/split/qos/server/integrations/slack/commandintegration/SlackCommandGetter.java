@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
-import io.split.qos.server.integrations.slack.SlackCommon;
+import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSServerModule;
 
 import java.util.List;
@@ -15,19 +15,19 @@ import java.util.Optional;
 @Singleton
 public class SlackCommandGetter {
 
-    private final SlackCommon slackCommon;
+    private final SlackSessionProvider slackSessionProvider;
     private final String serverName;
 
     @Inject
     public SlackCommandGetter(
-            SlackCommon slackCommon,
+            SlackSessionProvider slackSessionProvider,
             @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
-        this.slackCommon = Preconditions.checkNotNull(slackCommon);
+        this.slackSessionProvider= Preconditions.checkNotNull(slackSessionProvider);
         this.serverName = Preconditions.checkNotNull(serverName);
     }
 
     public Optional<SlackCommand> get(SlackMessagePosted message) {
-        String commandWithArgs = stripBotId(slackCommon, message);
+        String commandWithArgs = stripBotId(message);
         List<String> all = Lists.newArrayList(commandWithArgs.split(" "));
         if (all.isEmpty()) {
             return Optional.empty();
@@ -44,11 +44,11 @@ public class SlackCommandGetter {
         return Optional.of(new SlackCommand(serverNameOptional, all.remove(0), all));
     }
 
-    private String stripBotId(SlackCommon slackCommon, SlackMessagePosted message) {
+    private String stripBotId(SlackMessagePosted message) {
         return message
                 .getMessageContent()
                 .trim()
-                .replaceFirst(String.format("<@%s>", slackCommon.botId()), "")
+                .replaceFirst(String.format("<@%s>", slackSessionProvider.botId()), "")
                 .replaceFirst(":", "")
                 .trim();
     }

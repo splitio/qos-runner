@@ -55,6 +55,38 @@ public class QOSServerConfiguration extends Configuration {
         }
     }
 
+    public Slack slack;
+
+    @JsonProperty
+    public Slack getSlack() {
+        return slack;
+    }
+
+    public static class Slack {
+        @NotEmpty
+        private String token;
+
+        @JsonProperty
+        public String getToken() {
+            return this.token;
+        }
+
+        @NotEmpty
+        private String verboseChannel;
+
+        @JsonProperty
+        public String getVerboseChannel() {
+            return this.verboseChannel;
+        }
+
+        @NotEmpty
+        private String digestChannel;
+
+        @JsonProperty
+        public String getDigestChannel() {
+            return this.digestChannel;
+        }
+    }
 
     //Comma separated list of configs.
     @JsonProperty

@@ -2,13 +2,13 @@ package io.split.qos.server.mocks;
 
 import com.google.inject.Singleton;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
-import io.split.qos.server.integrations.slack.broadcaster.SlackBroadcaster;
+import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadcaster;
 import org.junit.runner.Description;
 
 import java.util.Optional;
 
 @Singleton
-public class SlackBroadcastIntegrationForTest implements SlackBroadcaster {
+public class SlackTestResultBroadcasterImplForTest implements SlackTestResultBroadcaster {
     @Override
     public void firstFailure(Description description, Throwable error, String serverName, Long duration,
                              Optional<String> titleLink) {
@@ -42,17 +42,8 @@ public class SlackBroadcastIntegrationForTest implements SlackBroadcaster {
     }
 
     @Override
-    public void initialize() {
-
-    }
-
-    @Override
     public boolean isEnabled() {
         return false;
     }
 
-    @Override
-    public void close() throws Exception {
-
-    }
 }

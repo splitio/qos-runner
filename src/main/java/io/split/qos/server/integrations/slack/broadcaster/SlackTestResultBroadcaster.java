@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * In charge of broadcasting success/failures etc.
  */
-public interface SlackBroadcaster extends AutoCloseable, Integration {
+public interface SlackTestResultBroadcaster extends Integration {
     /**
      * Broadcasts the first failure
      *
@@ -55,9 +55,4 @@ public interface SlackBroadcaster extends AutoCloseable, Integration {
      * @param attachment the slack attachment (THIS MEANS IT IS IN IN THE WRONG PLACE)
      */
     void broadcastDigest(String message, SlackAttachment attachment);
-
-    /**
-     * Initializes the broadcaster.
-     */
-    void initialize();
 }

@@ -12,6 +12,7 @@ import io.dropwizard.Application;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Environment;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
+import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.register.QOSRegister;
@@ -91,9 +92,6 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         environment.jersey().register(new CountResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new BehaviourResource(injector.getInstance(QOSServerBehaviour.class)));
 
-        QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
-        behaviour.call();
-
         QOSServerConfiguration.Register register = configuration.getRegister();
         if (register != null) {
             this.register = injector.getInstance(QOSRegister.class);
@@ -111,6 +109,24 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
             }
             this.pagerDuty.initialize(pagerDuty.getServiceKey(), name);
         }
+
+        QOSServerConfiguration.Slack slack = configuration.getSlack();
+        if (slack!= null) {
+            SlackSessionProvider provider = injector.getInstance(SlackSessionProvider.class);
+            if (Strings.isNullOrEmpty(slack.getToken())) {
+                throw new IllegalArgumentException("Slack was set in yaml, but not property token");
+            }
+            if (Strings.isNullOrEmpty(slack.getVerboseChannel())) {
+                throw new IllegalArgumentException("Slack was set in yaml, but not property verboseChannel");
+            }
+            if (Strings.isNullOrEmpty(slack.getDigestChannel())) {
+                throw new IllegalArgumentException("Slack was set in yaml, but not property digestchannel");
+            }
+            provider.initialize(slack.getToken(), slack.getVerboseChannel(), slack.getDigestChannel());
+        }
+
+        QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
+        behaviour.call();
 
         // Not so nice way to shut down the Slack Connection.
         // Could not figure it ouw a cleaner way.

@@ -9,7 +9,7 @@ import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
-import io.split.qos.server.integrations.slack.SlackCommon;
+import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSCommonModule;
 import io.split.qos.server.modules.QOSFailWithModule;
 import io.split.qos.server.stories.QOSStories;
@@ -89,7 +89,7 @@ public class TestRunner extends BlockJUnit4ClassRunner {
         if (GuiceInitializator.isQos()) {
             if (QOSServerApplication.injector != null) {
                 modules.add(new QOSCommonModule(
-                        QOSServerApplication.injector.getInstance(SlackCommon.class),
+                        QOSServerApplication.injector.getInstance(SlackSessionProvider.class),
                         QOSServerApplication.injector.getInstance(QOSServerState.class),
                         QOSServerApplication.injector.getInstance(QOSStories.class),
                         QOSServerApplication.injector.getInstance(TestsFinder.class),

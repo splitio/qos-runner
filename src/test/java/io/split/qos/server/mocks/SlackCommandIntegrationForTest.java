@@ -16,9 +16,6 @@ public class SlackCommandIntegrationForTest implements SlackCommandIntegration {
     }
 
     @Override
-    public void initialize() {}
-
-    @Override
     public void startBotListener() {
         registerer.register();
     }
@@ -26,10 +23,5 @@ public class SlackCommandIntegrationForTest implements SlackCommandIntegration {
     @Override
     public boolean isEnabled() {
         return false;
-    }
-
-    @Override
-    public void close() throws Exception {
-
     }
 }
