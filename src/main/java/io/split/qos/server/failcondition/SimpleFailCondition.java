@@ -6,8 +6,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.util.TestId;
 
@@ -30,14 +32,15 @@ public class SimpleFailCondition implements FailCondition {
     private static final Map<TestId, Long> FIRST_FAILURE_TIME = Maps.newConcurrentMap();
     private static final Map<TestId, Integer> FAILURE_MULTIPLIER = Maps.newConcurrentMap();
 
-    private final int consecutiveFailures;
     private final Integer reBroadcastFailureInMinutes;
+    private final Provider<QOSServerConfiguration> configurationProvider;
 
     @Inject
     public SimpleFailCondition(
-            @Named(QOSPropertiesModule.CONSECUTIVE_FAILURES) String consecutiveFailures,
+            /** Using a Provider since running from IDE it gets initalizated. **/
+            Provider<QOSServerConfiguration> configurationProvider,
             @Named(QOSPropertiesModule.RE_BROADCAST_FAILURE_IN_MINUTES) String reBroadastFailureInMinutes) {
-        this.consecutiveFailures = Integer.valueOf(Preconditions.checkNotNull(consecutiveFailures));
+        this.configurationProvider = Preconditions.checkNotNull(configurationProvider);
         this.reBroadcastFailureInMinutes = Integer.valueOf(Preconditions.checkNotNull(reBroadastFailureInMinutes));
 
     }
@@ -45,6 +48,7 @@ public class SimpleFailCondition implements FailCondition {
     @Override
     public Broadcast failed(TestId testId) {
         Preconditions.checkNotNull(testId);
+        Integer consecutiveFailures = configurationProvider.get().getTest().getConsecutiveFailures();
         FAILURES.add(testId);
         if (FAILURES.count(testId) == consecutiveFailures) {
             FIRST_FAILURE_TIME.put(testId, System.currentTimeMillis());
@@ -63,6 +67,7 @@ public class SimpleFailCondition implements FailCondition {
     @Override
     public Broadcast success(TestId testId) {
         Preconditions.checkNotNull(testId);
+        Integer consecutiveFailures = configurationProvider.get().getTest().getConsecutiveFailures();
         int count = FAILURES.count(testId);
         FIRST_FAILURE_TIME.remove(testId);
         FAILURE_MULTIPLIER.put(testId, 1);

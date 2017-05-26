@@ -78,7 +78,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         GuiceInitializator.setQos();
         List<Module> modules = Lists.newArrayList(
                 new QOSPropertiesModule(),
-                new QOSServerModule(configuration.getServerName())
+                new QOSServerModule(configuration)
         );
 
         LOG.info("Initializing Guice");

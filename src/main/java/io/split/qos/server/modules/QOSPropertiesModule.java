@@ -64,8 +64,6 @@ public class QOSPropertiesModule extends AbstractModule {
     // TEST PROPERTIES
     // ------------------
 
-    // Default 2
-    public static final String CONSECUTIVE_FAILURES = "CONSECUTIVE_FAILURES";
     // If a test keeps failing, how often to re broadcast the failure
     // Default is 60 minutes
     public static final String RE_BROADCAST_FAILURE_IN_MINUTES = "RE_BROADCAST_FAILURE_IN_MINUTES";
@@ -87,7 +85,6 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(TIME_ZONE, "America/Los_Angeles");
 
         // Test
-        defaultProperties.put(CONSECUTIVE_FAILURES, "2");
         defaultProperties.put(RE_BROADCAST_FAILURE_IN_MINUTES, "60");
     }
 

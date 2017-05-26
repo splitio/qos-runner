@@ -5,6 +5,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
@@ -30,9 +31,11 @@ public class QOSServerModule extends AbstractModule {
     // Server Name
     // Default QOS Server
     public static final String QOS_SERVER_NAME = "QOS_SERVER_NAME";
+    private final QOSServerConfiguration configuration;
 
-    public QOSServerModule(String serverName) {
-        this.serverName = Preconditions.checkNotNull(serverName);
+    public QOSServerModule(QOSServerConfiguration configuration) {
+        this.configuration = Preconditions.checkNotNull(configuration);
+        this.serverName = Preconditions.checkNotNull(configuration.getServerName());
     }
 
     @Override
@@ -50,6 +53,7 @@ public class QOSServerModule extends AbstractModule {
         bindConstant()
                 .annotatedWith(Names.named(QOS_SERVER_NAME))
                 .to(serverName);
+        bind(QOSServerConfiguration.class).toInstance(configuration);
         // HACK. Since we need the server for the tests (for broadcasting) and the tests use a complete different
         // Injector, we use static variables to communicate.
         BroadcasterTestWatcher.serverName = serverName;

@@ -2,6 +2,7 @@ package io.split.qos.server.modules;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
+import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
@@ -23,17 +24,20 @@ public class QOSCommonModule extends AbstractModule {
     private final QOSStories stories;
     private final TestsFinder testFinder;
     private final PagerDutyBroadcaster pagetDuty;
+    private final QOSServerConfiguration configuration;
 
     public QOSCommonModule(SlackSessionProvider slackSessionProvider,
                            QOSServerState serverState,
                            QOSStories stories,
                            TestsFinder testsFinder,
-                           PagerDutyBroadcaster pagerDutyBroadcaster) {
+                           PagerDutyBroadcaster pagerDutyBroadcaster,
+                           QOSServerConfiguration configuration) {
         this.slackSessionProvider = Preconditions.checkNotNull(slackSessionProvider);
         this.state = Preconditions.checkNotNull(serverState);
         this.stories = Preconditions.checkNotNull(stories);
         this.testFinder = Preconditions.checkNotNull(testsFinder);
         this.pagetDuty = Preconditions.checkNotNull(pagerDutyBroadcaster);
+        this.configuration = Preconditions.checkNotNull(configuration);
     }
 
     @Override
@@ -43,5 +47,6 @@ public class QOSCommonModule extends AbstractModule {
         bind(QOSStories.class).toInstance(stories);
         bind(TestsFinder.class).toInstance(testFinder);
         bind(PagerDutyBroadcaster.class).toInstance(pagetDuty);
+        bind(QOSServerConfiguration.class).toInstance(configuration);
     }
 }

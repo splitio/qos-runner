@@ -88,6 +88,24 @@ public class QOSServerConfiguration extends Configuration {
         }
     }
 
+    public Test test;
+
+    @JsonProperty
+    public Test getTest() {
+        return test;
+    }
+
+    public static class Test {
+        @NotEmpty
+        private Integer consecutiveFailures = 2;
+
+        @JsonProperty
+        public Integer getConsecutiveFailures() {
+            return this.consecutiveFailures;
+        }
+
+    }
+
     //Comma separated list of configs.
     @JsonProperty
     public String getConfig() {

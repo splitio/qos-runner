@@ -19,11 +19,10 @@ import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
 
 public class QOSServerModuleForTest extends AbstractModule {
-    private final String serverName;
-
     // Server Name
     // Default QOS Server
     public static final String QOS_SERVER_NAME = "QOS_SERVER_NAME";
+    private final String serverName;
 
     public QOSServerModuleForTest(String serverName) {
         this.serverName = Preconditions.checkNotNull(serverName);
