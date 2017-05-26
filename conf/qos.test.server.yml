@@ -5,6 +5,9 @@ config: conf/qos.test.properties
 register:
   dashboardURL: URL
 
+test:
+  consecutiveFailures: 2
+
 pagerDuty:
   serviceKey: KEY
 
