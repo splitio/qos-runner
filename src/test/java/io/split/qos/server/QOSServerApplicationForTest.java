@@ -9,6 +9,8 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
+import io.split.qos.server.failcondition.SimpleFailCondition;
+import io.split.qos.server.modules.QOSFailWithModule;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModuleForTest;
 import io.split.qos.server.resources.BehaviourResource;
@@ -59,7 +61,8 @@ public class QOSServerApplicationForTest extends Application<QOSServerConfigurat
         //GuiceWizard.
         List<Module> modules = Lists.newArrayList(
                 new QOSPropertiesModule(),
-                new QOSServerModuleForTest(configuration.getServerName())
+                new QOSServerModuleForTest(configuration.getServerName()),
+                new QOSFailWithModule(SimpleFailCondition.class)
         );
 
         injector = Guice.createInjector(modules);

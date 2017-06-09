@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.util.TestId;
 import org.joda.time.DateTime;
 import org.junit.runner.Description;
@@ -37,6 +38,8 @@ import java.util.Map;
 @Singleton
 public class QOSServerState {
 
+    private final FailCondition failCondition;
+
     private Long lastGreen;
 
     private Status status;
@@ -54,7 +57,7 @@ public class QOSServerState {
     private String who;
 
     @Inject
-    public QOSServerState() {
+    public QOSServerState(FailCondition failCondition) {
         this.status = Status.PAUSED;
         this.activeSince = null;
         this.pausedSince = DateTime.now().getMillis();
@@ -62,6 +65,7 @@ public class QOSServerState {
         this.lastGreen = null;
         this.succeededInARow = Maps.newConcurrentMap();
         this.tests = Maps.newConcurrentMap();
+        this.failCondition = failCondition;
     }
 
     public void resume(String who) {
@@ -117,6 +121,7 @@ public class QOSServerState {
     }
 
     public void reset() {
+        this.failCondition.reset();
         this.lastGreen = null;
         this.succeededInARow.clear();
         for(TestId testId : this.tests.keySet()) {

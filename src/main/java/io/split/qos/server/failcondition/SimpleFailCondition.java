@@ -83,4 +83,11 @@ public class SimpleFailCondition implements FailCondition {
     public Long firstFailure(TestId testId) {
         return FIRST_FAILURE_TIME.get(testId);
     }
+
+    @Override
+    public void reset() {
+        FAILURES.clear();
+        FIRST_FAILURE_TIME.clear();
+        FAILURE_MULTIPLIER.clear();
+    }
 }

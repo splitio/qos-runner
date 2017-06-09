@@ -30,4 +30,6 @@ public interface FailCondition {
      * @return when was the first failure found.
      */
     Long firstFailure(TestId testId);
+
+    void reset();
 }
