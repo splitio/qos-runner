@@ -10,6 +10,7 @@ import io.split.testrunner.util.DateFormatter;
 import org.junit.runner.Description;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -110,18 +111,10 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
                         "",
                         reason);
 
-        StringBuilder exception = new StringBuilder();
-        exception.append("```");
-        Arrays.asList(error.getStackTrace())
-                .stream()
-                .forEach(stackTraceElement -> exception
-                        .append(stackTraceElement.toString())
-                        .append("\n"));
-        exception.append("```");
         slackSessionProvider
                 .slackSession()
                 .sendMessage(channel,
-                        exception.toString());
+                        exception(error));
 
     }
 
@@ -182,18 +175,31 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
                         "",
                         reason);
 
-        StringBuilder exception = new StringBuilder();
-        exception.append("```");
-        Arrays.asList(error.getStackTrace())
-                .stream()
-                .forEach(stackTraceElement -> exception
-                        .append(stackTraceElement.toString())
-                        .append("\n"));
-        exception.append("```");
         slackSessionProvider
                 .slackSession()
                 .sendMessage(channel,
-                        exception.toString());
+                        exception(error));
+    }
+
+    private static final int MAX_EXCEPTION_LENGTH = 15;
+
+    private String exception(Throwable error) {
+        StringBuilder exception = new StringBuilder();
+        exception.append("```");
+        List<StackTraceElement> elements = Arrays.asList(error.getStackTrace());
+        elements
+                .stream()
+                .map(stackTraceElement -> stackTraceElement.toString())
+                .limit(Math.min(MAX_EXCEPTION_LENGTH, elements.size()))
+                .forEach(line -> exception
+                        .append(line)
+                        .append("\n"));
+        if (elements.size() > MAX_EXCEPTION_LENGTH) {
+            exception.append("...\n");
+        }
+        exception.append("```");
+        return exception.toString();
+
     }
 
     private SlackAttachment createHeaderAttachment(Description description,

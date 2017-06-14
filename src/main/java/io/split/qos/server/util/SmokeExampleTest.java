@@ -23,7 +23,8 @@ public class SmokeExampleTest extends QOSTestCase {
         if (count < 3) {
             Assert.fail();
         }
-        System.out.print("FINISHED ONE");
+        throw new IllegalStateException("JAJAJA");
+//        System.out.print("FINISHED ONE");
     }
 
     @Test
@@ -31,5 +32,7 @@ public class SmokeExampleTest extends QOSTestCase {
     @Description("Short description of the test")
     public void testTwo() {
         System.out.print("FINISHED SECOND");
+        throw new IllegalStateException("JAJAJA");
+
     }
 }
