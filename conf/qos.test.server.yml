@@ -4,7 +4,7 @@ config: conf/qos.test.properties
 
 register:
   dashboardURL: URL
-  hostURL: URL
+  hostURL: URL_HOST
 
 test:
   consecutiveFailures: 2
