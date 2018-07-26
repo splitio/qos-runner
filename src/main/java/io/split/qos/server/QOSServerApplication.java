@@ -98,7 +98,12 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
             if (Strings.isNullOrEmpty(register.getDashboardURL())) {
                 throw new IllegalArgumentException("Register was set in yaml, but not property qosDashboardURL");
             }
-            environment.lifecycle().addServerLifecycleListener(new ServiceLyfeListener(this, register.getDashboardURL()));
+            if (!Strings.isNullOrEmpty(register.getHostURL())) {
+                environment.lifecycle().addServerLifecycleListener(new ServiceLyfeListener(this, register.getDashboardURL(), Optional.of(register.getHostURL())));
+            }
+            else{
+                environment.lifecycle().addServerLifecycleListener(new ServiceLyfeListener(this, register.getDashboardURL(), Optional.empty()));
+            }
         }
 
         QOSServerConfiguration.PagerDuty pagerDuty = configuration.getPagerDuty();
@@ -147,14 +152,22 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
 
         private final QOSServerApplication serverApplication;
         private final String dashboardURL;
+        private final Optional<String> hostURL;
 
-        private ServiceLyfeListener(QOSServerApplication serverApplication, String dashboardURL) {
+        private ServiceLyfeListener(QOSServerApplication serverApplication, String dashboardURL, Optional<String> hostURL) {
             this.serverApplication = Preconditions.checkNotNull(serverApplication);
             this.dashboardURL = Preconditions.checkNotNull(dashboardURL);
+            this.hostURL = Preconditions.checkNotNull(hostURL);
         }
+
         @Override
         public void serverStarted(Server server) {
-            serverApplication.register.register(dashboardURL, getRunnerURL(server));
+            if (hostURL.isPresent()) {
+                serverApplication.register.register(dashboardURL, hostURL.get());
+            }
+            else{
+                serverApplication.register.register(dashboardURL, getRunnerURL(server));
+            }
         }
     }
 

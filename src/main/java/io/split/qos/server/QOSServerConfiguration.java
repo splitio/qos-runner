@@ -31,9 +31,16 @@ public class QOSServerConfiguration extends Configuration {
         @NotEmpty
         private String dashboardURL;
 
+        private String hostURL;
+
         @JsonProperty
         public String getDashboardURL() {
             return this.dashboardURL;
+        }
+
+        @JsonProperty
+        public String getHostURL() {
+            return this.hostURL;
         }
     }
 
