@@ -8,8 +8,12 @@ import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
 import io.split.qos.server.modules.QOSServerModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SlackCommandIntegrationImpl implements SlackCommandIntegration {
+    private static final Logger LOG = LoggerFactory.getLogger(SlackCommandIntegrationImpl.class);
+
     private final SlackCommandListener slackCommandListener;
     private final String serverName;
     private final SlackCommandRegisterer register;
@@ -35,8 +39,6 @@ public class SlackCommandIntegrationImpl implements SlackCommandIntegration {
      */
     public void startBotListener() {
         register.register();
-
-
         SlackMessagePostedListener slackMessagePostedListener = (event, session) -> {
             if (isBot(event)) {
                 slackCommandGetter.get(event)

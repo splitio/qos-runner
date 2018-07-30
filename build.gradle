@@ -7,7 +7,7 @@ apply plugin: 'signing'
 
 group = "io.split"
 archivesBaseName = "qosrunner"
-version = "22.3"
+version = "22.4.0"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -45,7 +45,7 @@ dependencies {
     compile 'com.github.dikhan:pagerduty-client:2.0.2', withoutLog
 
     // Common
-    compile 'com.ullink.slack:simpleslackapi:1.2.0', withoutLog
+    compile 'com.ullink.slack:simpleslackapi:0.6.0', withoutLog
     compile 'com.google.inject:guice:4.0'
     compile 'com.google.inject.extensions:guice-assistedinject:4.0'
     compile 'org.mockito:mockito-core:1.9.5'
