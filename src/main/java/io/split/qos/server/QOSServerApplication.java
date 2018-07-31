@@ -51,7 +51,12 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
     private PagerDutyBroadcaster pagerDuty;
 
     public static void main(String[] args) throws Exception {
-        new QOSServerApplication().run(args);
+        try {
+            new QOSServerApplication().run(args);
+        } catch (Throwable t) {
+            LOG.error("QOS Server unpexpectedly exited", t);
+
+        }
     }
 
     @Override
