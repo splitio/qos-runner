@@ -55,4 +55,12 @@ public interface SlackTestResultBroadcaster extends Integration {
      * @param attachment the slack attachment (THIS MEANS IT IS IN IN THE WRONG PLACE)
      */
     void broadcastDigest(String message, SlackAttachment attachment);
+
+    /**
+     * Broadcasts a message to the alert channel.
+     *
+     * @param message the message to send.
+     * @param attachment the slack attachment (THIS MEANS IT IS IN IN THE WRONG PLACE)
+     */
+    void broadcastAlert(String message, SlackAttachment attachment);
 }

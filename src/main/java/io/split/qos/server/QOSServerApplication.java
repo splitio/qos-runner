@@ -51,7 +51,12 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
     private PagerDutyBroadcaster pagerDuty;
 
     public static void main(String[] args) throws Exception {
-        new QOSServerApplication().run(args);
+        try {
+            new QOSServerApplication().run(args);
+        } catch (Throwable t) {
+            LOG.error("QOS Server unpexpectedly exited", t);
+
+        }
     }
 
     @Override
@@ -127,7 +132,10 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
             if (Strings.isNullOrEmpty(slack.getDigestChannel())) {
                 throw new IllegalArgumentException("Slack was set in yaml, but not property digestchannel");
             }
-            provider.initialize(slack.getToken(), slack.getVerboseChannel(), slack.getDigestChannel());
+            if (Strings.isNullOrEmpty(slack.getAlertChannel())) {
+                throw new IllegalArgumentException("Slack was set in yaml, but not property alertchannel");
+            }
+            provider.initialize(slack.getToken(), slack.getVerboseChannel(), slack.getDigestChannel(), slack.getAlertChannel());
         }
 
         QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);

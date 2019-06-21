@@ -23,7 +23,7 @@ public class SmokeExampleTest extends QOSTestCase {
         if (count < 3) {
             Assert.fail();
         }
-        throw new IllegalStateException("JAJAJA");
+        throw new IllegalStateException("HTTP 503 Service Unavailable: Back-end server is at capacity");
 //        System.out.print("FINISHED ONE");
     }
 
@@ -32,7 +32,5 @@ public class SmokeExampleTest extends QOSTestCase {
     @Description("Short description of the test")
     public void testTwo() {
         System.out.print("FINISHED SECOND");
-        throw new IllegalStateException("JAJAJA");
-
     }
 }

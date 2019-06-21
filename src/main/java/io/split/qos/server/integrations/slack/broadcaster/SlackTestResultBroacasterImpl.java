@@ -12,6 +12,8 @@ import org.junit.runner.Description;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Singleton
 public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster {
@@ -29,7 +31,12 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
     @Override
     public void firstFailure(Description description, Throwable error, String serverName, Long duration,
                              Optional<String> titleLink) {
-        broadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, duration, titleLink);
+        if (errorEqualOrGreaterThanFiveHundred(error)) {
+            broadcastFailure(description, error, slackSessionProvider.alertChannel(), serverName, duration, titleLink);
+        }
+        else {
+            broadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, duration, titleLink);
+        }
     }
 
     @Override
@@ -61,6 +68,16 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
                             attachment);
     }
 
+    @Override
+    public void broadcastAlert(String message, SlackAttachment attachment) {
+        slackSessionProvider
+                .slackSession()
+                .sendMessage(
+                        slackSessionProvider.alertChannel(),
+                        message,
+                        attachment);
+    }
+
 
     @Override
     public boolean isEnabled() {
@@ -70,7 +87,12 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
     @Override
     public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure,
                                    Long duration, Optional<String> titleLink) {
-        reBroadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, whenFirstFailure, duration, titleLink);
+        if (errorEqualOrGreaterThanFiveHundred(error)) {
+            reBroadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, whenFirstFailure, duration, titleLink);
+        }
+        else {
+            reBroadcastFailure(description, error, slackSessionProvider.verboseChannel(), serverName, whenFirstFailure, duration, titleLink);
+        }
     }
 
     private void reBroadcastFailure(Description description,
@@ -217,5 +239,12 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
         titleLink
                 .ifPresent(link -> slackAttachment.setTitleLink(link));
         return slackAttachment;
+    }
+
+    private boolean errorEqualOrGreaterThanFiveHundred(Throwable error) {
+        String reason = error.getMessage();
+        Pattern pattern = Pattern.compile("50*");
+
+        return pattern.matcher(reason).find();
     }
 }

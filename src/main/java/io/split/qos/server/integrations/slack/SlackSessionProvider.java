@@ -17,6 +17,7 @@ public class SlackSessionProvider {
     private SlackChannel digestChannel;
     private SlackSession slackSession;
     private SlackChannel verboseChannel;
+    private SlackChannel alertChannel;
 
     /**
      * Initialization of slack connection and slack channels
@@ -27,7 +28,8 @@ public class SlackSessionProvider {
      */
     public synchronized void initialize(String slackBotToken,
                                   String slackVerboseChannel,
-                                  String slackDigestChannel) {
+                                  String slackDigestChannel,
+                                  String slackAlertChannel) {
         if (Strings.isNullOrEmpty(slackBotToken)) {
             LOG.warn("No Slack Bot Token, Slack Integration will not broadcast at all");
         } else {
@@ -49,6 +51,13 @@ public class SlackSessionProvider {
                     slackSession
                             .joinChannel(slackDigestChannel);
                 }
+                alertChannel = slackSession.findChannelByName(slackAlertChannel);
+                if (alertChannel == null) {
+                    throw new IllegalArgumentException("Could not find alert channel " + slackAlertChannel);
+                } else {
+                    slackSession
+                            .joinChannel(slackAlertChannel);
+                }
             } catch (IOException e) {
                 throw new IllegalArgumentException("Could not connect to slack", e);
             }
@@ -65,6 +74,11 @@ public class SlackSessionProvider {
 
     public SlackChannel verboseChannel() {
         return verboseChannel;
+    }
+
+
+    public SlackChannel alertChannel() {
+        return alertChannel;
     }
 
     public String botId() {

@@ -42,6 +42,11 @@ public class SlackTestResultBroadcasterImplForTest implements SlackTestResultBro
     }
 
     @Override
+    public void broadcastAlert(String message, SlackAttachment attachment) {
+
+    }
+
+    @Override
     public boolean isEnabled() {
         return false;
     }
