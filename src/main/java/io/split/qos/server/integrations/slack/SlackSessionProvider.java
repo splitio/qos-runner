@@ -25,6 +25,7 @@ public class SlackSessionProvider {
      * @param slackBotToken auth token for the bot
      * @param slackVerboseChannel name of the verbose channel.
      * @param slackDigestChannel name of the digest channel.
+     * @param slackAlertChannel name of the alert channel.
      */
     public synchronized void initialize(String slackBotToken,
                                   String slackVerboseChannel,
