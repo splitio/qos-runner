@@ -88,10 +88,10 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
     public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure,
                                    Long duration, Optional<String> titleLink) {
         if (errorEqualOrGreaterThanFiveHundred(error)) {
-            reBroadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, whenFirstFailure, duration, titleLink);
+            reBroadcastFailure(description, error, slackSessionProvider.alertChannel(), serverName, whenFirstFailure, duration, titleLink);
         }
         else {
-            reBroadcastFailure(description, error, slackSessionProvider.verboseChannel(), serverName, whenFirstFailure, duration, titleLink);
+            reBroadcastFailure(description, error, slackSessionProvider.digestChannel(), serverName, whenFirstFailure, duration, titleLink);
         }
     }
 

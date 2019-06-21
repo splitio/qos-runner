@@ -12,19 +12,13 @@ import org.junit.Test;
  */
 @Suites("SMOKE_FOR_TEST")
 public class SmokeExampleTest extends QOSTestCase {
-
-    public static int count = 0;
+    
     @Test
     @Title("First Test")
-    @Description("First updates a split, changing the treatments, then kills and restores the split. Always checking that" +
-            "the manager split() method returns accordingly")
+    @Description("Short description of the test")
     public void testOne() {
-        count++;
-        if (count < 3) {
-            Assert.fail();
-        }
-        throw new IllegalStateException("HTTP 503 Service Unavailable: Back-end server is at capacity");
-//        System.out.print("FINISHED ONE");
+        System.out.print("FINISHED ONE");
+        throw new IllegalStateException("Server returned HTTP response code: 502 for URL");
     }
 
     @Test
@@ -32,5 +26,6 @@ public class SmokeExampleTest extends QOSTestCase {
     @Description("Short description of the test")
     public void testTwo() {
         System.out.print("FINISHED SECOND");
+        throw new IllegalStateException("HTTP 503 Service Unavailable: Back-end server is at capacity");
     }
 }
