@@ -93,6 +93,14 @@ public class QOSServerConfiguration extends Configuration {
         public String getDigestChannel() {
             return this.digestChannel;
         }
+
+        @NotEmpty
+        private String alertChannel;
+
+        @JsonProperty
+        public String getAlertChannel() {
+            return this.alertChannel;
+        }
     }
 
     public Test test;
