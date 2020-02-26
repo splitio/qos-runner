@@ -7,9 +7,9 @@ apply plugin: 'signing'
 
 group = "io.split"
 archivesBaseName = "qosrunner"
-version = "22.4.1"
+version = "22.4.3"
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_11
 
 dependencies {
     def withoutLog = {
@@ -54,6 +54,8 @@ dependencies {
     compile 'commons-lang:commons-lang:2.6' 
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.code.gson:gson:2.8.0'
+    compile 'javax.xml.bind:jaxb-api:2.3.0'
+    compile 'javax.activation:activation:1.1'
 
 }
 
@@ -89,13 +91,14 @@ publishing {
             }
             artifact javadocJar {
                 classifier "javadoc"
-            }    
+            }
         }
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+wrapper {
+    gradleVersion = '6.1.1'
+    distributionUrl = distributionUrl.replace("bin", "all")
 }
 
 repositories {
