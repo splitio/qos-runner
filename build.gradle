@@ -39,24 +39,23 @@ dependencies {
     testCompile 'io.dropwizard:dropwizard-testing:1.1.0', withoutLog
 
     //Method and Suite
-    compile 'com.beust:jcommander:1.48'
+    compile 'com.beust:jcommander:1.47'
 
     // PagerDuty Integration
     compile 'com.github.dikhan:pagerduty-client:2.0.2', withoutLog
 
     // Common
     compile 'com.ullink.slack:simpleslackapi:0.6.0', withoutLog
-    compile 'com.google.inject:guice:4.0'
+    compile 'com.google.inject:guice:4.2.2'
     compile 'com.google.inject.extensions:guice-assistedinject:4.0'
     compile 'org.mockito:mockito-core:1.9.5'
     compile 'org.hamcrest:hamcrest-all:1.3'
     compile 'junit:junit:4.12'
     compile 'commons-lang:commons-lang:2.6' 
-    compile 'com.google.guava:guava:19.0'
+    compile 'com.google.guava:guava:23.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'javax.xml.bind:jaxb-api:2.3.0'
     compile 'javax.activation:activation:1.1'
-
 }
 
 configurations.all {
