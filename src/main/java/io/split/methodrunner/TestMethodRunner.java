@@ -99,7 +99,7 @@ public class TestMethodRunner implements Callable<List<TestResult>> {
         for (int index = 0; index < this.quantity; index++) {
             Util.pause(Util.getRandom(500, 2000));
             ListenableFuture<TestResult> future = executor.submit(testRunnerFactory.create(method, Optional.of(String.valueOf(index))));
-            Futures.addCallback(future, createCallback(method));
+            Futures.addCallback(future, createCallback(method), executor);
         }
         executor.awaitTermination(timeoutInMinutes, TimeUnit.MINUTES);
         LOG.info(String.format("FINISHED TestMethodRunner %s in %s", testId.testName(), Util.TO_PRETTY_FORMAT.apply(System.currentTimeMillis() - start)));
