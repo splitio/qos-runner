@@ -171,7 +171,8 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                     method,
                     delayBetweenInSeconds,
                     delayBetweenInSecondsWhenFail,
-                    delayBetweenInSeconds));
+                    delayBetweenInSeconds),
+                    executor);
             schedule += step;
         }
         return  methodsToTest;
@@ -205,7 +206,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                             triggerAgain,
                             TimeUnit.SECONDS);
                     tracker.track(method, runner, future);
-                    Futures.addCallback(future, createCallback(method, afterFirst, ifFailed, afterFirst));
+                    Futures.addCallback(future, createCallback(method, afterFirst, ifFailed, afterFirst), executor);
                 }
                 processOutput(result.getOut());
             }
@@ -319,7 +320,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                         0,
                         TimeUnit.SECONDS);
                 tracker.track(track.method(), runner, future);
-                Futures.addCallback(future, createCallback(track.method(), schedule, delayBetweenInSecondsWhenFail, delayBetweenInSeconds));
+                Futures.addCallback(future, createCallback(track.method(), schedule, delayBetweenInSecondsWhenFail, delayBetweenInSeconds), executor);
                 schedule += step;
             }
             running.add(track.method());

@@ -90,7 +90,7 @@ public class TestSuiteRunner implements Callable<List<TestResult>> {
                             totalTests++;
                             Util.pause(Util.getRandom(500, 2000));
                             ListenableFuture<TestResult> future = executor.submit(testRunnerFactory.create(method, Optional.empty()));
-                            Futures.addCallback(future, createCallback(method));
+                            Futures.addCallback(future, createCallback(method), executor);
                         }));
         LOG.info(String.format("Total tests running: %s", totalTests));
         executor.awaitTermination(timeoutInMinutes, TimeUnit.MINUTES);
