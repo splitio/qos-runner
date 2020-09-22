@@ -12,6 +12,10 @@ test:
 pagerDuty:
   serviceKey: KEY
 
+datadog:
+  host: "localhost"
+  port: 8125
+
 server:
   type: simple
   applicationContextPath: /api
