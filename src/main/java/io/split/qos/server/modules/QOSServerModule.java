@@ -8,6 +8,8 @@ import com.google.inject.name.Names;
 import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.failcondition.SimpleFailCondition;
+import io.split.qos.server.integrations.datadog.DatadogBroadcaster;
+import io.split.qos.server.integrations.datadog.DatadogBroadcasterImpl;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcasterImpl;
 import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroacasterImpl;
@@ -50,6 +52,7 @@ public class QOSServerModule extends AbstractModule {
         bind(SlackTestResultBroadcaster.class).to(SlackTestResultBroacasterImpl.class);
         bind(SlackCommandListener.class).to(SlackCommandListenerImpl.class);
         bind(PagerDutyBroadcaster.class).to(PagerDutyBroadcasterImpl.class);
+        bind(DatadogBroadcaster.class).to(DatadogBroadcasterImpl.class);
         bindConstant()
                 .annotatedWith(Names.named(QOS_SERVER_NAME))
                 .to(serverName);
