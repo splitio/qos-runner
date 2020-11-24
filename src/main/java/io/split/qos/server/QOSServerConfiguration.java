@@ -113,6 +113,31 @@ public class QOSServerConfiguration extends Configuration {
 
     }
 
+    public Datadog datadog;
+
+    @JsonProperty
+    public Datadog getDatadog() {
+        return datadog;
+    }
+
+    public static class Datadog {
+        @NotEmpty
+        private String host;
+
+        @JsonProperty
+        public String getHost() {
+            return this.host;
+        }
+
+        @NotEmpty
+        private int port;
+
+        @JsonProperty
+        public Integer getPort() {
+            return this.port;
+        }
+    }
+
     //Comma separated list of configs.
     @JsonProperty
     public String getConfig() {

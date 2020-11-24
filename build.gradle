@@ -59,9 +59,9 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'javax.xml.bind:jaxb-api:2.3.0'
     compile 'javax.activation:activation:1.1'
+    compile 'com.datadoghq:java-dogstatsd-client:2.10.3'
     compile 'javax.websocket:javax.websocket-api:1.1'
     compile 'org.glassfish.tyrus.bundles:tyrus-standalone-client:1.13.1'
-
     extraLibs group:'com.ullink.slack',name:'simpleslackapi',version:'1.2.1'
     configurations.compile.extendsFrom(configurations.extraLibs)
 }

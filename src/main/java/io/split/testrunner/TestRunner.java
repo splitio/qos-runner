@@ -9,6 +9,7 @@ import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.FailWith;
 import io.split.qos.server.failcondition.SimpleFailCondition;
+import io.split.qos.server.integrations.datadog.DatadogBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSCommonModule;
@@ -95,7 +96,8 @@ public class TestRunner extends BlockJUnit4ClassRunner {
                         QOSServerApplication.injector.getInstance(QOSStories.class),
                         QOSServerApplication.injector.getInstance(TestsFinder.class),
                         QOSServerApplication.injector.getInstance(PagerDutyBroadcaster.class),
-                        QOSServerApplication.injector.getInstance(QOSServerConfiguration.class)));
+                        QOSServerApplication.injector.getInstance(QOSServerConfiguration.class),
+                        QOSServerApplication.injector.getInstance(DatadogBroadcaster.class)));
             }
         }
         modules.add(getFailCondition(theClass));

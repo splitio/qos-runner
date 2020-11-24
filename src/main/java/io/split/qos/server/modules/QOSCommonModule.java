@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.QOSServerState;
+import io.split.qos.server.integrations.datadog.DatadogBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.stories.QOSStories;
@@ -25,19 +26,22 @@ public class QOSCommonModule extends AbstractModule {
     private final TestsFinder testFinder;
     private final PagerDutyBroadcaster pagetDuty;
     private final QOSServerConfiguration configuration;
+    private final DatadogBroadcaster datadogBroadcaster;
 
     public QOSCommonModule(SlackSessionProvider slackSessionProvider,
                            QOSServerState serverState,
                            QOSStories stories,
                            TestsFinder testsFinder,
                            PagerDutyBroadcaster pagerDutyBroadcaster,
-                           QOSServerConfiguration configuration) {
+                           QOSServerConfiguration configuration,
+                           DatadogBroadcaster datadogBroadcaster) {
         this.slackSessionProvider = Preconditions.checkNotNull(slackSessionProvider);
         this.state = Preconditions.checkNotNull(serverState);
         this.stories = Preconditions.checkNotNull(stories);
         this.testFinder = Preconditions.checkNotNull(testsFinder);
         this.pagetDuty = Preconditions.checkNotNull(pagerDutyBroadcaster);
         this.configuration = Preconditions.checkNotNull(configuration);
+        this.datadogBroadcaster = Preconditions.checkNotNull(datadogBroadcaster);
     }
 
     @Override
@@ -48,5 +52,6 @@ public class QOSCommonModule extends AbstractModule {
         bind(TestsFinder.class).toInstance(testFinder);
         bind(PagerDutyBroadcaster.class).toInstance(pagetDuty);
         bind(QOSServerConfiguration.class).toInstance(configuration);
+        bind(DatadogBroadcaster.class).toInstance(datadogBroadcaster);
     }
 }

@@ -11,6 +11,7 @@ import com.google.inject.name.Names;
 import io.dropwizard.Application;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Environment;
+import io.split.qos.server.integrations.datadog.DatadogBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSPropertiesModule;
@@ -49,6 +50,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
     private String name;
     public QOSRegister register;
     private PagerDutyBroadcaster pagerDuty;
+    private DatadogBroadcaster datadog;
 
     public static void main(String[] args) throws Exception {
         try {
@@ -118,6 +120,19 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
                 throw new IllegalArgumentException("PagerDuty was set in yaml, but not property serviceKey");
             }
             this.pagerDuty.initialize(pagerDuty.getServiceKey(), name);
+        }
+
+        QOSServerConfiguration.Datadog datadog = configuration.getDatadog();
+        if (datadog != null) {
+            this.datadog = injector.getInstance(DatadogBroadcaster.class);
+            QOSServerState serverState = injector.getInstance(QOSServerState.class);
+            if (Strings.isNullOrEmpty(datadog.getHost())) {
+                throw new IllegalArgumentException("Datadog was set in yaml, but not property host was set");
+            }
+            if (datadog.getPort() == null) {
+                throw new IllegalArgumentException("Datadog was set in yaml, but not property port was set");
+            }
+            this.datadog.initialize(serverState, datadog.getHost(), datadog.getPort(), name);
         }
 
         QOSServerConfiguration.Slack slack = configuration.getSlack();

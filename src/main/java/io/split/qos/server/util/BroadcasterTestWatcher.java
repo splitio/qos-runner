@@ -9,6 +9,7 @@ import io.split.qos.server.QOSServerApplication;
 import io.split.qos.server.QOSServerState;
 import io.split.qos.server.failcondition.Broadcast;
 import io.split.qos.server.failcondition.FailCondition;
+import io.split.qos.server.integrations.datadog.DatadogBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadcaster;
 import io.split.testrunner.util.GuiceInitializator;
@@ -51,7 +52,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
     @Override
     protected void succeeded(Description description) {
         if (GuiceInitializator.isQos()) {
-            SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
+            SlackTestResultBroadcaster slackBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
             Long length = null;
             state.testSucceeded(description);
             TestId testId = TestId.fromDescription(description);
@@ -59,12 +60,14 @@ public class BroadcasterTestWatcher extends TestWatcher {
                 length = System.currentTimeMillis() - started.get(testId);
             }
             Broadcast broadcast = failCondition.success(testId);
-            if (resultBroadcaster.isEnabled()) {
+            if (slackBroadcaster.isEnabled()) {
                 if (Broadcast.RECOVERY.equals(broadcast)) {
-                    resultBroadcaster.recovery(description, serverName, length, titleLink);
+                    slackBroadcaster.recovery(description, serverName, length, titleLink);
                 }
-                resultBroadcaster.success(description, serverName, length, titleLink);
+                slackBroadcaster.success(description, serverName, length, titleLink);
             }
+
+            // Pagerduty
             PagerDutyBroadcaster pagerDuty = QOSServerApplication.injector.getInstance(PagerDutyBroadcaster.class);
             if (pagerDuty.isEnabled()) {
                 if (Broadcast.RECOVERY.equals(broadcast)) {
@@ -75,6 +78,16 @@ public class BroadcasterTestWatcher extends TestWatcher {
                     }
                 }
             }
+
+            // Datadog
+            DatadogBroadcaster datadog = QOSServerApplication.injector.getInstance(DatadogBroadcaster.class);
+            if (datadog.isEnabled()) {
+                if (Broadcast.RECOVERY.equals(broadcast)) {
+                    datadog.recovery(description, serverName, length, titleLink);
+                }
+                datadog.success(description, serverName, length, titleLink);
+            }
+
         }
     }
 
@@ -86,6 +99,8 @@ public class BroadcasterTestWatcher extends TestWatcher {
             if (started.get(testId) != null) {
                 length = System.currentTimeMillis() - started.get(testId);
             }
+
+            // Slack
             Broadcast broadcast = failCondition.failed(testId);
             SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
             if (resultBroadcaster.isEnabled()) {
@@ -97,6 +112,8 @@ public class BroadcasterTestWatcher extends TestWatcher {
                     resultBroadcaster.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
                 }
             }
+
+            // Pagerduty
             PagerDutyBroadcaster pagerDuty = QOSServerApplication.injector.getInstance(PagerDutyBroadcaster.class);
             if (pagerDuty.isEnabled()) {
                 if (Broadcast.FIRST.equals(broadcast)) {
@@ -105,6 +122,17 @@ public class BroadcasterTestWatcher extends TestWatcher {
                     } catch (Exception failed) {
                         LOG.error(String.format("Failed to trigger pager duty for test %s", testId), failed);
                     }
+                }
+            }
+
+            // Datadog
+            DatadogBroadcaster datadog = QOSServerApplication.injector.getInstance(DatadogBroadcaster.class);
+            if (resultBroadcaster.isEnabled()) {
+                if (Broadcast.FIRST.equals(broadcast)) {
+                    datadog.firstFailure(description, e, serverName, length, titleLink);
+                }
+                if (Broadcast.REBROADCAST.equals(broadcast)) {
+                    datadog.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
                 }
             }
         }
