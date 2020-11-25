@@ -9,6 +9,7 @@ import com.google.inject.name.Names;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.testrunner.util.GuiceInitializator;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,6 +46,7 @@ public class TestRunnerPropertiesModuleTest {
     }
 
     @Test
+    @Ignore
     public void testWithExistent() throws IOException {
         File conf = temporaryFolder.newFile("conf");
         BufferedWriter output = new BufferedWriter(new FileWriter(conf.getAbsolutePath(), true));

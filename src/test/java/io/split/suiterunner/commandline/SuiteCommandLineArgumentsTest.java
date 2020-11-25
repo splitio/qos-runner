@@ -16,7 +16,7 @@ public class SuiteCommandLineArgumentsTest {
     @Test
     public void testNoArguments() {
         expectedException.expect(ParameterException.class);
-        expectedException.expectMessage("The following options are required: -suitesPackage -suites -confs");
+        expectedException.expectMessage("The following options are required: [-suitesPackage], [-suites], [-confs]");
         String[] arguments = { };
         SuiteCommandLineArguments.initialize(arguments);
     }
