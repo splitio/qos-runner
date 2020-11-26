@@ -25,16 +25,19 @@ public class QOSRegister {
     private final ScheduledExecutorService executor;
     private final HttpPoster poster;
     private final String serverName;
+    private final String teamName;
     private final SlackSessionProvider slackSessionProvider;
 
     @Inject
     public QOSRegister(HttpPoster poster,
                        SlackSessionProvider slackSessionProvider,
-                       @Named(QOSServerModule.QOS_SERVER_NAME) String serverName) {
+                       @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
+                       @Named(QOSServerModule.TEAM_NAME) String teamName) {
         this.executor = Executors.newSingleThreadScheduledExecutor();
         this.poster = Preconditions.checkNotNull(poster);
         this.slackSessionProvider = Preconditions.checkNotNull(slackSessionProvider);
         this.serverName = Preconditions.checkNotNull(serverName);
+        this.teamName = Preconditions.checkNotNull(teamName);
     }
 
     public void register(String qosDashboardURL, String qosRunnerURL) {
@@ -45,7 +48,8 @@ public class QOSRegister {
                 apiURL.toString(),
                 slackSessionProvider.isEnabled() ?
                     slackSessionProvider.slackSession().sessionPersona().getUserName() :
-                    "NO_SLACK");
+                    "NO_SLACK",
+                teamName);
         executor.scheduleAtFixedRate(new Register(registerURL, poster, dto), 0, 1, TimeUnit.MINUTES);
     }
 
