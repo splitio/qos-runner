@@ -13,11 +13,19 @@ public class QOSServerConfiguration extends Configuration {
     private String serverName;
 
     @NotEmpty
+    private String teamName;
+
+    @NotEmpty
     private String config;
 
     @JsonProperty
     public String getServerName() {
         return serverName;
+    }
+
+    @JsonProperty
+    public String getTeamName() {
+        return teamName;
     }
 
     public Register register;
