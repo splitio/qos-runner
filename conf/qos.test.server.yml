@@ -1,4 +1,5 @@
 serverName: qos-server
+teamName: SDK
 
 config: conf/qos.test.properties
 
