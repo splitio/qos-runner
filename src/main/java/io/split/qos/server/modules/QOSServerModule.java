@@ -29,15 +29,18 @@ import io.split.testrunner.junit.JUnitRunnerFactory;
  */
 public class QOSServerModule extends AbstractModule {
     private final String serverName;
+    private final String teamName;
 
     // Server Name
     // Default QOS Server
     public static final String QOS_SERVER_NAME = "QOS_SERVER_NAME";
+    public static final String TEAM_NAME = "TEAM_NAME";
     private final QOSServerConfiguration configuration;
 
     public QOSServerModule(QOSServerConfiguration configuration) {
         this.configuration = Preconditions.checkNotNull(configuration);
         this.serverName = Preconditions.checkNotNull(configuration.getServerName());
+        this.teamName = Preconditions.checkNotNull(configuration.getTeamName());
     }
 
     @Override
@@ -56,6 +59,9 @@ public class QOSServerModule extends AbstractModule {
         bindConstant()
                 .annotatedWith(Names.named(QOS_SERVER_NAME))
                 .to(serverName);
+        bindConstant()
+                .annotatedWith(Names.named(TEAM_NAME))
+                .to(teamName);
         bind(QOSServerConfiguration.class).toInstance(configuration);
         // HACK. Since we need the server for the tests (for broadcasting) and the tests use a complete different
         // Injector, we use static variables to communicate.

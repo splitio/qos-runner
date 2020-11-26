@@ -7,7 +7,7 @@ apply plugin: 'signing'
 
 group = "io.split"
 archivesBaseName = "qosrunner"
-version = "22.4.4"
+version = "22.4.6"
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = 11
@@ -26,7 +26,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
     }
 
-    implementation 'io.split:qosdtos:1.8'
+    implementation(group: 'io.split', name: 'qos-dtos', version: '1.9')
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
     implementation 'org.slf4j:jul-to-slf4j:1.7.30'

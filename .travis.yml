@@ -1,0 +1,17 @@
+dist: xenial
+
+language: java
+
+jdk:
+  - openjdk11
+
+before_install:
+  - wget --quiet https://services.gradle.org/distributions/gradle-6.7-bin.zip
+  - unzip -qq gradle-6.7-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-6.7
+  - export PATH=$GRADLE_HOME/bin:$PATH
+
+install: true
+
+script:
+  - gradle build -x test
