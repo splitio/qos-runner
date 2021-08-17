@@ -9,7 +9,10 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import io.dropwizard.Application;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.split.qos.server.integrations.datadog.DatadogBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
@@ -59,6 +62,18 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
             LOG.error("QOS Server unpexpectedly exited", t);
 
         }
+    }
+
+    @Override
+    public void initialize(Bootstrap<QOSServerConfiguration> bootstrap) {
+        // Enable variable substitution with environment variables
+        bootstrap.setConfigurationSourceProvider(
+                new SubstitutingSourceProvider(
+                        bootstrap.getConfigurationSourceProvider(),
+                        new EnvironmentVariableSubstitutor(false)
+                )
+        );
+        super.initialize(bootstrap);
     }
 
     @Override
