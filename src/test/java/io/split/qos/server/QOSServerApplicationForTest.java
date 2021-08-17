@@ -8,6 +8,9 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import io.dropwizard.Application;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.modules.QOSFailWithModule;
@@ -39,6 +42,18 @@ public class QOSServerApplicationForTest extends Application<QOSServerConfigurat
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void initialize(Bootstrap<QOSServerConfigurationForTest> bootstrap) {
+        // Enable variable substitution with environment variables
+        bootstrap.setConfigurationSourceProvider(
+                new SubstitutingSourceProvider(
+                        bootstrap.getConfigurationSourceProvider(),
+                        new EnvironmentVariableSubstitutor(false)
+                )
+        );
+        super.initialize(bootstrap);
     }
 
     @Override
