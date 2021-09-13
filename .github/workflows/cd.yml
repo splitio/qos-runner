@@ -1,0 +1,38 @@
+name: cd
+on:
+  push:
+    branches:
+      - master
+jobs:
+  maven-install:
+    name: Maven install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Prepare gradle properties
+        run: |
+          mkdir -p ~/.gradle/
+          echo "artifactoryUser=${{ secrets.ARTIFACTORY_USER }}" >> ~/.gradle/gradle.properties
+          echo "artifactoryPassword=${{ secrets.ARTIFACTORY_TOKEN }}" >> ~/.gradle/gradle.properties
+
+      - name: Gradle build
+        uses: gradle/gradle-build-action@v1
+        with:
+          configuration-cache-key: ~/.gradle/gradle.properties
+          gradle-version: 6.7
+          arguments: build -x test
+
+      - name: Gradle publish
+        uses: gradle/gradle-build-action@v1
+        with:
+          configuration-cache-key: ~/.gradle/gradle.properties
+          gradle-version: 6.7
+          arguments: publish
