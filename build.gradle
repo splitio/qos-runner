@@ -1,9 +1,9 @@
 projects {
-    apply plugin: 'idea'
     apply plugin: 'eclipse'
+    apply plugin: 'idea'
     apply plugin: 'java'
-    apply plugin: 'signing'
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 }
 
 dependencies {
@@ -29,7 +29,7 @@ dependencies {
     implementation 'io.dropwizard:dropwizard-core:2.0.0', withoutLog
     implementation 'io.dropwizard:dropwizard-client:2.0.0', withoutLog
     implementation 'io.dropwizard:dropwizard-forms:2.0.0', withoutLog
-    implementation 'io.dropwizard:dropwizard-testing:2.0.0', withoutLog
+    testImplementation 'io.dropwizard:dropwizard-testing:2.0.0', withoutLog
 
     // Method and Suite
     implementation 'com.beust:jcommander:1.78'
