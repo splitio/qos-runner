@@ -7,7 +7,7 @@
 *.jar
 !common/libs/*.jar
 !selenium/selenium-server-standalone*.jar
-!allure-report/aspectjweaver.jar 
+!allure-report/aspectjweaver.jar
 !diffy/diffy-server.jar
 *.war
 *.ear

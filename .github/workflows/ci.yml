@@ -5,28 +5,24 @@ on:
       - master
 
 jobs:
-  build-and-test:
-    name: Build and test
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup JDK
+      - name: Setup JDK 11
         uses: actions/setup-java@v2
         with:
-          distribution: 'adopt'
           java-version: '11'
+          distribution: 'adopt'
 
-      - name: Prepare gradle properties
-        run: |
-          mkdir -p ~/.gradle/
-          echo "artifactoryUser=${{ secrets.ARTIFACTORY_USER }}" >> ~/.gradle/gradle.properties
-          echo "artifactoryPassword=${{ secrets.ARTIFACTORY_TOKEN }}" >> ~/.gradle/gradle.properties
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
 
-      - name: Gradle build
-        uses: gradle/gradle-build-action@v1
-        with:
-          configuration-cache-key: ~/.gradle/gradle.properties
-          gradle-version: 6.7
-          arguments: build -x test
+      - name: Build
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+        run: ./gradlew build
