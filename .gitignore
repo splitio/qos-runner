@@ -27,6 +27,3 @@ hs_err_pid*
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
-.gradle/
-build/
-/out/
