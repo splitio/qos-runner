@@ -2,7 +2,6 @@ package io.split.qos.server.integrations.slack;
 
 import com.google.common.base.Strings;
 import com.google.inject.Singleton;
-import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import org.slf4j.Logger;
@@ -14,9 +13,9 @@ import java.io.IOException;
 public class SlackSessionProvider {
     private static final Logger LOG = LoggerFactory.getLogger(SlackSessionProvider.class);
 
-    private SlackChannel digestChannel;
+    private String digestChannel;
     private SlackSession slackSession;
-    private SlackChannel verboseChannel;
+    private String verboseChannel;
 
     /**
      * Initialization of slack connection and slack channels
@@ -24,32 +23,31 @@ public class SlackSessionProvider {
      * @param slackBotToken auth token for the bot
      * @param slackVerboseChannel name of the verbose channel.
      * @param slackDigestChannel name of the digest channel.
+     * @param serverName name of the server.
      */
     public synchronized void initialize(String slackBotToken,
                                   String slackVerboseChannel,
-                                  String slackDigestChannel) {
+                                  String slackDigestChannel,
+                                  String serverName) {
         if (Strings.isNullOrEmpty(slackBotToken)) {
             LOG.warn("No Slack Bot Token, Slack Integration will not broadcast at all");
         } else {
             try {
+//                SlackBolt.startSlackServer(serverName);
+
                 slackSession = SlackSessionFactory
                         .createWebSocketSlackSession(slackBotToken);
                 slackSession.connect();
-                verboseChannel = slackSession.findChannelByName(slackVerboseChannel);
+                verboseChannel = slackVerboseChannel;
                 if (verboseChannel == null) {
                     throw new IllegalArgumentException("Could not find verbose channel " + slackVerboseChannel);
-                } else {
-                    slackSession
-                    .joinChannel(slackVerboseChannel);
                 }
-                digestChannel = slackSession.findChannelByName(slackDigestChannel);
+
+                digestChannel = slackDigestChannel;
                 if (digestChannel == null) {
                     throw new IllegalArgumentException("Could not find digest channel " + slackDigestChannel);
-                } else {
-                    slackSession
-                            .joinChannel(slackDigestChannel);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new IllegalArgumentException("Could not connect to slack", e);
             }
         }
@@ -59,13 +57,11 @@ public class SlackSessionProvider {
         return slackSession;
     }
 
-    public SlackChannel digestChannel() {
+    public String digestChannel() {
         return digestChannel;
     }
 
-    public SlackChannel verboseChannel() {
-        return verboseChannel;
-    }
+    public String verboseChannel() { return verboseChannel; }
 
     public String botId() {
         if (slackSession != null && slackSession.sessionPersona() != null) {

@@ -25,7 +25,7 @@ jobs:
         env:
           ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
           ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
-        run: ./gradlew build
+        run: ./gradlew fatjar
 
       - name: Publish
         env:

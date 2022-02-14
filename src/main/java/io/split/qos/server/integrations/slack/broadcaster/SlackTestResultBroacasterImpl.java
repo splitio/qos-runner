@@ -3,8 +3,10 @@ package io.split.qos.server.integrations.slack.broadcaster;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.slack.api.model.block.composition.MarkdownTextObject;
+import com.slack.api.model.block.composition.PlainTextObject;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
-import com.ullink.slack.simpleslackapi.SlackChannel;
+import io.split.qos.server.integrations.slack.SlackBolt;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.testrunner.util.DateFormatter;
 import org.junit.runner.Description;
@@ -12,6 +14,11 @@ import org.junit.runner.Description;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static com.slack.api.model.block.Blocks.*;
+import static com.slack.api.model.block.Blocks.section;
+import static com.slack.api.model.block.composition.BlockCompositions.markdownText;
+import static com.slack.api.model.block.composition.BlockCompositions.plainText;
 
 @Singleton
 public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster {
@@ -44,21 +51,12 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
 
     @Override
     public void broadcastVerbose(String message, SlackAttachment attachment) {
-        slackSessionProvider.slackSession()
-                    .sendMessage(
-                            slackSessionProvider.verboseChannel(),
-                            message,
-                            attachment);
+        SlackBolt.sendMessage(message, slackSessionProvider.verboseChannel());
     }
 
     @Override
     public void broadcastDigest(String message, SlackAttachment attachment) {
-        slackSessionProvider
-                .slackSession()
-                    .sendMessage(
-                            slackSessionProvider.digestChannel(),
-                            message,
-                            attachment);
+        SlackBolt.sendMessage(message,slackSessionProvider.digestChannel());
     }
 
 
@@ -75,110 +73,88 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
 
     private void reBroadcastFailure(Description description,
                                     Throwable error,
-                                    SlackChannel channel,
+                                    String channel,
                                     String serverName,
                                     Long whenFirstFailure,
                                     Long duration,
                                     Optional<String> titleLink) {
-        String text = String.format("%s#%s finished in %s",
-                                        description.getClassName(),
-                                        description.getMethodName(),
-                                        dateFormatter.formatHour(duration));
-        String title = String.format("[%s] KEEPS FAILING SINCE %s",
-                                            serverName.toUpperCase(),
-                                            dateFormatter.formatDate(whenFirstFailure));
 
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor("danger");
-        titleLink.ifPresent(link -> slackAttachment.setTitleLink(link));
-
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(channel,
-                        "",
-                        slackAttachment);
-
-        title = "Reason";
-        text = error.getMessage();
-        SlackAttachment reason = new SlackAttachment(title, "", text, null);
-        reason
-                .setColor("warning");
-
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(channel,
-                        "",
-                        reason);
-
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(channel,
-                        exception(error));
-
+        SlackBolt.sendMessage(asBlocks(
+                // Header
+                header( header -> header.text(
+                        getHeader(serverName, " :x: KEEPS FAILING SINCE", dateFormatter.formatDate(whenFirstFailure)))
+                ),
+                // Test name and duration
+                section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration)))
+                ),
+                divider(),
+                // Reason of the failure
+                section(section -> section.text(markdownText(mt -> mt.text(
+                        "*REASON* \n "+error.getMessage())))
+                ),
+                // Stacktrace
+                section(section -> section.text(markdownText(mt -> mt.text(
+                        "*STACKTRACE* "+ exception(error))))
+                )
+        ), channel);
     }
 
     private void broadcastRecovery(Description description,
                                    String serverName,
                                    Long duration,
                                    Optional<String> titleLink) {
-        String text = String.format("%s#%s finished in %s", description.getClassName(), description.getMethodName(),
-                dateFormatter.formatHour(duration));
-        String title = String.format("[%s] RECOVERED", serverName.toUpperCase());
-
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor("good");
-        titleLink.ifPresent(link -> slackAttachment.setTitleLink(link));
-
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(
-                        slackSessionProvider.digestChannel(),
-                        "",
-                        slackAttachment);
-
+        SlackBolt.sendMessage(
+                asBlocks(
+                        // Header
+                        section(section -> section.text(getHeader(serverName,":white_check_mark: RECOVERED", " "))
+                        ),
+                        // Test name and duration
+                        section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration)))
+                        ))
+                ,slackSessionProvider.verboseChannel()
+        );
     }
 
     private void broadcastSuccess(Description description,
                                   String serverName,
                                   Long duration,
                                   Optional<String> titleLink) {
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(
-                        slackSessionProvider.verboseChannel(),
-                        "",
-                        createHeaderAttachment(description, true, serverName, duration, titleLink));
+        SlackBolt.sendMessage(
+            asBlocks(
+                // Header
+                section(section -> section.text(getHeader(serverName,":white_check_mark: SUCCEEDED", " "))
+                ),
+                // Test name and duration
+                section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration))))
+            )
+            ,slackSessionProvider.verboseChannel()
+        );
     }
 
     private void broadcastFailure(Description description,
                                   Throwable error,
-                                  SlackChannel channel,
+                                  String channel,
                                   String serverName,
                                   Long duration,
                                   Optional<String> titleLink) {
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(channel,
-                        "",
-                        createHeaderAttachment(description, false, serverName, duration, titleLink));
-
-        String title = "Reason";
-        String text = error.getMessage();
-        SlackAttachment reason = new SlackAttachment(title, "", text, null);
-        reason
-                .setColor("warning");
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(channel,
-                        "",
-                        reason);
-
-        slackSessionProvider
-                .slackSession()
-                .sendMessage(channel,
-                        exception(error));
+        SlackBolt.sendMessage(asBlocks(
+                // Header
+                header( header -> header.text(
+                        getHeader(serverName, ":x: FAILED", " "))
+                ),
+                // Test name and description
+                section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration)))
+                ),
+                divider(),
+                // Reason of the failure
+                section(section -> section.text(markdownText(mt -> mt.text(
+                        "*REASON* \n "+error.getMessage())))
+                ),
+                // Stacktrace
+                section(section -> section.text(markdownText(mt -> mt.text(
+                        "*STACKTRACE* "+ exception(error))))
+                )
+        ), channel);
     }
 
     private static final int MAX_EXCEPTION_LENGTH = 15;
@@ -202,20 +178,22 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
 
     }
 
-    private SlackAttachment createHeaderAttachment(Description description,
-                                                   boolean succeeded,
-                                                   String serverName,
-                                                   Long duration,
-                                                   Optional<String> titleLink) {
-        String text = String.format("%s#%s finished in %s", description.getClassName(), description.getMethodName(),
-                dateFormatter.formatHour(duration));
-        String title = String.format("[%s] %s", serverName.toUpperCase(), succeeded ? "SUCCEEDED" : "FAILED");
-
-        SlackAttachment slackAttachment = new SlackAttachment(title, "", text, null);
-        slackAttachment
-                .setColor(succeeded ? "good" : "danger");
-        titleLink
-                .ifPresent(link -> slackAttachment.setTitleLink(link));
-        return slackAttachment;
+    // Format the header string as a plan text with emoji visibility as true
+    private PlainTextObject getHeader(String serverName, String message, String date){
+        return plainText(pt -> pt.emoji(true).text(
+                String.format("[%s] %s %s",
+                        serverName.toUpperCase(),
+                        message,
+                        date
+                )));
+    }
+    // Returns the string formated with the test name and duration
+    private MarkdownTextObject getTestName(Description description, String date) {
+        return markdownText(mt -> mt.text(
+                String.format("%s#%s finished in %s",
+                        description.getClassName(),
+                        description.getMethodName(),
+                        date
+                )));
     }
 }

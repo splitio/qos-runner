@@ -37,8 +37,14 @@ dependencies {
     // PagerDuty Integration
     implementation 'com.github.dikhan:pagerduty-client:2.0.2', withoutLog
 
-    // Common
+    // Slack
+    implementation("com.slack.api:bolt:1.1.+")
+    implementation('com.slack.api:bolt-servlet:1.1.+')
+    implementation('com.slack.api:bolt-jetty:1.1.+')
     implementation files ('libs/simpleslackapi-1.2.1.jar')
+
+
+    // Common
     implementation(group: 'com.google.guava', name: 'guava', version: '19.0')
     implementation 'com.google.inject:guice:4.2.2'
     implementation 'com.google.inject.extensions:guice-assistedinject:4.0'
@@ -98,7 +104,7 @@ task javadocJar(type: Jar, dependsOn: javadocTask) {
 }
 
 task fatJar(type: Jar) {
-    from { configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
