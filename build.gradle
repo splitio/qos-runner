@@ -122,7 +122,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             version = project.version
-            from components.java
+            artifact fatJar
             pom {
                 name = 'qos-runner'
                 description = 'QOS runner'
