@@ -3,6 +3,7 @@ package io.split.qos.server.integrations.slack;
 import com.slack.api.Slack;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.jetty.SlackAppServer;
+import com.slack.api.methods.request.chat.ChatPostEphemeralRequest;
 import com.slack.api.model.block.LayoutBlock;
 import com.slack.api.model.event.AppHomeOpenedEvent;
 
@@ -61,18 +62,8 @@ public class SlackBolt {
      * @param channel Where you want the text to be published
      */
     public static void sendMessage(String message, String channel){
-        try {
-            var slack = Slack.getInstance().methods();
-            slack.chatPostMessage(req -> req
-                    .token(System.getenv("SLACK_BOT_TOKEN"))
-                    .channel(channel)
-                    .blocks(asBlocks(
-                            section(section -> section.text(markdownText(message)))
-                    ))
-            );
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Could not connect to slack", e);
-        }
+        var block = asBlocks(section(section -> section.text(markdownText(message))));
+        sendMessage(block,channel);
     }
 
     /**
@@ -83,13 +74,14 @@ public class SlackBolt {
     public static void sendMessage(List<LayoutBlock> block, String channel){
         try {
             var slack = Slack.getInstance().methods();
+
             slack.chatPostMessage(req -> req
                     .token(System.getenv("SLACK_BOT_TOKEN"))
                     .channel(channel)
                     .blocks(block)
             );
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not connect to slack", e);
+            throw new IllegalArgumentException("Could not send message to slack", e);
         }
     }
 }
