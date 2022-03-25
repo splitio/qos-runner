@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.slack.api.model.block.composition.MarkdownTextObject;
 import com.slack.api.model.block.composition.PlainTextObject;
-import com.ullink.slack.simpleslackapi.SlackAttachment;
 import io.split.qos.server.integrations.slack.SlackBolt;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.testrunner.util.DateFormatter;
@@ -50,12 +49,12 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
     }
 
     @Override
-    public void broadcastVerbose(String message, SlackAttachment attachment) {
+    public void broadcastVerbose(String message) {
         SlackBolt.sendMessage(message, slackSessionProvider.verboseChannel());
     }
 
     @Override
-    public void broadcastDigest(String message, SlackAttachment attachment) {
+    public void broadcastDigest(String message) {
         SlackBolt.sendMessage(message,slackSessionProvider.digestChannel());
     }
 

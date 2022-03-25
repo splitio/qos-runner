@@ -16,7 +16,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
     }
 
-    implementation(group: 'io.split', name: 'qos-dtos', version: '1.9')
+    implementation(group: 'io.split', name: 'qos-dtos', version: '1.11')
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
     implementation 'org.slf4j:jul-to-slf4j:1.7.30'
@@ -41,7 +41,6 @@ dependencies {
     implementation("com.slack.api:bolt:1.1.+")
     implementation('com.slack.api:bolt-servlet:1.1.+')
     implementation('com.slack.api:bolt-jetty:1.1.+')
-    implementation files ('libs/simpleslackapi-1.2.1.jar')
 
 
     // Common

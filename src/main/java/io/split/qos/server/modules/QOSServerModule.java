@@ -14,12 +14,6 @@ import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcasterImpl;
 import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroacasterImpl;
 import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadcaster;
-import io.split.qos.server.integrations.slack.commander.SlackCommandProvider;
-import io.split.qos.server.integrations.slack.commander.SlackCommanderProviderImpl;
-import io.split.qos.server.integrations.slack.commandintegration.SlackCommandIntegration;
-import io.split.qos.server.integrations.slack.commandintegration.SlackCommandIntegrationImpl;
-import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
-import io.split.qos.server.integrations.slack.listener.SlackCommandListenerImpl;
 import io.split.qos.server.util.BroadcasterTestWatcher;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
@@ -50,10 +44,7 @@ public class QOSServerModule extends AbstractModule {
                 .build(JUnitRunnerFactory.class));
 
         bind(FailCondition.class).to(SimpleFailCondition.class).in(Singleton.class);
-        bind(SlackCommandProvider.class).to(SlackCommanderProviderImpl.class);
-        bind(SlackCommandIntegration.class).to(SlackCommandIntegrationImpl.class);
         bind(SlackTestResultBroadcaster.class).to(SlackTestResultBroacasterImpl.class);
-        bind(SlackCommandListener.class).to(SlackCommandListenerImpl.class);
         bind(PagerDutyBroadcaster.class).to(PagerDutyBroadcasterImpl.class);
         bind(DatadogBroadcaster.class).to(DatadogBroadcasterImpl.class);
         bindConstant()

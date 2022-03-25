@@ -78,13 +78,6 @@ public class QOSServerConfiguration extends Configuration {
     }
 
     public static class Slack {
-        @NotEmpty
-        private String token;
-
-        @JsonProperty
-        public String getToken() {
-            return this.token;
-        }
 
         @NotEmpty
         private String verboseChannel;
