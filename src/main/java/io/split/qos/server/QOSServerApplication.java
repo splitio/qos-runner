@@ -153,16 +153,13 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         QOSServerConfiguration.Slack slack = configuration.getSlack();
         if (slack!= null) {
             SlackSessionProvider provider = injector.getInstance(SlackSessionProvider.class);
-            if (Strings.isNullOrEmpty(slack.getToken())) {
-                throw new IllegalArgumentException("Slack was set in yaml, but not property token");
-            }
             if (Strings.isNullOrEmpty(slack.getVerboseChannel())) {
                 throw new IllegalArgumentException("Slack was set in yaml, but not property verboseChannel");
             }
             if (Strings.isNullOrEmpty(slack.getDigestChannel())) {
                 throw new IllegalArgumentException("Slack was set in yaml, but not property digestchannel");
             }
-            provider.initialize(slack.getToken(), slack.getVerboseChannel(), slack.getDigestChannel(), this.name);
+            provider.initialize(slack.getVerboseChannel(), slack.getDigestChannel());
         }
 
         QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);

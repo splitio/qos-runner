@@ -6,13 +6,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadcaster;
-import io.split.qos.server.integrations.slack.commander.SlackCommandProvider;
-import io.split.qos.server.integrations.slack.commander.SlackCommanderProviderImpl;
-import io.split.qos.server.integrations.slack.commandintegration.SlackCommandIntegration;
-import io.split.qos.server.integrations.slack.listener.SlackCommandListener;
 import io.split.qos.server.mocks.PagerDutyBroadcasterForTest;
-import io.split.qos.server.mocks.SlackCommandIntegrationForTest;
-import io.split.qos.server.mocks.SlackCommandListenerForTest;
 import io.split.qos.server.mocks.SlackTestResultBroadcasterImplForTest;
 import io.split.qos.server.util.BroadcasterTestWatcher;
 import io.split.testrunner.junit.JUnitRunner;
@@ -34,10 +28,7 @@ public class QOSServerModuleForTest extends AbstractModule {
                 .implement(JUnitRunner.class, JUnitRunner.class)
                 .build(JUnitRunnerFactory.class));
 
-        bind(SlackCommandProvider.class).to(SlackCommanderProviderImpl.class);
-        bind(SlackCommandIntegration.class).to(SlackCommandIntegrationForTest.class);
         bind(SlackTestResultBroadcaster.class).to(SlackTestResultBroadcasterImplForTest.class);
-        bind(SlackCommandListener.class).to(SlackCommandListenerForTest.class);
         bind(PagerDutyBroadcaster.class).to(PagerDutyBroadcasterForTest.class);
         bindConstant()
                 .annotatedWith(Names.named(QOS_SERVER_NAME))

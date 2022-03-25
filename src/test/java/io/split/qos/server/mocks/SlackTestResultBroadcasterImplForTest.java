@@ -1,7 +1,6 @@
 package io.split.qos.server.mocks;
 
 import com.google.inject.Singleton;
-import com.ullink.slack.simpleslackapi.SlackAttachment;
 import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadcaster;
 import org.junit.runner.Description;
 
@@ -32,12 +31,12 @@ public class SlackTestResultBroadcasterImplForTest implements SlackTestResultBro
     }
 
     @Override
-    public void broadcastVerbose(String message, SlackAttachment attachment) {
+    public void broadcastVerbose(String message) {
 
     }
 
     @Override
-    public void broadcastDigest(String message, SlackAttachment attachment) {
+    public void broadcastDigest(String message) {
 
     }
 

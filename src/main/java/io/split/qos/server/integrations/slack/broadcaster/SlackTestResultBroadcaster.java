@@ -1,6 +1,5 @@
 package io.split.qos.server.integrations.slack.broadcaster;
 
-import com.ullink.slack.simpleslackapi.SlackAttachment;
 import io.split.qos.server.integrations.Integration;
 import org.junit.runner.Description;
 
@@ -44,15 +43,13 @@ public interface SlackTestResultBroadcaster extends Integration {
      * Broadcasts a message to the verbose channel.
      *
      * @param message the message to send.
-     * @param attachment the slack attachment (THIS MEANS IT IS IN IN THE WRONG PLACE)
      */
-    void broadcastVerbose(String message, SlackAttachment attachment);
+    void broadcastVerbose(String message);
 
     /**
      * Broadcasts a message to the digest channel.
      *
      * @param message the message to send.
-     * @param attachment the slack attachment (THIS MEANS IT IS IN IN THE WRONG PLACE)
      */
-    void broadcastDigest(String message, SlackAttachment attachment);
+    void broadcastDigest(String message);
 }
