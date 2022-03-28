@@ -16,6 +16,15 @@ public class QOSServerBehaviourTests extends BaseCaseForTest {
 
 
     @Test
+    public void testBehaviourCanBeCalledAndRunsTwoTests() throws Exception {
+        QOSServerBehaviour behaviour = injector().getInstance(QOSServerBehaviour.class);
+        behaviour.call();
+        QOSTestsTracker tracker = injector().getInstance(QOSTestsTracker.class);
+        Assert.assertEquals(2, tracker.tests().size());
+        behaviour.close();
+    }
+
+    @Test
     public void testRunAllSorting() throws Exception {
         QOSServerBehaviour behaviour = injector().getInstance(QOSServerBehaviour.class);
         QOSServerState state = injector().getInstance(QOSServerState.class);
