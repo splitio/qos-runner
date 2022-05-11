@@ -46,7 +46,7 @@ public class QOSRegister {
         RegisterDTO dto = new RegisterDTO(
                 serverName,
                 apiURL.toString(),
-                "Slack app",
+                "qos-bot",
                 teamName);
         executor.scheduleAtFixedRate(new Register(registerURL, poster, dto), 0, 1, TimeUnit.MINUTES);
     }

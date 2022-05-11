@@ -110,7 +110,7 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
                         // Test name and duration
                         section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration)))
                         ))
-                ,slackSessionProvider.verboseChannel()
+                ,slackSessionProvider.digestChannel()
         );
     }
 
