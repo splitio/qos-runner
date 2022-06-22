@@ -17,6 +17,9 @@ import java.util.Properties;
  * Module for loading properties from the properties file.
  */
 public class QOSPropertiesModule extends AbstractModule {
+
+    private static final String ENV_VAR_PREFIX = "QOS_PROP_";
+
     // ------------------
     // COMMON PROPERTIES
     // ------------------
@@ -88,7 +91,9 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(RE_BROADCAST_FAILURE_IN_MINUTES, "60");
     }
 
-    public QOSPropertiesModule() { }
+    public QOSPropertiesModule() {
+
+    }
 
     @Override
     protected void configure() {
@@ -111,8 +116,12 @@ public class QOSPropertiesModule extends AbstractModule {
                 throw new IllegalArgumentException("Properties file does not exist " + propertiesPath);
             }
         }
-        Names.bindProperties(binder(), theProperties);
 
+        System.getenv().entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(ENV_VAR_PREFIX))
+                .forEach(entry -> theProperties.put(entry.getKey().replace(ENV_VAR_PREFIX, ""), entry.getValue()));
+
+        Names.bindProperties(binder(), theProperties);
         bind(Properties.class).annotatedWith(Names.named(CONFIGURATION)).toInstance(theProperties);
     }
 }

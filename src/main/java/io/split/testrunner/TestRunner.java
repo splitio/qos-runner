@@ -1,13 +1,10 @@
 package io.split.testrunner;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.util.Modules;
-import io.split.modules.EnvVarModule;
 import io.split.qos.server.QOSServerApplication;
 import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.QOSServerState;
@@ -18,7 +15,6 @@ import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSCommonModule;
 import io.split.qos.server.modules.QOSFailWithModule;
-import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.stories.QOSStories;
 import io.split.testrunner.guice.ExtraModules;
 import io.split.testrunner.guice.GuiceModules;
@@ -32,7 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The base class should use @RunWith with this Runners
@@ -47,7 +42,7 @@ public class TestRunner extends BlockJUnit4ClassRunner {
      * @param clazz The in test.
      * @throws InitializationError If something goes wrong.
      */
-    public TestRunner(final Class<?> clazz) throws InitializationError, NoSuchMethodException {
+    public TestRunner(final Class<?> clazz) throws InitializationError {
         super(clazz);
 
         // This is for running tests from the IDE.
@@ -77,33 +72,23 @@ public class TestRunner extends BlockJUnit4ClassRunner {
      * @return A Guice Injector instance.
      * @throws InitializationError If couldn't instantiate a module.
      */
-    private Injector createInjectorFor(Class<?> theClass) throws InitializationError, NoSuchMethodException {
-         /*
+    private Injector createInjectorFor(Class<?> theClass) throws InitializationError {
         List<Module> modules = Lists.newArrayList();
+
         for(Class<? extends AbstractModule> clazz : getGuiceModulesFor(theClass)) {
             try {
-                modules.add(clazz.newInstance());
-            } catch (InstantiationException | IllegalAccessException e) {
+                modules.add(clazz.getDeclaredConstructor().newInstance());
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new IllegalStateException(e);
             }
         }
         for(Class<? extends AbstractModule> clazz : getExtraModulesFor(theClass)) {
             try {
-                if (clazz.equals(QOSPropertiesModule.class)) {
-                    modules.add(Modules.override(new QOSPropertiesModule()).with(new EnvVarModule("QOS_PROP_")));
-                } else {
-                    modules.add(clazz.newInstance());
-                }
-            } catch (InstantiationException | IllegalAccessException e) {
+                modules.add(clazz.getDeclaredConstructor().newInstance());
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new IllegalStateException(e);
             }
         }
-        */
-
-        List<Module> modules = Streams.concat(
-                setupModules(getGuiceModulesFor(theClass)).stream(),
-                setupModules(getExtraModulesFor(theClass)).stream())
-                .collect(Collectors.toList());
 
         if (GuiceInitializator.isQos()) {
             if (QOSServerApplication.injector != null) {
@@ -121,7 +106,7 @@ public class TestRunner extends BlockJUnit4ClassRunner {
         return Guice.createInjector(modules);
     }
 
-    private static List<Class<? extends AbstractModule>> getGuiceModulesFor(final Class<?> clazz) throws InitializationError {
+    private List<Class<? extends AbstractModule>> getGuiceModulesFor(final Class<?> clazz) throws InitializationError {
         final GuiceModules annotation = clazz.getAnnotation(GuiceModules.class);
 
         if (annotation == null) {
@@ -132,26 +117,9 @@ public class TestRunner extends BlockJUnit4ClassRunner {
         return Lists.newArrayList(annotation.value());
     }
 
-    private static List<Class<? extends AbstractModule>> getExtraModulesFor(final Class<?> clazz) throws InitializationError {
+    private List<Class<? extends AbstractModule>> getExtraModulesFor(final Class<?> clazz) throws InitializationError {
         ExtraModules annotation = clazz.getAnnotation(ExtraModules.class);
         return annotation == null ? Lists.newArrayList() : Lists.newArrayList(annotation.value());
-    }
-
-    private static List<Module> setupModules(List<Class<? extends AbstractModule>> moduleClasses) throws NoSuchMethodException{
-        return moduleClasses.stream()
-                .map(c -> c.equals(QOSPropertiesModule.class)
-                        ? Modules.override(new QOSPropertiesModule()).with(new EnvVarModule("QOS_PROP_"))
-                        : instantiateGenericModule(c))
-                .collect(Collectors.toList());
-    }
-
-    private static Module instantiateGenericModule(Class<? extends AbstractModule> moduleClass) {
-        try {
-            return moduleClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(String.format("Failed to get a no argument constructor for class %s. Exc: %s",
-                    moduleClass.getName(), e.getMessage()));
-        }
     }
 
     private AbstractModule getFailCondition(Class<?> clazz) throws InitializationError {

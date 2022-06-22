@@ -8,14 +8,12 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
-import com.google.inject.util.Modules;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.split.modules.EnvVarModule;
 import io.split.qos.server.integrations.datadog.DatadogBroadcaster;
 import io.split.qos.server.integrations.pagerduty.PagerDutyBroadcaster;
 import io.split.qos.server.integrations.slack.SlackSessionProvider;
@@ -100,10 +98,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
                 .collect(Collectors.toList());
         GuiceInitializator.addAllPaths(toBeAdded);
         GuiceInitializator.setQos();
-        List<Module> modules = Lists.newArrayList(
-                new QOSServerModule(configuration),
-                Modules.override(new QOSPropertiesModule()).with(new EnvVarModule("QOS_PROP_"))
-        );
+        List<Module> modules = Lists.newArrayList(new QOSServerModule(configuration), new QOSPropertiesModule());
 
         LOG.info("Initializing Guice");
         long begin = System.currentTimeMillis();
