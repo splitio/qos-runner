@@ -1,4 +1,4 @@
-package io.split.modules;
+package io.split.qos.server.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
