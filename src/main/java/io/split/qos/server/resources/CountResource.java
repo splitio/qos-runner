@@ -25,7 +25,7 @@ public class CountResource {
     public CountResource(QOSServerState state) {
         this.state = Preconditions.checkNotNull(state);
     }
-    
+
     @GET
     public Response count() {
         int failed = state.failedTests().size();
