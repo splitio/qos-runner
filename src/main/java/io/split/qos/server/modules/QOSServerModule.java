@@ -18,8 +18,6 @@ import io.split.qos.server.util.BroadcasterTestWatcher;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
 
-import java.util.Optional;
-
 /**
  * Module for installing Server related Guice injections.
  */
