@@ -27,17 +27,20 @@ public class QOSRegister {
     private final String serverName;
     private final String teamName;
     private final SlackSessionProvider slackSessionProvider;
+    private final Optional<String> languageName;
 
     @Inject
     public QOSRegister(HttpPoster poster,
                        SlackSessionProvider slackSessionProvider,
                        @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
-                       @Named(QOSServerModule.TEAM_NAME) String teamName) {
+                       @Named(QOSServerModule.TEAM_NAME) String teamName,
+                       @Named(QOSServerModule.TEAM_NAME) String languageName) {
         this.executor = Executors.newSingleThreadScheduledExecutor();
         this.poster = Preconditions.checkNotNull(poster);
         this.slackSessionProvider = Preconditions.checkNotNull(slackSessionProvider);
         this.serverName = Preconditions.checkNotNull(serverName);
         this.teamName = Preconditions.checkNotNull(teamName);
+        this.languageName = Optional.ofNullable(languageName);
     }
 
     public void register(String qosDashboardURL, String qosRunnerURL) {
@@ -47,7 +50,8 @@ public class QOSRegister {
                 serverName,
                 apiURL.toString(),
                 "qos-bot",
-                teamName);
+                teamName,
+                languageName);
         executor.scheduleAtFixedRate(new Register(registerURL, poster, dto), 0, 1, TimeUnit.MINUTES);
     }
 
