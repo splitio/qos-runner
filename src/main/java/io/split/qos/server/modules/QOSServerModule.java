@@ -5,6 +5,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import io.dropwizard.util.Strings;
 import io.split.qos.server.QOSServerConfiguration;
 import io.split.qos.server.failcondition.FailCondition;
 import io.split.qos.server.failcondition.SimpleFailCondition;
@@ -17,6 +18,8 @@ import io.split.qos.server.integrations.slack.broadcaster.SlackTestResultBroadca
 import io.split.qos.server.util.BroadcasterTestWatcher;
 import io.split.testrunner.junit.JUnitRunner;
 import io.split.testrunner.junit.JUnitRunnerFactory;
+
+import java.util.Optional;
 
 /**
  * Module for installing Server related Guice injections.
@@ -37,7 +40,7 @@ public class QOSServerModule extends AbstractModule {
         this.configuration = Preconditions.checkNotNull(configuration);
         this.serverName = Preconditions.checkNotNull(configuration.getServerName());
         this.teamName = Preconditions.checkNotNull(configuration.getTeamName());
-        this.languageName = Preconditions.checkNotNull(configuration.getLanguageName());
+        this.languageName = Optional.ofNullable(configuration.getLanguageName()).orElse("N/A");
     }
 
     @Override
