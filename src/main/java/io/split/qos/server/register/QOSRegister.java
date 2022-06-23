@@ -34,7 +34,7 @@ public class QOSRegister {
                        SlackSessionProvider slackSessionProvider,
                        @Named(QOSServerModule.QOS_SERVER_NAME) String serverName,
                        @Named(QOSServerModule.TEAM_NAME) String teamName,
-                       @Named(QOSServerModule.TEAM_NAME) String languageName) {
+                       @Named(QOSServerModule.LANGUAGE_NAME) String languageName) {
         this.executor = Executors.newSingleThreadScheduledExecutor();
         this.poster = Preconditions.checkNotNull(poster);
         this.slackSessionProvider = Preconditions.checkNotNull(slackSessionProvider);

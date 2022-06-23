@@ -37,7 +37,7 @@ public class QOSServerModule extends AbstractModule {
         this.configuration = Preconditions.checkNotNull(configuration);
         this.serverName = Preconditions.checkNotNull(configuration.getServerName());
         this.teamName = Preconditions.checkNotNull(configuration.getTeamName());
-        this.languageName = Preconditions.checkNotNull(configuration.getTeamName());
+        this.languageName = Preconditions.checkNotNull(configuration.getLanguageName());
     }
 
     @Override
