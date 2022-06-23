@@ -18,6 +18,8 @@ public class QOSServerConfiguration extends Configuration {
     @NotEmpty
     private String config;
 
+    private String languageName;
+
     @JsonProperty
     public String getServerName() {
         return serverName;
@@ -26,6 +28,11 @@ public class QOSServerConfiguration extends Configuration {
     @JsonProperty
     public String getTeamName() {
         return teamName;
+    }
+
+    @JsonProperty
+    public String getLanguageName() {
+        return languageName;
     }
 
     public Register register;

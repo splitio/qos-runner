@@ -1,5 +1,6 @@
 serverName: qos-server
 teamName: SDK
+languageName: qos-runner
 
 config: conf/qos.test.properties
 
