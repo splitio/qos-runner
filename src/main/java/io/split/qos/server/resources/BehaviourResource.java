@@ -12,6 +12,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Path("/behaviour")
 @Produces(MediaType.APPLICATION_JSON)
@@ -38,6 +40,19 @@ public class BehaviourResource {
     @Path("runall")
     public Response runAll() {
         behaviour.runAllNow();
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("run/{who}")
+    public Response runTest(@PathParam("who") String who) {
+        Preconditions.checkNotNull(who);
+        var args = who.split("#");
+        if (args.length == 1) {
+            var testsexecuted = behaviour.runTestsNow(Optional.empty(),args[0]);
+        } else {
+            var testsexecuted = behaviour.runTestsNow(Optional.of(args[0]), args[1]);
+        }
         return Response.ok().build();
     }
 
