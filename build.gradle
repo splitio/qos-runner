@@ -103,7 +103,7 @@ task javadocJar(type: Jar, dependsOn: javadocTask) {
 }
 
 task fatJar(type: Jar) {
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtimeClasspath.collect { it.name.startsWith("jackson") ? it : zipTree(it) } }
     with jar
 }
 
