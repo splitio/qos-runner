@@ -12,7 +12,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
 @Path("/behaviour")
@@ -47,13 +48,14 @@ public class BehaviourResource {
     @Path("run/{who}")
     public Response runTest(@PathParam("who") String who) {
         Preconditions.checkNotNull(who);
-        var args = who.split("#");
+        var args = who.split(",");
+        List<Method> testsExecuted;
         if (args.length == 1) {
-            var testsexecuted = behaviour.runTestsNow(Optional.empty(),args[0]);
+            testsExecuted = behaviour.runTestsNow(Optional.empty(),args[0]);
         } else {
-            var testsexecuted = behaviour.runTestsNow(Optional.of(args[0]), args[1]);
+            testsExecuted = behaviour.runTestsNow(Optional.of(args[0]), args[1]);
         }
-        return Response.ok().build();
+        return Response.ok(testsExecuted).build();
     }
 
     @POST
