@@ -44,15 +44,14 @@ public class DatadogBroadcasterImpl implements DatadogBroadcaster {
 
     @Override
     public void firstFailure(Description description, Throwable error, String serverName, Long duration, Optional<String> titleLink) {
-        String[] tags = Lists.newArrayList("servername:"+ serverName).toArray(new String[1]);
+        String[] tags = Lists.newArrayList("servername:"+ serverName, "length:"+duration.toString()).toArray(new String[2]);
         this.statsDClient.count("test.firstfail", 1,tags);
-
         reportServerState();
     }
 
     @Override
     public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure, Long duration, Optional<String> titleLink) {
-        String[] tags = Lists.newArrayList("servername:"+ serverName).toArray(new String[1]);
+        String[] tags = Lists.newArrayList("servername:"+ serverName, "length:"+duration.toString()).toArray(new String[2]);
         this.statsDClient.count("test.fail", 1, tags);
         reportServerState();
     }

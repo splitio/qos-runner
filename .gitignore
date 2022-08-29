@@ -16,7 +16,7 @@ hs_err_pid*
 *.ipk
 *.ipa
 *.ipr
-.out/
+out/
 
 # OSX
 .DS_Store
