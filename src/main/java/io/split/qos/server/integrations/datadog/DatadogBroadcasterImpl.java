@@ -42,16 +42,21 @@ public class DatadogBroadcasterImpl implements DatadogBroadcaster {
         this.serverState = serverState;
     }
 
+    private Long durationToSeconds(long l) {
+        Long sec = l / 1000;
+        return sec;
+    }
+
     @Override
     public void firstFailure(Description description, Throwable error, String serverName, Long duration, Optional<String> titleLink) {
-        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + duration.toString(), "testname:" + description.getMethodName()).toArray(new String[3]);
+        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + durationToSeconds(duration), "testname:" + description.getMethodName()).toArray(new String[3]);
         this.statsDClient.count("test.firstfail", 1,tags);
         reportServerState();
     }
 
     @Override
     public void reBroadcastFailure(Description description, Throwable error, String serverName, Long whenFirstFailure, Long duration, Optional<String> titleLink) {
-        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + duration.toString(), "testname:" + description.getMethodName()).toArray(new String[3]);
+        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + durationToSeconds(duration), "testname:" + description.getMethodName()).toArray(new String[3]);
         this.statsDClient.count("test.fail", 1, tags);
         reportServerState();
     }
@@ -63,7 +68,7 @@ public class DatadogBroadcasterImpl implements DatadogBroadcaster {
 
     @Override
     public void success(Description description, String serverName, Long duration, Optional<String> titleLink) {
-        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + duration.toString(), "testname:" + description.getMethodName()).toArray(new String[3]);
+        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + durationToSeconds(duration), "testname:" + description.getMethodName()).toArray(new String[3]);
         this.statsDClient.count("test.success", 1, tags);
         reportServerState();
     }
