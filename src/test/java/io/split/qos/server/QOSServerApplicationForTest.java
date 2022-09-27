@@ -16,12 +16,7 @@ import io.split.qos.server.failcondition.SimpleFailCondition;
 import io.split.qos.server.modules.QOSFailWithModule;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModuleForTest;
-import io.split.qos.server.resources.BehaviourResource;
-import io.split.qos.server.resources.ConfigResource;
-import io.split.qos.server.resources.CountResource;
-import io.split.qos.server.resources.GreenResource;
-import io.split.qos.server.resources.HealthResource;
-import io.split.qos.server.resources.StateResource;
+import io.split.qos.server.resources.*;
 import io.split.testrunner.util.GuiceInitializator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +82,7 @@ public class QOSServerApplicationForTest extends Application<QOSServerConfigurat
         environment.jersey().register(new StateResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new CountResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new BehaviourResource(injector.getInstance(QOSServerBehaviour.class)));
+        environment.jersey().register(new RunningResource(injector.getInstance(QOSTestsTracker.class)));
 
         QOSServerBehaviour behaviour = injector.getInstance(QOSServerBehaviour.class);
 

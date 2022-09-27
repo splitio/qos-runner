@@ -5,8 +5,8 @@ languageName: qos-runner
 config: conf/qos.test.properties
 
 register:
-  dashboardURL: URL
-  hostURL: URL_HOST
+  dashboardURL: http://qos-dashboard-backend/api
+  hostURL: http://qos-android-standalone-memory-streaming
 
 test:
   consecutiveFailures: 2
