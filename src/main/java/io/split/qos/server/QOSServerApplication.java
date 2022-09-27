@@ -20,12 +20,7 @@ import io.split.qos.server.integrations.slack.SlackSessionProvider;
 import io.split.qos.server.modules.QOSPropertiesModule;
 import io.split.qos.server.modules.QOSServerModule;
 import io.split.qos.server.register.QOSRegister;
-import io.split.qos.server.resources.BehaviourResource;
-import io.split.qos.server.resources.ConfigResource;
-import io.split.qos.server.resources.CountResource;
-import io.split.qos.server.resources.GreenResource;
-import io.split.qos.server.resources.HealthResource;
-import io.split.qos.server.resources.StateResource;
+import io.split.qos.server.resources.*;
 import io.split.testrunner.util.GuiceInitializator;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -110,6 +105,7 @@ public class QOSServerApplication extends Application<QOSServerConfiguration> {
         environment.jersey().register(new StateResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new CountResource(injector.getInstance(QOSServerState.class)));
         environment.jersey().register(new BehaviourResource(injector.getInstance(QOSServerBehaviour.class)));
+        environment.jersey().register(new RunningResource(injector.getInstance(QOSTestsTracker.class)));
 
         QOSServerConfiguration.Register register = configuration.getRegister();
         if (register != null) {
