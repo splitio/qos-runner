@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import io.split.testrunner.util.GuiceInitializator;
+import io.split.api.webadmin.common.KeyImpressionUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,11 +24,35 @@ public class QOSPropertiesModule extends AbstractModule {
     // ------------------
     // COMMON PROPERTIES
     // ------------------
-
+    public static final String SDK = "SDK";
+    public static final String TREATMENT_URL = "TREATMENT_URL";
+    public static final String TREATMENT_CONFIG_URL = "TREATMENT_CONFIG_URL";
+    public static final String CONFIG_URL= "CONFIG_URL";
+    public static final String GET_TREATMENTS_URL = "GET_TREATMENTS_URL";
+    public static final String GET_TREATMENTS_CONFIG_URL = "GET_TREATMENTS_CONFIG_URL";
+    public static final String SPLIT_URL = "SPLIT_URL";
+    public static final String SPLITS_URL = "SPLITS_URL";
+    public static final String SPLITNAMES_URL = "SPLITNAMES_URL";
+    public static final String WAIT_TIME_IN_SECONDS = "WAIT_TIME_IN_SECONDS";
+    public static final String WAIT_BETWEEN_ITERATIONS_IN_MILLISECONDS = "WAIT_BETWEEN_ITERATIONS_IN_MILLISECONDS";
+    public static final String URL = "URL";
+    public static final String USER_EMAIL = "USER_EMAIL";
+    public static final String USER_PASSWORD = "USER_PASSWORD";
+    public static final String ORG_ID = "ORG_ID";
+    public static final String ENVIRONMENT_NAME = "ENVIRONMENT_NAME";
+    public static final String USER_IN_EMPLOYEES = "USER_IN_EMPLOYEES";
+    public static final String TRAFFIC_NAME = "TRAFFIC_NAME";
+    public static final String WEB_API_URL = "WEB_API_URL";
+    public static final String SDK_API_URL = "SDK_API_URL";
+    public static final String VERSION_URL = "VERSION_URL";
+    public static final String EXPECT_IMPRESSIONS = "EXPECT_IMPRESSIONS";
+    public static final String EXPECT_LISTENER_IMPRESSIONS = "EXPECT_LISTENER_IMPRESSIONS";
+    public static final String IMPRESSIONS_URL = "IMPRESSIONS_URL";
+    public static final String CAPABILITIES = "CAPABILITIES";
+    
     // ------------------
     // SERVER PROPERTIES
     // ------------------
-
     // How many tests will be running in parallel
     // Default 10
     public static final String PARALLEL_TESTS = "PARALLEL_TESTS";
@@ -74,7 +99,41 @@ public class QOSPropertiesModule extends AbstractModule {
     private static final Map<String, String> defaultProperties = Maps.newHashMap();
 
     static {
+        //Common
+        defaultProperties.put(URL, "");
+        defaultProperties.put(WAIT_TIME_IN_SECONDS, "90");
+        defaultProperties.put(WAIT_BETWEEN_ITERATIONS_IN_MILLISECONDS, "500");
+        defaultProperties.put(USER_EMAIL, "");
+        defaultProperties.put(USER_PASSWORD, "");
+        defaultProperties.put(ORG_ID, "");
+        defaultProperties.put(ENVIRONMENT_NAME, "");
+        defaultProperties.put(TRAFFIC_NAME, "");
+        defaultProperties.put(WEB_API_URL, "");
+        defaultProperties.put(SDK_API_URL, "");
+        defaultProperties.put(USER_IN_EMPLOYEES, "");
+        defaultProperties.put(EXPECT_IMPRESSIONS, "false");
+        defaultProperties.put(EXPECT_LISTENER_IMPRESSIONS, "false");
+        defaultProperties.put(IMPRESSIONS_URL, "impressions");
+        defaultProperties.put(VERSION_URL, "version");
 
+        defaultProperties.put(USER_IN_EMPLOYEES, "user_for_testing_do_no_erase");
+        defaultProperties.put(SDK, "JAVA");
+        defaultProperties.put(TREATMENT_URL, "automation");
+        defaultProperties.put(GET_TREATMENTS_URL, "gettreatments");
+        defaultProperties.put(GET_TREATMENTS_CONFIG_URL, "gettreatmentswithconfig");
+        defaultProperties.put(CONFIG_URL, "config");
+        defaultProperties.put(SPLIT_URL, "manager/split");
+        defaultProperties.put(SPLITS_URL, "manager/splits");
+        defaultProperties.put(SPLITNAMES_URL, "manager/splitnames");
+        defaultProperties.put(IMPRESSIONS_URL, "impressions");
+        defaultProperties.put(CAPABILITIES, "capabilities/chrome.yaml");
+
+        defaultProperties.put(KeyImpressionUtil.CHECK_LABEL_IMPRESSIONS, "false");
+        defaultProperties.put(KeyImpressionUtil.CHECK_MACHINE_IP_IMPRESSIONS, "false");
+        defaultProperties.put(KeyImpressionUtil.CHECK_MACHINE_NAME_IMPRESSIONS , "false");
+        defaultProperties.put(KeyImpressionUtil.CHECK_CHANGE_NUMBER, "false");
+        defaultProperties.put(KeyImpressionUtil.CHECK_SDK_IMPRESSIONS, "false");
+        
         // Server
         defaultProperties.put(PARALLEL_TESTS, "10");
         defaultProperties.put(SHUTDOWN_WAIT_IN_MINUTES, "10");

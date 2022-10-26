@@ -5,17 +5,14 @@ languageName: qos-runner
 config: conf/qos.test.properties
 
 register:
-  dashboardURL: URL
-  hostURL: URL_HOST
+  dashboardURL: "${DASHBOARD_URL}"
+  hostURL: "${HOST_URL}"
 
 test:
   consecutiveFailures: 2
 
-pagerDuty:
-  serviceKey: KEY
-
 datadog:
-  host: "localhost"
+  host: "${STATSD_HOST}"
   port: 8125
 
 server:
