@@ -8,11 +8,15 @@ buildscript {
             }
         }
     }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+    }
 }
 
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'maven-publish'
 }
 
 projects {
@@ -114,7 +118,7 @@ shadowJar {
     manifest {
         attributes 'Main-Class': 'io.split.qos.server.QOSServerApplication'
     }
-    archiveName 'qos-runner.jar'
+    archiveName = "${project.name}-${project.version}.jar"
 }
 
 wrapper {
@@ -129,19 +133,13 @@ artifacts {
 
 publishing {
     publications {
-        maven(MavenPublication) {
-            version = project.version
-            artifact shadowJar
-            pom {
-                name = 'qos-runner'
-                description = 'QOS runner'
-            }
+        mavenJava(MavenPublication) {
+            from components.java
         }
     }
-
     repositories {
         maven {
-            url = "https://splitio.jfrog.io/artifactory/maven-dev"
+            url "https://splitio.jfrog.io/artifactory/maven-dev"
             credentials {
                 username = project.findProperty('artifactoryUser') ?: "$System.env.ARTIFACTORY_USER"
                 password = project.findProperty('artifactoryPassword') ?: "$System.env.ARTIFACTORY_TOKEN"
