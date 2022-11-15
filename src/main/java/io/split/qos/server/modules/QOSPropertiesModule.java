@@ -49,6 +49,9 @@ public class QOSPropertiesModule extends AbstractModule {
     public static final String EXPECT_LISTENER_IMPRESSIONS = "EXPECT_LISTENER_IMPRESSIONS";
     public static final String IMPRESSIONS_URL = "IMPRESSIONS_URL";
     public static final String CAPABILITIES = "CAPABILITIES";
+    public static final String LIVE_TAIL_URL = "LIVE_TAIL_URL";
+    public static final String CALL_HOME_URL = "CALL_HOME_URL";
+    public static final String CALL_HOME_AUTH = "CALL_HOME_AUTH";
     
     // ------------------
     // SERVER PROPERTIES
@@ -133,6 +136,9 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(KeyImpressionUtil.CHECK_MACHINE_NAME_IMPRESSIONS , "false");
         defaultProperties.put(KeyImpressionUtil.CHECK_CHANGE_NUMBER, "false");
         defaultProperties.put(KeyImpressionUtil.CHECK_SDK_IMPRESSIONS, "false");
+        defaultProperties.put(LIVE_TAIL_URL, "");
+        defaultProperties.put(CALL_HOME_URL, "");
+        defaultProperties.put(CALL_HOME_AUTH, "");
         
         // Server
         defaultProperties.put(PARALLEL_TESTS, "10");
