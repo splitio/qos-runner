@@ -40,4 +40,10 @@ public interface DatadogBroadcaster extends AutoCloseable, Integration {
      */
     void success(Description description, String serverName, Long duration, Optional<String> titleLink);
 
+    /**
+     * Broadcasts the sauce labs failure
+     *
+     * @param description the test description.
+     */
+    void sauceFailure(Description description, String serverName);
 }

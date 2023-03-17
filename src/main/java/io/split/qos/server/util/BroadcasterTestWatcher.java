@@ -134,6 +134,11 @@ public class BroadcasterTestWatcher extends TestWatcher {
                 if (Broadcast.REBROADCAST.equals(broadcast)) {
                     datadog.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
                 }
+                // Send to Datadog every time it fails due to Sauce Labs
+                String reason = e.getMessage();
+                if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
+                    datadog.sauceFailure(description, serverName);
+                }
             }
         }
     }
