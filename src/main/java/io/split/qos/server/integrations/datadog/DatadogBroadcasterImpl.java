@@ -75,7 +75,7 @@ public class DatadogBroadcasterImpl implements DatadogBroadcaster {
 
     @Override
     public void sauceFailure(Description description, String serverName) {
-        String[] tags = Lists.newArrayList("servername:" + serverName, "testname:" + description.getMethodName()).toArray(new String[3]);
+        String[] tags = Lists.newArrayList("servername:" + serverName, "testname:" + description.getMethodName()).toArray(new String[2]);
         this.statsDClient.count("test.saucefail", 1,tags);
     }
 
