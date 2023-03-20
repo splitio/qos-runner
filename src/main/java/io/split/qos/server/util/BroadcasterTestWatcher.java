@@ -137,6 +137,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
                 // Send to Datadog every time it fails due to Sauce Labs
                 String reason = e.getMessage();
                 if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
+                    LOG.info(String.format("The test failed with reason: %s", reason));
                     datadog.sauceFailure(description, serverName);
                 }
             }
