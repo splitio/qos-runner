@@ -37,7 +37,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
     }
 
-    implementation(group: 'io.split.split-testing', name: 'api', version: '1.0.1')
+    implementation(group: 'io.split.split-testing', name: 'api', version: '1.0.5')
     implementation(group: 'io.split', name: 'qos-dtos', version: '1.12')
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
