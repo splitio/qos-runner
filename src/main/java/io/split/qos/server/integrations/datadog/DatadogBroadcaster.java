@@ -46,4 +46,11 @@ public interface DatadogBroadcaster extends AutoCloseable, Integration {
      * @param description the test description.
      */
     void sauceFailure(Description description, String serverName);
+
+    /**
+     * Broadcasts the Impression Not Found failure
+     *
+     * @param description the test description.
+     */
+    void impressionFailure(Description description, String serverName);
 }
