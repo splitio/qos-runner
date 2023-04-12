@@ -140,6 +140,10 @@ public class BroadcasterTestWatcher extends TestWatcher {
                     LOG.info(String.format("Sauce error: The test %s failed with reason: %s", description.getMethodName(), reason));
                     datadog.sauceFailure(description, serverName);
                 }
+                if (reason.contains("Impression Not Present KeyImpressionDTO")) {
+                    LOG.info(String.format("Impression Not Present error: The test %s failed with reason: %s", description.getMethodName(), reason));
+                    datadog.impressionFailure(description, serverName);
+                }
             }
         }
     }
