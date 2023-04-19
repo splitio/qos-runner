@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import io.split.testrunner.util.GuiceInitializator;
-import io.split.api.webadmin.common.KeyImpressionUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -101,6 +100,12 @@ public class QOSPropertiesModule extends AbstractModule {
 
     private static final Map<String, String> defaultProperties = Maps.newHashMap();
 
+    public static final String CHECK_LABEL_IMPRESSIONS = "CHECK_LABEL_IMPRESSIONS";
+    public static final String CHECK_MACHINE_IP_IMPRESSIONS = "CHECK_MACHINE_IP_IMPRESSIONS";
+    public static final String CHECK_MACHINE_NAME_IMPRESSIONS =  "CHECK_MACHINE_NAME_IMPRESSIONS";
+    public static final String CHECK_CHANGE_NUMBER =  "CHECK_CHANGE_NUMBER";
+    public static final String CHECK_SDK_IMPRESSIONS = "CHECK_SDK_IMPRESSIONS";
+
     static {
         //Common
         defaultProperties.put(URL, "");
@@ -131,11 +136,11 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(IMPRESSIONS_URL, "impressions");
         defaultProperties.put(CAPABILITIES, "capabilities/chrome.yaml");
 
-        defaultProperties.put(KeyImpressionUtil.CHECK_LABEL_IMPRESSIONS, "false");
-        defaultProperties.put(KeyImpressionUtil.CHECK_MACHINE_IP_IMPRESSIONS, "false");
-        defaultProperties.put(KeyImpressionUtil.CHECK_MACHINE_NAME_IMPRESSIONS , "false");
-        defaultProperties.put(KeyImpressionUtil.CHECK_CHANGE_NUMBER, "false");
-        defaultProperties.put(KeyImpressionUtil.CHECK_SDK_IMPRESSIONS, "false");
+        defaultProperties.put(CHECK_LABEL_IMPRESSIONS, "false");
+        defaultProperties.put(CHECK_MACHINE_IP_IMPRESSIONS, "false");
+        defaultProperties.put(CHECK_MACHINE_NAME_IMPRESSIONS , "false");
+        defaultProperties.put(CHECK_CHANGE_NUMBER, "false");
+        defaultProperties.put(CHECK_SDK_IMPRESSIONS, "false");
         defaultProperties.put(LIVE_TAIL_URL, "");
         defaultProperties.put(CALL_HOME_URL, "");
         defaultProperties.put(CALL_HOME_AUTH, "");
