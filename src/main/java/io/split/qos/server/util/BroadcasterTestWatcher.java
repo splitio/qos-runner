@@ -141,7 +141,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
                     datadog.sauceFailure(description, serverName);
                 }
                 if (reason.contains("Impression Not Present KeyImpressionDTO")) {
-                    LOG.info(String.format("Impression Not Present error: The test %s failed with reason: %s", description.getMethodName(), reason));
+                    LOG.info(String.format("Impression Not Present error: The test %s failed with reason: %s. Stacktrace: %s", description.getMethodName(), reason, e.getStackTrace()));
                     datadog.impressionFailure(description, serverName);
                 }
             }
