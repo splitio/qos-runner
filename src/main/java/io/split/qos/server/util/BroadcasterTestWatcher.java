@@ -18,6 +18,8 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -141,12 +143,23 @@ public class BroadcasterTestWatcher extends TestWatcher {
                     datadog.sauceFailure(description, serverName);
                 }
                 if (reason.contains("Impression Not Present KeyImpressionDTO")) {
-                    String stacktrace = e.getStackTrace().toString();
+                    String stacktrace = getStackTrace(e);
                     LOG.info(String.format("Impression Not Present error: The test %s failed with reason: %s. Stacktrace: %s", description.getMethodName(), reason, stacktrace));
                     datadog.impressionFailure(description, serverName);
                 }
             }
         }
+    }
+
+    private String getStackTrace(Throwable error){
+        StringBuilder exception = new StringBuilder();
+        List<StackTraceElement> elements = Arrays.asList(error.getStackTrace());
+        elements.stream()
+                .map(stackTraceElement -> stackTraceElement.toString())
+                .forEach(line -> exception
+                        .append(line)
+                        .append(" "));
+        return exception.toString();
     }
 
     @Override
