@@ -68,8 +68,9 @@ public class DatadogBroadcasterImpl implements DatadogBroadcaster {
 
     @Override
     public void success(Description description, String serverName, Long duration, Optional<String> titleLink) {
-        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + durationToSeconds(duration), "testname:" + description.getMethodName()).toArray(new String[3]);
-        this.statsDClient.count("test.success", 1, tags);
+        // disable 'qos.test.success' custom metric
+//        String[] tags = Lists.newArrayList("servername:" + serverName, "length:" + durationToSeconds(duration), "testname:" + description.getMethodName()).toArray(new String[3]);
+//        this.statsDClient.count("test.success", 1, tags);
         reportServerState();
     }
 
