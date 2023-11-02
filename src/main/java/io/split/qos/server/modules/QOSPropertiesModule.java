@@ -51,6 +51,8 @@ public class QOSPropertiesModule extends AbstractModule {
     public static final String LIVE_TAIL_URL = "LIVE_TAIL_URL";
     public static final String CALL_HOME_URL = "CALL_HOME_URL";
     public static final String CALL_HOME_AUTH = "CALL_HOME_AUTH";
+    public static final String GET_TREATMENTS_BY_FLAG_SET = "GET_TREATMENTS_BY_FLAG_SET";
+    public static final String GET_TREATMENTS_BY_FLAG_SETS = "GET_TREATMENTS_BY_FLAG_SETS";
     
     // ------------------
     // SERVER PROPERTIES
@@ -144,6 +146,8 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(LIVE_TAIL_URL, "");
         defaultProperties.put(CALL_HOME_URL, "");
         defaultProperties.put(CALL_HOME_AUTH, "");
+        defaultProperties.put(GET_TREATMENTS_BY_FLAG_SET, "gettreatmentsbyflagset");
+        defaultProperties.put(GET_TREATMENTS_BY_FLAG_SETS, "gettreatmentsbyflagsets");
         
         // Server
         defaultProperties.put(PARALLEL_TESTS, "10");
