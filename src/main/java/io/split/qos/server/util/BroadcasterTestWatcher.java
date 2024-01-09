@@ -108,7 +108,6 @@ public class BroadcasterTestWatcher extends TestWatcher {
             String reason = e.getMessage();
             Boolean testAborted = false;
             if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
-                state.testAborted(description);
                 testAborted = true;
             }
 
@@ -116,12 +115,16 @@ public class BroadcasterTestWatcher extends TestWatcher {
             Broadcast broadcast = failCondition.failed(testId);
             SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
             if (resultBroadcaster.isEnabled()) {
-                if (Broadcast.FIRST.equals(broadcast) || testAborted) {
+                if (Broadcast.FIRST.equals(broadcast) && !testAborted) {
                     state.testFailed(description);
                     resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 }
-                if (Broadcast.REBROADCAST.equals(broadcast)) {
+                if (Broadcast.REBROADCAST.equals(broadcast) && !testAborted) {
                     resultBroadcaster.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
+                }
+                if (testAborted) {
+                    state.testAborted(description);
+                    resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 }
             }
 
@@ -140,7 +143,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
             // Datadog
             DatadogBroadcaster datadog = QOSServerApplication.injector.getInstance(DatadogBroadcaster.class);
             if (resultBroadcaster.isEnabled()) {
-                if (Broadcast.FIRST.equals(broadcast) || testAborted) {
+                if (Broadcast.FIRST.equals(broadcast)) {
                     datadog.firstFailure(description, e, serverName, length, titleLink);
                 }
                 if (Broadcast.REBROADCAST.equals(broadcast)) {
