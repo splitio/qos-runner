@@ -1,4 +1,7 @@
 VERSION COMMENT
 
+v22.9.12 - Add testAborted() method for tests that fail due to Sauce Labs VMs unavailability
+v22.9.11 - Add GET_TREATMENTS_BY_FLAG_SET and GET_TREATMENTS_BY_FLAG_SETS properties
+
 v22.9.2 - LIVE_TAIL_URL, CALL_HOME_URL & CALL_HOME_AUTH added to QOSPropertiesModule
 v22.9.1 - Common Properties added to QOSPropertiesModule and ShadowJAR implemented

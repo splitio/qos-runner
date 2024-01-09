@@ -102,16 +102,29 @@ public class BroadcasterTestWatcher extends TestWatcher {
                 length = System.currentTimeMillis() - started.get(testId);
             }
 
+            // Tests that run on Sauce Labs have limited amount of VMs to run
+            // Test could fail due to a promised VM that is already in use when get the session
+            // Those tests will be treated as aborted, and will be back to the running queue
+            String reason = e.getMessage();
+            Boolean testAborted = false;
+            if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
+                testAborted = true;
+            }
+
             // Slack
             Broadcast broadcast = failCondition.failed(testId);
             SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
             if (resultBroadcaster.isEnabled()) {
-                if (Broadcast.FIRST.equals(broadcast)) {
+                if (Broadcast.FIRST.equals(broadcast) && !testAborted) {
                     state.testFailed(description);
                     resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 }
-                if (Broadcast.REBROADCAST.equals(broadcast)) {
+                if (Broadcast.REBROADCAST.equals(broadcast) && !testAborted) {
                     resultBroadcaster.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
+                }
+                if (testAborted) {
+                    state.testAborted(description);
+                    resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 }
             }
 
@@ -137,7 +150,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
                     datadog.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
                 }
                 // Send to Datadog every time it fails due to Sauce Labs
-                String reason = e.getMessage();
+                reason = e.getMessage();
                 if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
                     LOG.info(String.format("Sauce error: The test %s failed with reason: %s", description.getMethodName(), reason));
                     datadog.sauceFailure(description, serverName);
