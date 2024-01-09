@@ -105,7 +105,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
      *     <li> Do all the initialization</li>
      *     <li> Find all the classes that are annotated with the suite, then find all the tests of those classes</li>
      *     <li> Add each test to an executor. The tests will be spread if spreadTests is enabled</li>
-     *     <li> When each tests finished, it will be readded to the executor, with some delay specificed in delayBetweenInSeconds</li>
+     *     <li> When each tests finished, it will be read to the executor, with some delay specified in delayBetweenInSeconds</li>
      * </ul>
      */
     @Override
@@ -113,7 +113,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
         LOG.info(String.format("STARTING QOS Server for suites %s, running %s tests in parallel", suites, parallelTests));
 
         List<Method> sheduled = scheduleTests();
-        String message = String.format("[%s] QOS Server '%s' is up", serverName,serverName);
+        String message = String.format("*[%s] QOS Server is up*", serverName);
         if (sheduled.size() == 0) {
             LOG.error("Could not find tests to run on " + suites + " package " + suitesPackage);
             message = String.format("No tests found for %s, suites %s, package %s", serverName, suites, suitesPackage);
