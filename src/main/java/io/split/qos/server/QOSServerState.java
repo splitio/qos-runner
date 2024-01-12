@@ -114,9 +114,13 @@ public class QOSServerState {
         this.lastGreen = null;
     }
 
-    // Get the test back to the running queue when aborted
     public void testAborted(Description description) {
-        registerTest(description);
+        testAborted(TestId.fromDescription(description));
+    }
+
+    // Get the test back to the running queue when aborted
+    public void testAborted(TestId testId) {
+        this.tests.put(testId, TestStatus.empty());
     }
 
     public enum Status {
