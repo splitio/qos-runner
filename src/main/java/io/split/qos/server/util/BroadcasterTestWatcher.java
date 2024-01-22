@@ -102,29 +102,34 @@ public class BroadcasterTestWatcher extends TestWatcher {
                 length = System.currentTimeMillis() - started.get(testId);
             }
 
+            SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
+            DatadogBroadcaster datadog = QOSServerApplication.injector.getInstance(DatadogBroadcaster.class);
+            String reason = e.getMessage();
+
             // Tests that run on Sauce Labs have limited amount of VMs to run
             // Test could fail due to a promised VM that is already in use when get the session
             // Those tests will be treated as aborted, and will be back to the running queue
-            String reason = e.getMessage();
-            Boolean testAborted = false;
             if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
-                testAborted = true;
+                state.testAborted(description);
+                LOG.info(String.format("Sauce error: The test %s failed with reason: %s", description.getMethodName(), reason));
+                // send message to slack
+                resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
+                // report to Datadog
+                datadog.firstFailure(description, e, serverName, length, titleLink);
+                datadog.sauceFailure(description, serverName);
+                return;
             }
 
             // Slack
             Broadcast broadcast = failCondition.failed(testId);
-            SlackTestResultBroadcaster resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
+            resultBroadcaster = QOSServerApplication.injector.getInstance(SlackTestResultBroadcaster.class);
             if (resultBroadcaster.isEnabled()) {
-                if (Broadcast.FIRST.equals(broadcast) && !testAborted) {
+                if (Broadcast.FIRST.equals(broadcast)) {
                     state.testFailed(description);
                     resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 }
-                if (Broadcast.REBROADCAST.equals(broadcast) && !testAborted) {
+                if (Broadcast.REBROADCAST.equals(broadcast)) {
                     resultBroadcaster.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
-                }
-                if (testAborted) {
-                    state.testAborted(description);
-                    resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 }
             }
 
@@ -141,19 +146,12 @@ public class BroadcasterTestWatcher extends TestWatcher {
             }
 
             // Datadog
-            DatadogBroadcaster datadog = QOSServerApplication.injector.getInstance(DatadogBroadcaster.class);
             if (resultBroadcaster.isEnabled()) {
                 if (Broadcast.FIRST.equals(broadcast)) {
                     datadog.firstFailure(description, e, serverName, length, titleLink);
                 }
                 if (Broadcast.REBROADCAST.equals(broadcast)) {
                     datadog.reBroadcastFailure(description, e, serverName, failCondition.firstFailure(testId), length, titleLink);
-                }
-                // Send to Datadog every time it fails due to Sauce Labs
-                reason = e.getMessage();
-                if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
-                    LOG.info(String.format("Sauce error: The test %s failed with reason: %s", description.getMethodName(), reason));
-                    datadog.sauceFailure(description, serverName);
                 }
                 if (reason.contains("Impression Not Present KeyImpressionDTO")) {
                     String stacktrace = getStackTrace(e);
