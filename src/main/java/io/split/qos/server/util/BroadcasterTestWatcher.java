@@ -58,13 +58,15 @@ public class BroadcasterTestWatcher extends TestWatcher {
             Long length = null;
             state.testSucceeded(description);
             TestId testId = TestId.fromDescription(description);
+            // Get the time when first failed to compare with the recovery, before is removed from the list
+            Long whenFirstFailure = failCondition.firstFailure(testId);
             if (started.get(testId) != null) {
                 length = System.currentTimeMillis() - started.get(testId);
             }
             Broadcast broadcast = failCondition.success(testId);
             if (slackBroadcaster.isEnabled()) {
                 if (Broadcast.RECOVERY.equals(broadcast)) {
-                    slackBroadcaster.recovery(description, serverName, length, titleLink);
+                    slackBroadcaster.recovery(description, serverName, length, titleLink, whenFirstFailure);
                 }
                 slackBroadcaster.success(description, serverName, length, titleLink);
             }

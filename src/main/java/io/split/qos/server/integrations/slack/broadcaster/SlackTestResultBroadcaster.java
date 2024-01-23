@@ -29,8 +29,9 @@ public interface SlackTestResultBroadcaster extends Integration {
      * Broadcasts that a test that was failing now succeeded.
      *
      * @param description the test description.
+     * @param whenFirstFailure
      */
-    void recovery(Description description, String serverName, Long duration, Optional<String> titleLink);
+    void recovery(Description description, String serverName, Long duration, Optional<String> titleLink, Long whenFirstFailure);
 
     /**
      * Broadcasts that a test has succeeded.

@@ -39,8 +39,8 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
     }
 
     @Override
-    public void recovery(Description description, String serverName, Long duration, Optional<String> titleLink) {
-        broadcastRecovery(description, serverName, duration, titleLink);
+    public void recovery(Description description, String serverName, Long duration, Optional<String> titleLink, Long whenFirstFailure) {
+        broadcastRecovery(description, serverName, duration, titleLink, whenFirstFailure);
     }
 
     @Override
@@ -78,7 +78,8 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
                                     Long duration,
                                     Optional<String> titleLink) {
 
-        SlackBolt.sendMessage(asBlocks(
+        SlackBolt.sendMessage(
+            asBlocks(
                 // Header
                 header( header -> header.text(
                         getHeader(serverName, " :x: KEEPS FAILING SINCE", dateFormatter.formatDate(whenFirstFailure)))
@@ -101,16 +102,20 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
     private void broadcastRecovery(Description description,
                                    String serverName,
                                    Long duration,
-                                   Optional<String> titleLink) {
+                                   Optional<String> titleLink,
+                                   Long whenFirstFailure) {
         SlackBolt.sendMessage(
-                asBlocks(
-                        // Header
-                        section(section -> section.text(getHeader(serverName,":white_check_mark: RECOVERED", " "))
-                        ),
-                        // Test name and duration
-                        section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration)))
-                        ))
-                ,slackSessionProvider.digestChannel()
+            asBlocks(
+                    // Header
+                    section(section -> section.text(getHeader(serverName,":white_check_mark: RECOVERED", " "))
+                    ),
+                    // Test name and duration
+                    section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration)))
+                    ),
+                    // First time if failed before recovery
+                    section(section -> section.text(markdownText(mt -> mt.text("*first failure time:* "+ whenFirstFailure)))
+                    ))
+            ,slackSessionProvider.digestChannel()
         );
     }
 
@@ -121,7 +126,7 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
         SlackBolt.sendMessage(
             asBlocks(
                 // Header
-                section(section -> section.text(getHeader(serverName,":white_check_mark: SUCCEEDED", " "))
+                section(header -> header.text(getHeader(serverName,":white_check_mark: SUCCEEDED", " "))
                 ),
                 // Test name and duration
                 section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration))))
@@ -136,9 +141,10 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
                                   String serverName,
                                   Long duration,
                                   Optional<String> titleLink) {
-        SlackBolt.sendMessage(asBlocks(
+        SlackBolt.sendMessage(
+            asBlocks(
                 // Header
-                header( header -> header.text(
+                header(header -> header.text(
                         getHeader(serverName, ":x: FAILED", " "))
                 ),
                 // Test name and description
