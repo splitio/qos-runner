@@ -1,5 +1,6 @@
 VERSION COMMENT
 
+v22.9.16 - Fix time zone and first failure date for Slack recovery message
 v22.9.15 - Add First failure time to Slack recovery message
 v22.9.12 - Add testAborted() method for tests that fail due to Sauce Labs VMs unavailability
 v22.9.11 - Add GET_TREATMENTS_BY_FLAG_SET and GET_TREATMENTS_BY_FLAG_SETS properties
