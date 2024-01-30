@@ -113,7 +113,7 @@ public class SlackTestResultBroacasterImpl implements SlackTestResultBroadcaster
                     section(section -> section.text(getTestName(description, dateFormatter.formatHour(duration)))
                     ),
                     // First time if failed before recovery
-                    section(section -> section.text(markdownText(mt -> mt.text("*first failure time:* "+ whenFirstFailure)))
+                    section(section -> section.text(markdownText(mt -> mt.text("*First failure time:* "+ dateFormatter.formatDate(whenFirstFailure))))
                     ))
             ,slackSessionProvider.digestChannel()
         );
