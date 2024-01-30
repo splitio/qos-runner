@@ -111,7 +111,7 @@ public class BroadcasterTestWatcher extends TestWatcher {
             // Tests that run on Sauce Labs have limited amount of VMs to run
             // Test could fail due to a promised VM that is already in use when get the session
             // Those tests will be treated as aborted, and will be back to the running queue
-            if (reason.contains("Could not start a new session.") || reason.contains("It is impossible to create a new session")) {
+            if (reason.contains("Could not start a new session.") || reason.contains("Could not create a new session.")) {
                 state.testAborted(description);
                 LOG.info(String.format("Sauce error: The test %s failed with reason: %s", description.getMethodName(), reason));
                 // send message to slack
