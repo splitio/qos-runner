@@ -159,7 +159,7 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(DESCRIPTION, "-");
         defaultProperties.put(SUITES, "SMOKE");
         defaultProperties.put(SUITES_PACKAGE, "io.split");
-        defaultProperties.put(TIME_ZONE, "America/Los_Angeles");
+        defaultProperties.put(TIME_ZONE, "UTC");
 
         // Test
         defaultProperties.put(RE_BROADCAST_FAILURE_IN_MINUTES, "60");
