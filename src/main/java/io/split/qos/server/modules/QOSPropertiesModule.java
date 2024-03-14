@@ -145,7 +145,7 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(CONFIG_URL, "config");
         defaultProperties.put(DELAY_BETWEEN_IN_SECONDS, "90");
         defaultProperties.put(DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL, "500");
-        defaultProperties.put(DESCRIPTION, "");
+        defaultProperties.put(DESCRIPTION, "-");
         defaultProperties.put(ENVIRONMENT_NAME, "");
         defaultProperties.put(EXPECT_IMPRESSIONS, "false");
         defaultProperties.put(EXPECT_LISTENER_IMPRESSIONS, "false");
@@ -167,7 +167,6 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(SPLITS_URL, "manager/splits");
         defaultProperties.put(SUITES, "SMOKE");
         defaultProperties.put(SUITES_PACKAGE, "io.split");
-        defaultProperties.put(TIME_ZONE, "America/Los_Angeles");
         defaultProperties.put(TRAFFIC_NAME, "");
         defaultProperties.put(TREATMENT_CONFIG_URL, "gettreatmentwithconfig");
         defaultProperties.put(TREATMENT_URL, "automation");
