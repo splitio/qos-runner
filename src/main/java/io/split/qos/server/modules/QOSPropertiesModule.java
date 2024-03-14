@@ -169,7 +169,7 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(SUITES_PACKAGE, "io.split");
         defaultProperties.put(TIME_ZONE, "America/Los_Angeles");
         defaultProperties.put(TRAFFIC_NAME, "");
-        defaultProperties.put(TREATMENT_CONFIG_URL, "gettreatmentswithconfig");
+        defaultProperties.put(TREATMENT_CONFIG_URL, "gettreatmentwithconfig");
         defaultProperties.put(TREATMENT_URL, "automation");
         defaultProperties.put(URL, "");
         defaultProperties.put(USER_EMAIL, "");
