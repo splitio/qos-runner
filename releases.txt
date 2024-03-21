@@ -1,5 +1,6 @@
 VERSION COMMENT
 
+v22.9.19 - Add SAUCE_USER property to QOSPropertiesModule
 v22.9.18 - Add VM_MANAGER_URL to QOSPropertiesModule
 v22.9.17 - Fix error report when a test fails to connect to Sauce Labs
 v22.9.16 - Fix time zone and first failure date for Slack recovery message
