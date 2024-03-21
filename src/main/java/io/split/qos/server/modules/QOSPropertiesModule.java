@@ -37,6 +37,7 @@ public class QOSPropertiesModule extends AbstractModule {
     public static final String IMPRESSIONS_URL = "IMPRESSIONS_URL";
     public static final String LIVE_TAIL_URL = "LIVE_TAIL_URL";
     public static final String ORG_ID = "ORG_ID";
+    public static final String SAUCE_USER = "SAUCE_USER";
     public static final String SDK = "SDK";
     public static final String SDK_API_URL = "SDK_API_URL";
     public static final String SPLITNAMES_URL = "SPLITNAMES_URL";
@@ -158,6 +159,7 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(ONE_RUN, "false");
         defaultProperties.put(ORG_ID, "");
         defaultProperties.put(PARALLEL_TESTS, "10");
+        defaultProperties.put(SAUCE_USER, "");
         defaultProperties.put(SDK, "JAVA");
         defaultProperties.put(SDK_API_URL, "");
         defaultProperties.put(SHUTDOWN_WAIT_IN_MINUTES, "10");
