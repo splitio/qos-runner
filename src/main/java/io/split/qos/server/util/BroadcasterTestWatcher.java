@@ -37,6 +37,10 @@ public class BroadcasterTestWatcher extends TestWatcher {
     //Hack to set the title link at runtime
     private Optional<String> titleLink;
 
+    public static String noStartNewSession = "Could not start a new session.";
+    public static String noCreateNewSession = "Could not create a new session.";
+    public static String noVMManager = "Error requesting VM from VM-MANAGER";
+
     @Inject
     public BroadcasterTestWatcher(
             FailCondition failCondition,
@@ -111,14 +115,16 @@ public class BroadcasterTestWatcher extends TestWatcher {
             // Tests that run on Sauce Labs have limited amount of VMs to run
             // Test could fail due to a promised VM that is already in use when get the session
             // Those tests will be treated as aborted, and will be back to the running queue
-            if (reason.contains("Could not start a new session.") || reason.contains("Could not create a new session.")) {
+            if (reason.contains(noStartNewSession) || reason.contains(noCreateNewSession) || reason.contains(noVMManager)) {
                 state.testAborted(description);
                 LOG.info(String.format("Sauce error: The test %s failed with reason: %s", description.getMethodName(), reason));
                 // send message to slack
                 resultBroadcaster.firstFailure(description, e, serverName, length, titleLink);
                 // report to Datadog
                 datadog.firstFailure(description, e, serverName, length, titleLink);
-                datadog.sauceFailure(description, serverName);
+                if (!reason.contains(noVMManager)){
+                    datadog.sauceFailure(description, serverName);
+                }
                 return;
             }
 
