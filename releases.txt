@@ -1,5 +1,6 @@
 VERSION COMMENT
 
+v22.9.20 - Tests that fail due to VM Manager will go back to the queue, instead of be marked as failed
 v22.9.19 - Add SAUCE_USER property to QOSPropertiesModule
 v22.9.18 - Add VM_MANAGER_URL to QOSPropertiesModule
 v22.9.17 - Fix error report when a test fails to connect to Sauce Labs
