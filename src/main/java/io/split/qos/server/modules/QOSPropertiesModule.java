@@ -144,9 +144,6 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(CHECK_MACHINE_NAME_IMPRESSIONS, "false");
         defaultProperties.put(CHECK_SDK_IMPRESSIONS, "false");
         defaultProperties.put(CONFIG_URL, "config");
-        defaultProperties.put(DELAY_BETWEEN_IN_SECONDS, "90");
-        defaultProperties.put(DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL, "500");
-        defaultProperties.put(DESCRIPTION, "-");
         defaultProperties.put(ENVIRONMENT_NAME, "");
         defaultProperties.put(EXPECT_IMPRESSIONS, "false");
         defaultProperties.put(EXPECT_LISTENER_IMPRESSIONS, "false");
@@ -156,19 +153,13 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(GET_TREATMENTS_URL, "gettreatments");
         defaultProperties.put(IMPRESSIONS_URL, "impressions");
         defaultProperties.put(LIVE_TAIL_URL, "");
-        defaultProperties.put(ONE_RUN, "false");
         defaultProperties.put(ORG_ID, "");
-        defaultProperties.put(PARALLEL_TESTS, "10");
         defaultProperties.put(SAUCE_USER, "");
         defaultProperties.put(SDK, "JAVA");
         defaultProperties.put(SDK_API_URL, "");
-        defaultProperties.put(SHUTDOWN_WAIT_IN_MINUTES, "10");
-        defaultProperties.put(SPREAD_TESTS, "true");
         defaultProperties.put(SPLITNAMES_URL, "manager/splitnames");
         defaultProperties.put(SPLIT_URL, "manager/split");
         defaultProperties.put(SPLITS_URL, "manager/splits");
-        defaultProperties.put(SUITES, "SMOKE");
-        defaultProperties.put(SUITES_PACKAGE, "io.split");
         defaultProperties.put(TRAFFIC_NAME, "");
         defaultProperties.put(TREATMENT_CONFIG_URL, "gettreatmentwithconfig");
         defaultProperties.put(TREATMENT_URL, "automation");
@@ -183,16 +174,16 @@ public class QOSPropertiesModule extends AbstractModule {
         defaultProperties.put(WEB_API_URL, "");
 
         // Server
-        defaultProperties.put("PARALLEL_TESTS", "10");
-        defaultProperties.put("SHUTDOWN_WAIT_IN_MINUTES", "10");
-        defaultProperties.put("DELAY_BETWEEN_IN_SECONDS", "300");
-        defaultProperties.put("DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL", "60");
-        defaultProperties.put("SPREAD_TESTS", "true");
-        defaultProperties.put("ONE_RUN", "false");
-        defaultProperties.put("DESCRIPTION", "-");
-        defaultProperties.put("SUITES", "SMOKE");
-        defaultProperties.put("SUITES_PACKAGE", "io.split");
-        defaultProperties.put("TIME_ZONE", "UTC");
+        defaultProperties.put(DELAY_BETWEEN_IN_SECONDS, "300");
+        defaultProperties.put(DELAY_BETWEEN_IN_SECONDS_WHEN_FAIL, "60");
+        defaultProperties.put(DESCRIPTION, "-");
+        defaultProperties.put(ONE_RUN, "false");
+        defaultProperties.put(PARALLEL_TESTS, "10");
+        defaultProperties.put(SHUTDOWN_WAIT_IN_MINUTES, "10");
+        defaultProperties.put(SPREAD_TESTS, "true");
+        defaultProperties.put(SUITES, "SMOKE");
+        defaultProperties.put(SUITES_PACKAGE, "io.split");
+        defaultProperties.put(TIME_ZONE, "UTC");
 
         // Test
         defaultProperties.put(RE_BROADCAST_FAILURE_IN_MINUTES, "60");
