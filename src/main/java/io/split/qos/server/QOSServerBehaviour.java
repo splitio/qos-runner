@@ -129,6 +129,9 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
         List<Method> methodsToTest = testFinder.getTestMethodsOfPackage(suites, suitesPackage);
         int total = methodsToTest.size();
         int schedule = 0;
+        if (parallelTests > 1){
+            schedule = 1;
+        }
         if (total == 0) {
             return Lists.newArrayList();
         }
@@ -153,7 +156,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
                     executor);
             schedule += step;
         }
-        return  methodsToTest;
+        return methodsToTest;
     }
 
     public void pause(String who) {
@@ -169,7 +172,7 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     private FutureCallback<TestResult> createCallback(Method method, int when, int ifFailed, int afterFirst) {
         return new FutureCallback<TestResult>() {
             /**
-             * This is where tests are readded to the executor.
+             * This is where tests are read to the executor.
              */
             @Override
             public void onSuccess(TestResult result) {
