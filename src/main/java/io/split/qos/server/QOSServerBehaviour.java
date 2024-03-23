@@ -128,9 +128,9 @@ public class QOSServerBehaviour implements Callable<Void>, AutoCloseable {
     public List<Method> scheduleTests() throws Exception {
         List<Method> methodsToTest = testFinder.getTestMethodsOfPackage(suites, suitesPackage);
         int total = methodsToTest.size();
-        int schedule = 0;
+        int schedule = 1;
         if (parallelTests > 1){
-            schedule = 1;
+            schedule = 2;
         }
         if (total == 0) {
             return Lists.newArrayList();
